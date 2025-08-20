@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Easing, Text } from "react-native";
 import { Audio } from "expo-av";
+import { useThemeContext } from "../theme/ThemeProvider";
 
 export default function SplashScreen({ navigation }) {
+  const { theme } = useThemeContext();
+
   // Anim values
   const logoY = useRef(new Animated.Value(20)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -106,10 +109,9 @@ export default function SplashScreen({ navigation }) {
       animateLogo();
     }, 1000);
 
-    // Navigate when animation finishes
     const navT = setTimeout(() => {
-      navigation.replace("Home"); // replaces stack so back button doesn’t return to Splash
-    }, 4000); // adjust delay = animation length + extra
+      navigation.replace("Main");
+    }, 5000);
 
     return () => {
       clearTimeout(t);
@@ -118,7 +120,7 @@ export default function SplashScreen({ navigation }) {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.appBg }]}>
       <Animated.Image
         source={require("../assets/logo.png")}
         style={[
@@ -142,7 +144,6 @@ export default function SplashScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF9F2",
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: 60,

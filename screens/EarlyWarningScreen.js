@@ -1,5 +1,5 @@
 // screens/EarlyWarningScreen.js
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { WARNINGS } from "../data/homeData";
 import WarningCard from "../components/WarningCard";
+import { useThemeContext } from "../theme/ThemeProvider";
 
 const SCREEN_PADDING = 16;
 const GAP = 12;
@@ -22,6 +23,9 @@ const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 const MAX_DOTS = 5; // cap the number of visible dots
 
 export default function EarlyWarningScreen({ navigation }) {
+  const { theme } = useThemeContext();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
   // ---- Carousel state ----
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef(null);
@@ -45,7 +49,12 @@ export default function EarlyWarningScreen({ navigation }) {
 
   // Compute a sliding "window" of dots so we never render too many
   const getDotWindow = (total, current, max = MAX_DOTS) => {
-    if (total <= max) return { indices: Array.from({ length: total }, (_, i) => i), hasLeft: false, hasRight: false };
+    if (total <= max)
+      return {
+        indices: Array.from({ length: total }, (_, i) => i),
+        hasLeft: false,
+        hasRight: false,
+      };
     const half = Math.floor(max / 2);
     let start = current - half;
     let end = current + (max - half - 1);
@@ -64,11 +73,11 @@ export default function EarlyWarningScreen({ navigation }) {
     return { indices, hasLeft: start > 0, hasRight: end < total - 1 };
   };
 
-  const { indices: dotIndices, hasLeft, hasRight } = getDotWindow(
-    WARNINGS.length,
-    currentIndex,
-    MAX_DOTS
-  );
+  const {
+    indices: dotIndices,
+    hasLeft,
+    hasRight,
+  } = getDotWindow(WARNINGS.length, currentIndex, MAX_DOTS);
 
   // ---- List header (title + paragraph) becomes part of FlatList ----
   const ListHeader = (
@@ -140,7 +149,6 @@ export default function EarlyWarningScreen({ navigation }) {
         }}
         contentContainerStyle={{
           paddingHorizontal: SCREEN_PADDING,
-          paddingBottom: 18,
         }}
         renderItem={({ item }) => (
           <WarningCard
@@ -155,45 +163,59 @@ export default function EarlyWarningScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#F6F6F6" },
+const makeStyles = (theme) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: theme.colors.appBg },
 
-  // Carousel
-  hero: {
-    height: 180,
-    backgroundColor: "#e7eef8",
-  },
-  heroImg: { width: SCREEN_WIDTH, height: "100%", resizeMode: "cover" },
+    // Carousel
+    hero: {
+      height: 180,
+      backgroundColor: theme.key === "dark" ? "#1F2937" : "#e7eef8",
+    },
+    heroImg: { width: SCREEN_WIDTH, height: "100%", resizeMode: "cover" },
 
-  backBtn: {
-    position: "absolute",
-    left: 12,
-    top: 12,
-    height: 36,
-    width: 36,
-    borderRadius: 8,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backBtn: {
+      position: "absolute",
+      left: 12,
+      top: 12,
+      height: 36,
+      width: 36,
+      borderRadius: 8,
+      backgroundColor:
+        theme.key === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.35)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  dots: {
-    position: "absolute",
-    bottom: 10,
-    alignSelf: "center",
-    flexDirection: "row",
-    gap: 6,
-    backgroundColor: "rgba(0,0,0,0.15)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#D7E1F2" },
-  dotActive: { backgroundColor: "#ffffff" },
-  dotFaded: { opacity: 0.45 },
+    dots: {
+      position: "absolute",
+      bottom: 10,
+      alignSelf: "center",
+      flexDirection: "row",
+      gap: 6,
+      backgroundColor:
+        theme.key === "dark" ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.15)",
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 12,
+    },
+    // Use white-ish dots so they work on both themes
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: "rgba(255,255,255,0.7)",
+    },
+    dotActive: { backgroundColor: "#ffffff" },
+    dotFaded: { opacity: 0.45 },
 
-  // Header (now part of the FlatList via ListHeaderComponent)
-  headerCopy: { paddingTop: 14, paddingBottom: 6 },
-  h1: { fontSize: 22, fontWeight: "800", color: "#111", marginBottom: 6 },
-  p: { color: "#5F6D7E", lineHeight: 20, marginBottom: 8 },
-});
+    // Header (now part of the FlatList via ListHeaderComponent)
+    headerCopy: { paddingTop: 14, paddingBottom: 6 },
+    h1: {
+      fontSize: 22,
+      fontWeight: "800",
+      color: theme.colors.text,
+      marginBottom: 6,
+    },
+    p: { color: theme.colors.subtext, lineHeight: 20, marginBottom: 8 },
+  });

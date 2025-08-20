@@ -1,42 +1,47 @@
+// App.js
+import "react-native-gesture-handler";
 import * as React from "react";
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-// screens
 import SplashScreen from "./screens/SplashScreen";
-import HomeScreen from "./screens/HomeScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
 import ResourceHubScreen from "./screens/ResourceHubScreen";
+import AppNavigator from "./navigation/AppNavigator";
+import PreparednessGuideScreen  from "./screens/PreparednessGuideScreen";
+
+import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  const navTheme = {
-    ...DefaultTheme,
-    colors: { ...DefaultTheme.colors, background: "#F8F4EF" },
-  };
+function RootNav() {
+  const { theme } = useThemeContext();
 
   return (
-    <SafeAreaProvider>
-      {/* Apply Safe Area app-wide. Omit 'bottom' if you use a custom tab bar */}
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F4EF" }} edges={["top", "left", "right"]}>
-        <StatusBar style="light" backgroundColor="#110033" />
-        <NavigationContainer theme={navTheme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: "#F8F4EF" },
-            }}
-          >
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
-            <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    // Only top/left/right so bottom tab can remain fully flush to the bottom
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.appBg }} edges={["top", "left", "right"]}>
+      <StatusBar style={theme.statusBarStyle} />
+      <NavigationContainer theme={theme.navTheme}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="Main" component={AppNavigator} />
+          <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
+          <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
+          <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <RootNav />
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }
