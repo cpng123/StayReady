@@ -254,7 +254,7 @@ export default function HomeScreen() {
         </View>
 
         <FlatList
-          data={getHomePreparedness(4)}
+          data={HOME_PREPAREDNESS}
           keyExtractor={(i) => i.id}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -262,7 +262,13 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 15 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
-            <ImageOverlayCard title={item.title} source={item.img} />
+            <ImageOverlayCard
+              title={item.title}
+              source={item.img}
+              onPress={() =>
+                navigation.navigate("PreparednessGuide", { id: item.id })
+              }
+            />
           )}
         />
 

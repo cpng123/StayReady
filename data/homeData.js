@@ -92,17 +92,20 @@ export const getHomeWarnings = (n = 4) => WARNINGS.slice(0, n);
 
 // --- Disaster Preparedness topics (full list of 10) ---
 export const PREPAREDNESS = [
-  { id: "prep-flood",        title: "Flash Flood",      img: require("../assets/General/flash-flood.jpg") },
-  { id: "prep-haze",         title: "Haze (PM2.5)",     img: require("../assets/General/pm-haze.jpg") },
-  { id: "prep-thunder",      title: "Thunderstorm",     img: require("../assets/General/thunder-storm.jpg") },
-  { id: "prep-dengue",       title: "Dengue Prevention",img: require("../assets/General/dengue-cluster.jpg") },
-  { id: "prep-wind",         title: "Strong Wind",      img: require("../assets/General/strong-wind.jpg") },
-  { id: "prep-firstaid",     title: "CPR & First Aid",  img: require("../assets/General/first-aid.jpg") },
-  { id: "prep-fire",         title: "Fire Safety",      img: require("../assets/General/fire-safety.jpg") },
-  { id: "prep-kits",         title: "Emergency Kits",   img: require("../assets/General/emergency-kits.jpg") },
-  { id: "prep-disease",      title: "Disease Outbreak", img: require("../assets/General/disease-outbreak.jpg") },
-  { id: "prep-earthquake",   title: "Earthquake",       img: require("../assets/General/earthquake.jpg") },
+  { id: "flood",      title: "Flash Flood",      img: require("../assets/General/flash-flood.jpg") },
+  { id: "haze",       title: "Haze (PM2.5)",     img: require("../assets/General/pm-haze.jpg") },
+  { id: "storm",      title: "Thunderstorm",     img: require("../assets/General/thunder-storm.jpg") },
+  { id: "dengue",     title: "Dengue Prevention",img: require("../assets/General/dengue-cluster.jpg") },
+  { id: "wind",       title: "Strong Wind",      img: require("../assets/General/strong-wind.jpg") },
+  { id: "aid",        title: "CPR & First Aid",  img: require("../assets/General/first-aid.jpg") },
+  { id: "fire",       title: "Fire Safety",      img: require("../assets/General/fire-safety.jpg") },
+  { id: "kit",        title: "Emergency Kits",   img: require("../assets/General/emergency-kits.jpg") },
+  { id: "disease",    title: "Disease Outbreak", img: require("../assets/General/disease-outbreak.jpg") },
+  { id: "earthquake", title: "Earthquake",       img: require("../assets/General/earthquake.jpg") },
 ];
+
+export const GUIDE_IDS = ["flood","haze","dengue","storm","wind","fire","aid","kit","disease","earthquake"];
+export const isGuideId = (id) => GUIDE_IDS.includes(id);
 
 // Home only shows first N; “See More” can use full PREPAREDNESS later
 export const getHomePreparedness = (n = 4) => PREPAREDNESS.slice(0, n);
