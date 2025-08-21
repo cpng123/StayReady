@@ -292,7 +292,21 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 15 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
-            <ImageOverlayCard title={item.title} source={item.img} />
+            <ImageOverlayCard
+              title={item.title}
+              source={item.img}
+              onPress={() => {
+                if (item.id === "routine-external") {
+                  navigation.navigate("ExternalResources");
+                } else if (item.id === "routine-quiz")
+                  navigation.navigate("GamesTab");
+                else if (item.id === "routine-checklist")
+                  navigation.navigate("Checklist");
+              }}
+              testID={`routine-card-${item.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={item.title}
+            />
           )}
         />
 

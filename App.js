@@ -11,6 +11,8 @@ import EarlyWarningScreen from "./screens/EarlyWarningScreen";
 import ResourceHubScreen from "./screens/ResourceHubScreen";
 import AppNavigator from "./navigation/AppNavigator";
 import PreparednessGuideScreen  from "./screens/PreparednessGuideScreen";
+import ExternalResourceScreen from "./screens/ExternalResourceScreen";
+import ChecklistScreen from "./screens/ChecklistScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -30,6 +32,8 @@ function RootNav() {
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
           <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
+          <Stack.Screen name="ExternalResources" component={ExternalResourceScreen} />
+          <Stack.Screen name="Checklist" component={ChecklistScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

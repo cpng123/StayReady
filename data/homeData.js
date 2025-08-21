@@ -113,6 +113,6 @@ export const getHomePreparedness = (n = 4) => PREPAREDNESS.slice(0, n);
 // --- Routine Preparations (3) ---
 export const ROUTINE = [
   { id: "routine-checklist", title: "StayReady Checklist", img: require("../assets/General/checklist.jpg") },
-  { id: "routine-learning",  title: "Learning Resources",  img: require("../assets/General/learning-resource.jpg") },
+  { id: "routine-external",  title: "External Resources",  img: require("../assets/General/external-resource.jpg") },
   { id: "routine-quiz",      title: "Safety Quiz",         img: require("../assets/General/safety-quiz.jpg") },
 ];
