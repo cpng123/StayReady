@@ -1,39 +1,143 @@
-// screens/SOSScreen.js
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
+  Vibration,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
 export default function SOSScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const isDark = theme.key === "dark";
 
-  const onTap = () => Alert.alert("SOS", "Tapped SOS (wire up logic later).");
-  const onHold = () =>
-    Alert.alert("SOS (Hold)", "Held SOS (wire up help message later).");
+  const soundRef = useRef(null);
+  const [active, setActive] = useState(false);
 
-  // keep the banner above your 55px tab bar + tiny gap
+  // FLASH / CAMERA
+  const [camStatus, requestPermission] = useCameraPermissions();
+  const [torchOn, setTorchOn] = useState(false);
+  const [camReady, setCamReady] = useState(false);
+  const strobeTimerRef = useRef(null);
+  const STROBE_INTERVAL_MS = 800;
+
+  // Configure audio (bypass iOS mute switch)
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+      allowsRecordingIOS: false,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      shouldDuckAndroid: false,
+      playThroughEarpieceAndroid: false,
+      staysActiveInBackground: true,
+    }).catch(() => {});
+  }, []);
+
+  // Ask camera permission once (for flashlight)
+  useEffect(() => {
+    (async () => {
+      if (!camStatus?.granted) {
+        await requestPermission();
+      }
+    })();
+  }, [camStatus, requestPermission]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAlarm().catch(() => {});
+    };
+  }, []);
+
+  const startAlarm = async () => {
+    try {
+      // AUDIO
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+        allowsRecordingIOS: false,
+        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+        staysActiveInBackground: true,
+      });
+
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/Sound/alert.mp3"),
+        { shouldPlay: true, isLooping: true, volume: 1.0 } // app-level max; system volume still applies
+      );
+      soundRef.current = sound;
+
+      // VIBRATION
+      Vibration.vibrate([0, 1000, 500], true);
+
+      // FLASH (only if permitted)
+      if (camStatus?.granted) {
+        // wait for camera to be ready; we’ll flip torch on in onCameraReady
+        setTorchOn(true); // desired initial state; will be applied when ready
+        strobeTimerRef.current = setInterval(() => {
+          setTorchOn((v) => !v);
+        }, STROBE_INTERVAL_MS);
+      }
+
+      setActive(true);
+    } catch (e) {
+      // ignore for demo
+    }
+  };
+
+  const stopAlarm = async () => {
+    try {
+      // AUDIO
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+    } finally {
+      // VIBRATION
+      Vibration.cancel();
+      // FLASH
+      if (strobeTimerRef.current) {
+        clearInterval(strobeTimerRef.current);
+        strobeTimerRef.current = null;
+      }
+      setTorchOn(false);
+      setActive(false);
+    }
+  };
+
+  const onTap = () => {
+    if (active) stopAlarm();
+    else startAlarm();
+  };
+
+  const onHold = () => {
+    // reserved for future help-message flow
+  };
+
+  // Layout constants
   const TAB_BAR_HEIGHT = 55;
   const BANNER_GAP = 10;
   const bannerBottom = insets.bottom + TAB_BAR_HEIGHT + BANNER_GAP;
 
   const RING_COLORS = isDark
-    ? ["#FFFFFF26", "#FFFFFF1F", "#FFFFFF14"] // subtle white rings in dark
+    ? ["#FFFFFF26", "#FFFFFF1F", "#FFFFFF14"]
     : ["#FDE5E5", "#F9D2D2", "#F6BABA"];
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "transparent" : "#FFF6F5" }}>
-      {/* Dark mode background gradient */}
+    <View
+      style={{ flex: 1, backgroundColor: isDark ? "transparent" : "#FFF6F5" }}
+    >
       {isDark && (
         <LinearGradient
           colors={["#6E0F20", "#B32638"]}
@@ -49,14 +153,35 @@ export default function SOSScreen() {
           <Text style={[styles.title, { color: theme.colors.text }]}>
             SOS Emergency Alarm
           </Text>
-          <Text style={[styles.subtitle, { color: isDark ? "#d4d4d4ff" : "#5F6D7E" }]}>
-            Tap to alert,{"\n"}hold to send help messages.
+          <Text
+            style={[
+              styles.subtitle,
+              { color: isDark ? "#d4d4d4ff" : "#5F6D7E" },
+            ]}
+          >
+            Tap to {active ? "stop alarm" : "alert"},{"\n"}hold to send help
+            messages.
           </Text>
         </View>
 
-        {/* Bigger SOS button with larger concentric rings */}
+        {/* Invisible Camera (only mounted when active & permission granted) */}
+        {active && camStatus?.granted && (
+          <CameraView
+            facing="back"
+            enableTorch={camReady && torchOn}
+            // Keep it tiny/invisible but mounted so the session runs
+            style={{
+              position: "absolute",
+              width: 24, // <-- slight bump helps some devices
+              height: 24,
+              opacity: 0.001,
+            }}
+            onCameraReady={() => setCamReady(true)}
+          />
+        )}
+
+        {/* SOS Button */}
         <View style={styles.centerWrap}>
-          {/* outer soft rings */}
           <View
             style={[
               styles.ring,
@@ -76,7 +201,6 @@ export default function SOSScreen() {
             ]}
           />
 
-          {/* core tap area: red gradient in light, white pill in dark */}
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={onTap}
@@ -94,24 +218,33 @@ export default function SOSScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.core}
               >
-                <Text style={[styles.coreText, { color: "#B7404E", fontWeight: "700" }]}>
-                  SOS
+                <Text
+                  style={[
+                    styles.coreText,
+                    { color: "#B7404E", fontWeight: "700" },
+                  ]}
+                >
+                  {active ? "STOP" : "SOS"}
                 </Text>
               </LinearGradient>
             ) : (
               <LinearGradient
-                colors={["#FF6161", "#F34040"]}
+                colors={
+                  active ? ["#FF9E9E", "#FF6F6F"] : ["#FF6161", "#F34040"]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.core}
               >
-                <Text style={[styles.coreText, { color: "#fff" }]}>SOS</Text>
+                <Text style={[styles.coreText, { color: "#fff" }]}>
+                  {active ? "STOP" : "SOS"}
+                </Text>
               </LinearGradient>
             )}
           </TouchableOpacity>
         </View>
 
-        {/* Bottom banner pinned above tab bar */}
+        {/* Bottom banner */}
         <View
           style={[
             styles.banner,
@@ -123,12 +256,7 @@ export default function SOSScreen() {
             },
           ]}
         >
-          <View
-            style={[
-              styles.bannerIcon,
-              { backgroundColor: "#fff" },
-            ]}
-          >
+          <View style={[styles.bannerIcon, { backgroundColor: "#fff" }]}>
             <Ionicons
               name="alert"
               size={32}
@@ -136,7 +264,13 @@ export default function SOSScreen() {
             />
           </View>
           <Text style={[styles.bannerText, { color: "#fff" }]}>
-            Alarm will sound even if your phone is in silent mode.
+            {active
+              ? `Alarm is ON.${
+                  camStatus?.granted
+                    ? " Flashlight strobing."
+                    : " Enable camera permission to use flashlight."
+                } Raise volume for sound; vibration is active.`
+              : "Tap to sound the alarm (bypasses mute switch on iOS)."}
           </Text>
         </View>
       </SafeAreaView>
@@ -147,18 +281,9 @@ export default function SOSScreen() {
 const CORE_SIZE = 220;
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-
-  header: {
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-  },
+  safe: { flex: 1, paddingHorizontal: 20 },
+  header: { alignItems: "center" },
+  title: { fontSize: 28, fontWeight: "800" },
   subtitle: {
     marginTop: 10,
     fontSize: 18,
@@ -170,13 +295,10 @@ const styles = StyleSheet.create({
     marginTop: 32,
     alignItems: "center",
     justifyContent: "center",
-    height: 380, // room for the larger rings
+    height: 380,
   },
-  ring: {
-    position: "absolute",
-    borderRadius: 999,
-    opacity: 0.65,
-  },
+  ring: { position: "absolute", borderRadius: 999, opacity: 0.65 },
+
   coreWrap: {
     width: CORE_SIZE,
     height: CORE_SIZE,
@@ -188,18 +310,9 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 10 },
   },
-  core: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  coreText: {
-    fontSize: 80,
-    letterSpacing: 5,
-    fontWeight: "600",
-  },
+  core: { flex: 1, alignItems: "center", justifyContent: "center" },
+  coreText: { fontSize: 80, letterSpacing: 5, fontWeight: "600" },
 
-  // pinned banner
   banner: {
     position: "absolute",
     flexDirection: "row",
@@ -218,9 +331,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 5,
   },
-  bannerText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-  },
+  bannerText: { flex: 1, fontSize: 16, fontWeight: "500" },
 });
