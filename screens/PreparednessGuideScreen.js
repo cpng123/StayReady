@@ -11,6 +11,8 @@ import {
   Dimensions,
   Modal,
   Pressable,
+  Linking,
+  ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getGuideById } from "../data/preparednessGuides";
@@ -129,6 +131,86 @@ function SectionGrid({ section }) {
   );
 }
 
+// --- Big promo card -----------------------------------------
+function InteractiveLearning() {
+  return (
+    <View style={styles.bodyWrap}>
+      <Text style={styles.h2}>Interactive Learning</Text>
+
+      <TouchableOpacity activeOpacity={0.9}>
+        <ImageBackground
+          source={require("../assets/General/interactive-learning.jpg")}
+          style={styles.interactiveCard}
+          imageStyle={{ borderRadius: CARD_RADIUS }}
+        >
+          {/* a subtle left-to-right overlay so white text always reads */}
+          <View style={styles.interactiveTint} />
+
+          <View style={styles.interactiveContent}>
+            <Text style={styles.interactiveTitle}>Test your knowledge</Text>
+            <Text style={styles.interactiveSub}>
+              See how much you know about{"\n"}staying safe.
+            </Text>
+
+            <View style={styles.interactiveBtn}>
+              <Ionicons name="play" size={16} color="#0A84FF" />
+              <Text style={styles.interactiveBtnText}>Play & Learn</Text>
+            </View>
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// --- One external row ---------------------------------------
+function ExternalRow({ item }) {
+  const open = async () => {
+    try {
+      const ok = await Linking.canOpenURL(item.url);
+      if (ok) await Linking.openURL(item.url);
+    } catch {}
+  };
+
+  return (
+    <TouchableOpacity style={styles.extRow} onPress={open} activeOpacity={0.9}>
+      <View style={styles.extLogoWrap}>
+        <Image source={item.logo} style={styles.extLogo} />
+      </View>
+
+      <View style={styles.extTextWrap}>
+        <Text style={styles.extTitle} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={styles.extDesc} numberOfLines={3}>
+          {item.desc}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+// --- External section wrapper --------------------------------
+function ExternalResources({ resources = [] }) {
+  if (!resources.length) return null;
+  return (
+    <View style={styles.bodyWrap}>
+      <View style={styles.extHeaderRow}>
+        <Text style={[styles.h2, styles.extHeaderTitle]}>
+          External Resources
+        </Text>
+        <TouchableOpacity activeOpacity={0.8}>
+          <Text style={styles.seeMore}>See More</Text>
+        </TouchableOpacity>
+      </View>
+
+      {resources.map((r) => (
+        <ExternalRow key={r.id} item={r} />
+      ))}
+    </View>
+  );
+}
+
 export default function PreparednessGuideScreen({ navigation, route }) {
   const guideId = route?.params?.id;
   const guide = getGuideById(guideId) || getGuideById("flood");
@@ -144,14 +226,16 @@ export default function PreparednessGuideScreen({ navigation, route }) {
 
   // Build main FlatList sections
   const SECTIONS = useMemo(() => {
-    const base = [{ type: "reasons" }, { type: "stats" }];
+    const head = [{ type: "reasons" }, { type: "stats" }];
     const grids = sections.map((s, idx) => ({
       type: "grid",
       key: `grid-${idx}`,
       section: s,
     }));
-    return [...base, ...grids];
-  }, [sections]);
+    const tail = [{ type: "interactive" }];
+    if (guide.externalResources?.length) tail.push({ type: "external" });
+    return [...head, ...grids, ...tail];
+  }, [sections, guide.externalResources]);
 
   const ListHeader = (
     <>
@@ -220,6 +304,13 @@ export default function PreparednessGuideScreen({ navigation, route }) {
     if (item.type === "grid") {
       return <SectionGrid section={item.section} />;
     }
+    if (item.type === "interactive") {
+      return <InteractiveLearning />;
+    }
+    if (item.type === "external") {
+      return <ExternalResources resources={guide.externalResources} />;
+    }
+
     return null;
   };
 
@@ -374,4 +465,99 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
+
+  // ---- Interactive Learning
+  interactiveCard: {
+    height: 140,
+    borderRadius: CARD_RADIUS,
+    overflow: "hidden",
+    justifyContent: "center",
+  },
+  interactiveTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.12)",
+  },
+  interactiveContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  interactiveTitle: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 18,
+    marginBottom: 4,
+    textShadowColor: "rgba(0,0,0,0.35)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  interactiveSub: {
+    color: "#F3F4F6",
+    fontSize: 12,
+    lineHeight: 16,
+    marginBottom: 10,
+    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  interactiveBtn: {
+    alignSelf: "flex-start",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  interactiveBtnText: { color: "#0A84FF", fontWeight: "800" },
+
+  // ---- External resources
+  extHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // use the same vertical spacing as your h2
+    marginTop: 5,
+    marginBottom: 8,
+  },
+  extHeaderTitle: { marginBottom: 0 },
+  seeMore: { color: "#0A84FF", fontWeight: "700" },
+  extRow: {
+    flexDirection: "row",
+    height: 85,
+    borderRadius: CARD_RADIUS,
+    overflow: "hidden",
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+
+  // Left image column — no padding, fills height
+  extLogoWrap: {
+    width: 105, // adjust per your image aspect
+    height: "100%",
+    // only left corners rounded (right edge stays square)
+    borderTopLeftRadius: CARD_RADIUS,
+    borderBottomLeftRadius: CARD_RADIUS,
+    overflow: "hidden",
+  },
+  extLogo: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+
+  // Right text column — add internal padding here
+  extTextWrap: {
+    flex: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    justifyContent: "center",
+  },
+  extTitle: { fontWeight: "800", fontSize: 14, color: "#111" },
+  extDesc: { color: "#5F6D7E", fontSize: 11 },
 });
