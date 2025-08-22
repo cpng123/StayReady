@@ -14,6 +14,8 @@ import AppNavigator from "./navigation/AppNavigator";
 import PreparednessGuideScreen  from "./screens/PreparednessGuideScreen";
 import ExternalResourceScreen from "./screens/ExternalResourceScreen";
 import ChecklistScreen from "./screens/ChecklistScreen";
+import QuizSetsScreen from "./screens/QuizSetsScreen";
+import QuizPlayScreen from "./screens/QuizPlayScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -35,6 +37,8 @@ function RootNav() {
           <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
           <Stack.Screen name="ExternalResources" component={ExternalResourceScreen} />
           <Stack.Screen name="Checklist" component={ChecklistScreen} />
+          <Stack.Screen name="QuizSets" component={QuizSetsScreen} />
+          <Stack.Screen name="QuizPlay" component={QuizPlayScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

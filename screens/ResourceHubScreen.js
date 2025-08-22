@@ -42,11 +42,6 @@ export default function ResourceHubScreen({ navigation }) {
           source={require("../assets/General/resource-hub.jpg")}
           style={styles.heroImg}
         />
-        {/* If you add a back button later, the style is already themed:
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} activeOpacity={0.8}>
-          <Ionicons name="chevron-back" size={22} color="#fff" />
-        </TouchableOpacity>
-        */}
       </View>
 
       {/* Grid (2 columns) */}

@@ -29,7 +29,7 @@ export const darkTheme = {
     appBg: "#0b0b0d",
     text: "#F2F4F7",
     subtext: "#98A2B3",
-    card: "#121214",
+    card: "#19191bff",
     primary: "#0380FE",
     danger: "#FF6B6B",
     success: "#03A55A",
