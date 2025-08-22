@@ -270,7 +270,7 @@ export default function SOSScreen() {
                     ? " Flashlight strobing."
                     : " Enable camera permission to use flashlight."
                 } Raise volume for sound; vibration is active.`
-              : "Tap to sound the alarm (bypasses mute switch on iOS)."}
+              : "Tap to activate SOS alarm (sound, vibration & light)."}
           </Text>
         </View>
       </SafeAreaView>

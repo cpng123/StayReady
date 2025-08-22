@@ -1,19 +1,16 @@
+// screens/ExternalResourceScreen.js
 import React, { useMemo, useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Platform,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView, View, FlatList, StyleSheet } from "react-native";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { PREPAREDNESS_GUIDES } from "../data/preparednessGuides";
 import ExternalResourceCard from "../components/ExternalResourceCard";
 
+// Reusable UI
+import TopBar from "../components/TopBar";
+import SearchRow from "../components/SearchRow";
+import FilterChips from "../components/FilterChips";
+
+// IDs must match your guide IDs
 const FILTERS = [
   { id: "all", label: "All" },
   { id: "flood", label: "Flood" },
@@ -40,7 +37,6 @@ export default function ExternalResourceScreen({ navigation }) {
           ...r,
           key: `${guide.id}-${r.id}`,
           categoryId: guide.id,
-          categoryTitle: guide.title,
           updated: r.updated ?? "",
         });
       });
@@ -56,8 +52,7 @@ export default function ExternalResourceScreen({ navigation }) {
   const data = useMemo(() => {
     const q = query.trim().toLowerCase();
     let rows = allResources.filter((it) => {
-      const inFilter =
-        activeFilter === "all" ? true : it.categoryId === activeFilter;
+      const inFilter = activeFilter === "all" ? true : it.categoryId === activeFilter;
       if (!inFilter) return false;
       if (!q) return true;
       const hay = `${it.title ?? ""} ${it.desc ?? ""}`.toLowerCase();
@@ -78,110 +73,31 @@ export default function ExternalResourceScreen({ navigation }) {
     return rows;
   }, [allResources, activeFilter, query, sortDesc]);
 
-  const renderItem = ({ item }) => (
-    <View>
-      <ExternalResourceCard item={item} theme={theme} />
-    </View>
-  );
-
   return (
-    <SafeAreaView
-      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
-    >
-      {/* Fixed Top Bar */}
-      <View style={styles.topbar}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.85}
-          style={styles.backBtn}
-        >
-          <Ionicons name="chevron-back" size={30} color={theme.colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          External Resource
-        </Text>
-      </View>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
+      {/* Shared header block */}
+      <TopBar title="External Resource" onBack={() => navigation.goBack()} />
 
-      {/* Search + Sort */}
-      <View
-        style={[
-          styles.searchRow,
-          {
-            backgroundColor: theme.key === "dark" ? "#101316" : "#F2F4F7",
-            borderColor: theme.key === "dark" ? "#1F2937" : "#E5E7EB",
-          },
-        ]}
-      >
-        <Ionicons
-          name="search"
-          size={18}
-          color={theme.key === "dark" ? "#9CA3AF" : "#6B7280"}
-        />
-        <TextInput
-          placeholder="Search"
-          placeholderTextColor={theme.key === "dark" ? "#9CA3AF" : "#6B7280"}
-          style={[styles.searchInput, { color: theme.colors.text }]}
-          value={query}
-          onChangeText={setQuery}
-          returnKeyType="search"
-        />
-        <TouchableOpacity
-          onPress={() => setSortDesc((v) => !v)}
-          activeOpacity={0.6}
-          style={styles.sortIconBtn}
-        >
-          <Ionicons
-            name="swap-vertical"
-            size={20}
-            color={theme.key === "dark" ? "#E5E7EB" : "#374151"}
-          />
-        </TouchableOpacity>
-      </View>
+      <SearchRow
+        value={query}
+        onChangeText={setQuery}
+        onSortToggle={() => setSortDesc((v) => !v)}
+        placeholder="Search"
+        showSort
+      />
 
-      {/* Filter Chips */}
-      <View style={styles.filterRow}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={FILTERS}
-          keyExtractor={(i) => i.id}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
-          renderItem={({ item }) => {
-            const active = item.id === activeFilter;
-            return (
-              <TouchableOpacity
-                onPress={() => setActiveFilter(item.id)}
-                activeOpacity={0.85}
-                style={[
-                  styles.chip,
-                  active
-                    ? { backgroundColor: theme.colors.primary }
-                    : {
-                        backgroundColor:
-                          theme.key === "dark" ? "#1F2937" : "#EAECEF",
-                      },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: active ? "#fff" : theme.colors.text },
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+      <FilterChips
+        options={FILTERS}
+        activeId={activeFilter}
+        onChange={setActiveFilter}
+      />
 
-      {/* Resource List */}
+      {/* List */}
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         data={data}
         keyExtractor={(item) => item.key}
-        renderItem={renderItem}
+        renderItem={({ item }) => <ExternalResourceCard item={item} theme={theme} />}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -190,50 +106,4 @@ export default function ExternalResourceScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-
-  topbar: {
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-  backBtn: {
-    position: "absolute",
-    left: 8,
-    height: 36,
-    width: 36,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: { fontSize: 20, fontWeight: "800" },
-
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1.5,
-    marginHorizontal: 16,
-    marginBottom: 10,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    paddingVertical: 5,
-  },
-  sortIconBtn: {
-    marginLeft: 8,
-    padding: 4,
-  },
-
-  filterRow: { marginBottom: 12 },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginRight: 8,
-  },
-  chipText: { fontSize: 13, fontWeight: "700" },
 });
