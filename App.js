@@ -4,6 +4,7 @@ import * as React from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { navigationRef } from "./navigation/RootNavigation";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import SplashScreen from "./screens/SplashScreen";
@@ -25,7 +26,7 @@ function RootNav() {
     // Only top/left/right so bottom tab can remain fully flush to the bottom
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.appBg }} edges={["top", "left", "right"]}>
       <StatusBar style={theme.statusBarStyle} />
-      <NavigationContainer theme={theme.navTheme}>
+      <NavigationContainer ref={navigationRef} theme={theme.navTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Main" component={AppNavigator} />

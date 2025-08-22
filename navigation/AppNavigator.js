@@ -9,6 +9,7 @@ import {
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { navigate as rootNavigate } from "../navigation/RootNavigation";
 
 import HomeScreen from "../screens/HomeScreen";
 import ResourceHubScreen from "../screens/ResourceHubScreen";
@@ -166,42 +167,33 @@ function SideMenu({ navigation }) {
 
         <View style={styles.leftMargin}>
           <Row
-            icon={<Ionicons name="home" size={24} color={theme.colors.text} />}
-            label="Home"
+            icon={
+              <MaterialCommunityIcons
+                name="clipboard-check-multiple"
+                size={24}
+                color={theme.colors.text}
+              />
+            }
+            label="Checklist"
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
-              navigation.navigate("Tabs", { screen: "HomeTab" });
+              setTimeout(() => rootNavigate("Checklist"), 0);
             }}
           />
           <Row
             icon={
               <MaterialCommunityIcons
-                name="lightbulb-on"
+                name="file-link"
                 size={24}
                 color={theme.colors.text}
               />
             }
-            label="Resource Hub"
+            label="External Resources"
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
-              navigation.navigate("Tabs", { screen: "ResourceTab" });
-            }}
-          />
-          <Row
-            icon={
-              <Ionicons
-                name="game-controller"
-                size={24}
-                color={theme.colors.text}
-              />
-            }
-            label="Games"
-            textColor={theme.colors.text}
-            onPress={() => {
-              navigation.closeDrawer();
-              navigation.navigate("Tabs", { screen: "GamesTab" });
+              setTimeout(() => rootNavigate("ExternalResources"), 0);
             }}
           />
           <Row
