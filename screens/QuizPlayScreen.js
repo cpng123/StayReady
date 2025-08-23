@@ -10,11 +10,14 @@ import {
   Pressable,
   Animated,
   Easing,
+  Switch,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ConfirmModal from "../components/ConfirmModal";
 import QUIZ from "../data/quiz.json";
 
 import {
@@ -31,7 +34,7 @@ const H_PADDING = 20;
 const QUESTION_HEIGHT = 150;
 
 export default function QuizPlayScreen({ navigation, route }) {
-  const { theme } = useThemeContext();
+  const { theme, themeKey, setThemeKey } = useThemeContext(); // include theme controls
   const insets = useSafeAreaInsets();
   const s = useMemo(() => makeStyles(theme), [theme]);
 
@@ -58,10 +61,23 @@ export default function QuizPlayScreen({ navigation, route }) {
 
   // Gate to prevent time's-up from leaking across question transitions
   const readyRef = useRef(false);
+  const answersRef = useRef({}); // { [qIndex]: selectedIndex }
+  const timesUpRef = useRef({});
+
+  // Settings modal
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const soundEnabledRef = useRef(true);
+
+  // Exit confirmation
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const leavingRef = useRef(false);
 
   // Timer: numeric + smooth bar
   const [time, setTime] = useState(QUESTION_SECONDS);
   const timerRef = useRef(null);
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const quizStartRef = useRef(null);
 
   const [trackW, setTrackW] = useState(0);
   const barW = useRef(new Animated.Value(0)).current;
@@ -91,6 +107,7 @@ export default function QuizPlayScreen({ navigation, route }) {
 
   const playSfx = async (type) => {
     try {
+      if (!soundEnabledRef.current) return; // <-- respect pref
       let sound;
       if (type === "correct") sound = sfxCorrectRef.current;
       else if (type === "incorrect") sound = sfxWrongRef.current;
@@ -122,8 +139,34 @@ export default function QuizPlayScreen({ navigation, route }) {
     sfxTimesUpRef.current = null;
   };
 
+  // Load persisted prefs
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem("pref:sfxEnabled");
+        if (raw != null) {
+          const val = raw === "1";
+          setSoundEnabled(val);
+          soundEnabledRef.current = val;
+        }
+        const savedTheme = await AsyncStorage.getItem("pref:themeKey");
+        if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
+          setThemeKey(savedTheme);
+        }
+      } catch {}
+    })();
+  }, [setThemeKey]);
+
+  // Keep ref synced
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+  }, [soundEnabled]);
+
   // Preload & start background music once (on mount)
   useEffect(() => {
+    if (!quizStartRef.current) {
+      quizStartRef.current = Date.now();
+    }
     let mounted = true;
     (async () => {
       try {
@@ -140,7 +183,6 @@ export default function QuizPlayScreen({ navigation, route }) {
         ]);
 
         if (!mounted) {
-          // if unmounted before finishing, unload immediately
           bg.sound && (await bg.sound.unloadAsync());
           c.sound && (await c.sound.unloadAsync());
           w.sound && (await w.sound.unloadAsync());
@@ -153,7 +195,9 @@ export default function QuizPlayScreen({ navigation, route }) {
         sfxWrongRef.current = w.sound;
         sfxTimesUpRef.current = t.sound;
 
-        await bgRef.current.playAsync();
+        if (soundEnabledRef.current) {
+          await bgRef.current.playAsync();
+        }
       } catch {}
     })();
 
@@ -162,6 +206,22 @@ export default function QuizPlayScreen({ navigation, route }) {
       unloadAllSounds();
     };
   }, []);
+
+  // React to sound toggle at runtime
+  useEffect(() => {
+    (async () => {
+      try {
+        await AsyncStorage.setItem("pref:sfxEnabled", soundEnabled ? "1" : "0");
+      } catch {}
+      if (soundEnabled) {
+        try {
+          if (bgRef.current) await bgRef.current.playAsync();
+        } catch {}
+      } else {
+        await stopBgIfAny();
+      }
+    })();
+  }, [soundEnabled]);
   // ======================================================================
 
   useEffect(() => {
@@ -238,6 +298,10 @@ export default function QuizPlayScreen({ navigation, route }) {
   };
 
   const goNext = async () => {
+    const consumed = Math.max(0, QUESTION_SECONDS - time);
+    const totalSecNext = elapsedSec + consumed;
+    setElapsedSec(totalSecNext);
+
     setLocked(false);
     setSelected(null);
     setTimesUp(false);
@@ -246,13 +310,43 @@ export default function QuizPlayScreen({ navigation, route }) {
     if (idx + 1 < total) {
       setIdx((p) => p + 1);
     } else {
-      // stop bg immediately on leaving to results
+      leavingRef.current = true;
+      const totalSec = Math.max(
+        0,
+        Math.round((Date.now() - (quizStartRef.current || Date.now())) / 1000)
+      );
       await stopBgIfAny();
+
+      // Build review array for the result/review pages
+      const review = questions.map((q, i) => ({
+        id: q.id ?? `${setId || "set"}:${i}:${(q.text || "").slice(0, 40)}`,
+        text: q.text,
+        options: q.options,
+        answerIndex: q.answerIndex,
+        selectedIndex: Object.prototype.hasOwnProperty.call(
+          answersRef.current,
+          i
+        )
+          ? answersRef.current[i]
+          : undefined,
+        // show timesUp only if no answer was selected
+        timesUp:
+          !Object.prototype.hasOwnProperty.call(answersRef.current, i) &&
+          !!timesUpRef.current[i],
+      }));
+
       navigation.replace?.("QuizResult", {
         score,
         correct: correctCount,
         total,
         title: setTitle,
+        timeTakenSec: totalSec,
+        review,
+        meta: {
+          categoryId,
+          setId,
+          setTitle,
+        },
       });
     }
   };
@@ -265,6 +359,7 @@ export default function QuizPlayScreen({ navigation, route }) {
       setTimesUp(true);
       stopAllTimers();
       playSfx("timesup");
+      timesUpRef.current[idx] = true;
       showToast({ type: "timesup", text: "Time's up!" });
       revealTimeoutRef.current = setTimeout(goNext, REVEAL_DELAY_MS);
     }
@@ -272,6 +367,8 @@ export default function QuizPlayScreen({ navigation, route }) {
 
   const choose = (i) => {
     if (locked || timesUp) return;
+    answersRef.current[idx] = i;
+    timesUpRef.current[idx] = false;
     setSelected(i);
     setLocked(true);
     stopAllTimers();
@@ -281,7 +378,7 @@ export default function QuizPlayScreen({ navigation, route }) {
       const xp = computeXp(time, QUESTION_SECONDS);
       setScore((s0) => s0 + xp);
       setCorrectCount((c) => c + 1);
-      playSfx("correct"); 
+      playSfx("correct");
       showToast({ type: "correct", text: `+ ${xp} XP` });
     } else {
       playSfx("incorrect");
@@ -297,12 +394,32 @@ export default function QuizPlayScreen({ navigation, route }) {
   // Hint modal
   const [hintOpen, setHintOpen] = useState(false);
 
+  // Intercept back
+  useEffect(() => {
+    const sub = navigation.addListener("beforeRemove", (e) => {
+      if (leavingRef.current) return;
+      e.preventDefault();
+      setShowExitConfirm(true);
+    });
+    return sub;
+  }, [navigation]);
+
+  const handleExitConfirm = async () => {
+    setShowExitConfirm(false);
+    leavingRef.current = true;
+    stopAllTimers();
+    clearTimeout(revealTimeoutRef.current);
+    await stopBgIfAny();
+    navigation.goBack();
+  };
+  const handleExitCancel = () => setShowExitConfirm(false);
+
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
       {/* Top bar */}
       <View style={s.topbar}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => setShowExitConfirm(true)}
           activeOpacity={0.8}
           style={s.navBtn}
         >
@@ -311,9 +428,13 @@ export default function QuizPlayScreen({ navigation, route }) {
         <Text style={[s.title, { color: theme.colors.text }]} numberOfLines={1}>
           {setTitle}
         </Text>
-        <TouchableOpacity activeOpacity={0.8} style={s.navBtn}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={s.navBtn}
+          onPress={() => setSettingsOpen(true)}
+        >
           <Ionicons
-            name="bookmark-outline"
+            name="settings-outline"
             size={22}
             color={theme.colors.text}
           />
@@ -423,7 +544,6 @@ export default function QuizPlayScreen({ navigation, route }) {
                       <Ionicons name="close" size={13} color="#fff" />
                     </View>
                   )}
-                  {/* no badge for time's up */}
                 </View>
               </TouchableOpacity>
             );
@@ -509,6 +629,129 @@ export default function QuizPlayScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
+
+      {/* Settings Modal */}
+      <Modal
+        visible={settingsOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSettingsOpen(false)}
+      >
+        <View style={s.modalBackdrop}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setSettingsOpen(false)}
+          />
+        </View>
+        <View style={s.modalCenter} pointerEvents="box-none">
+          <View
+            style={[
+              s.modalCard,
+              { backgroundColor: theme.colors.card, paddingBottom: 12 },
+            ]}
+          >
+            <Text style={[s.modalTitle, { color: theme.colors.text }]}>
+              Quiz Settings
+            </Text>
+
+            {/* Sound */}
+            <View style={s.rowBetween}>
+              <Text
+                style={[
+                  s.modalBody,
+                  { color: theme.colors.text, marginBottom: 0 },
+                ]}
+              >
+                Sound effects
+              </Text>
+              <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
+            </View>
+
+            {/* Theme */}
+            <Text style={[s.modalBody, { color: theme.colors.text }]}>
+              Theme
+            </Text>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <TouchableOpacity
+                onPress={async () => {
+                  setThemeKey("light");
+                  try {
+                    await AsyncStorage.setItem("pref:themeKey", "light");
+                  } catch {}
+                }}
+                style={[
+                  s.themePill,
+                  {
+                    borderColor: theme.colors.primary,
+                    backgroundColor:
+                      themeKey === "light"
+                        ? theme.colors.primary
+                        : "transparent",
+                  },
+                ]}
+              >
+                <Text
+                  style={{
+                    color: themeKey === "light" ? "#fff" : theme.colors.primary,
+                    fontWeight: "800",
+                  }}
+                >
+                  Light
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  setThemeKey("dark");
+                  try {
+                    await AsyncStorage.setItem("pref:themeKey", "dark");
+                  } catch {}
+                }}
+                style={[
+                  s.themePill,
+                  {
+                    borderColor: theme.colors.primary,
+                    backgroundColor:
+                      themeKey === "dark"
+                        ? theme.colors.primary
+                        : "transparent",
+                  },
+                ]}
+              >
+                <Text
+                  style={{
+                    color: themeKey === "dark" ? "#fff" : theme.colors.primary,
+                    fontWeight: "800",
+                  }}
+                >
+                  Dark
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setSettingsOpen(false)}
+              style={[
+                s.modalBtn,
+                { backgroundColor: theme.colors.primary, marginTop: 14 },
+              ]}
+              activeOpacity={0.9}
+            >
+              <Text style={s.modalBtnText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Exit Confirm */}
+      <ConfirmModal
+        visible={showExitConfirm}
+        title="Leave quiz?"
+        message="Your progress won’t be saved. Are you sure you want to exit?"
+        confirmLabel="Leave"
+        cancelLabel="Stay"
+        onConfirm={handleExitConfirm}
+        onCancel={handleExitCancel}
+      />
     </SafeAreaView>
   );
 }
@@ -548,7 +791,7 @@ const makeStyles = (theme) =>
     content: { flex: 1, paddingHorizontal: H_PADDING, paddingTop: 6 },
 
     qCard: {
-      height: QUESTION_HEIGHT,
+      height: 150,
       borderRadius: 14,
       justifyContent: "center",
       alignItems: "center",
@@ -657,7 +900,7 @@ const makeStyles = (theme) =>
     },
     toastPillText: { color: "#1F2937", fontWeight: "800", fontSize: 14 },
 
-    // Hint modal
+    // Modal base
     modalBackdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.35)",
@@ -685,7 +928,20 @@ const makeStyles = (theme) =>
       marginBottom: 6,
       textAlign: "center",
     },
-    modalBody: { fontSize: 15, textAlign: "center", marginBottom: 14 },
+    modalBody: { fontSize: 15, textAlign: "left", marginBottom: 10 },
     modalBtn: { borderRadius: 12, paddingVertical: 10, alignItems: "center" },
     modalBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
+    rowBetween: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 6,
+    },
+    themePill: {
+      flex: 1,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: "center",
+      borderWidth: 1.5,
+    },
   });

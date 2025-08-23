@@ -112,6 +112,5 @@ export function deriveRevealFlags(i, answerIndex, selected, locked, timesUp) {
   const showRed = locked && !timesUp && isUserWrong;
   const showBlue = timesUp && isCorrect;
 
-  // We intentionally do NOT expose any "preSelect" highlight (keeps UI stable)
   return { showGreen, showRed, showBlue };
 }

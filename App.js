@@ -17,6 +17,10 @@ import ChecklistScreen from "./screens/ChecklistScreen";
 import QuizSetsScreen from "./screens/QuizSetsScreen";
 import QuizPlayScreen from "./screens/QuizPlayScreen";
 import QuizResultScreen from "./screens/QuizResultScreen";
+import ReviewAnswerScreen from "./screens/ReviewAnswerScreen";
+import BookmarkScreen from "./screens/BookmarkScreen";
+import BadgeRewardScreen from "./screens/BadgeRewardScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -33,7 +37,10 @@ function RootNav() {
     >
       <StatusBar style={theme.statusBarStyle} />
       <NavigationContainer ref={navigationRef} theme={theme.navTheme}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          // initialRouteName="QuizResult"
+        >
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Main" component={AppNavigator} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
@@ -50,6 +57,10 @@ function RootNav() {
           <Stack.Screen name="QuizSets" component={QuizSetsScreen} />
           <Stack.Screen name="QuizPlay" component={QuizPlayScreen} />
           <Stack.Screen name="QuizResult" component={QuizResultScreen} />
+          <Stack.Screen name="ReviewAnswer" component={ReviewAnswerScreen} />
+          <Stack.Screen name="Bookmark" component={BookmarkScreen} />
+          <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

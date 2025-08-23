@@ -206,13 +206,19 @@ function SideMenu({ navigation }) {
             }
             label="Bookmark"
             textColor={theme.colors.text}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.closeDrawer();
+              setTimeout(() => rootNavigate("Bookmark"), 0);
+            }}
           />
           <Row
             icon={<Ionicons name="gift" size={24} color={theme.colors.text} />}
             label="Badge & Reward"
             textColor={theme.colors.text}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.closeDrawer();
+              setTimeout(() => rootNavigate("BadgeReward"), 0);
+            }}
           />
           <Row
             icon={
@@ -220,7 +226,10 @@ function SideMenu({ navigation }) {
             }
             label="Setting"
             textColor={theme.colors.text}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.closeDrawer();
+              setTimeout(() => rootNavigate("Settings"), 0);
+            }}
           />
           <Row
             icon={
