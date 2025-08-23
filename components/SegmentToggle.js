@@ -12,7 +12,7 @@ export default function SegmentToggle({ options, value, onChange }) {
         padding: 6,
         flexDirection: "row",
         gap: 6,
-        backgroundColor: theme.key === "dark" ? "#2a2a2dff" : "#F3F4F6",
+        backgroundColor: theme.key === "dark" ? "#2a2a2dff" : "#e0e1e4ff",
       }}
     >
       {options.map((opt) => {

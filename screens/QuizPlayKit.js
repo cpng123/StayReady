@@ -172,11 +172,15 @@ export function useHaptics() {
     if (!enabledRef.current) return;
     try {
       if (kind === "success") {
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        await Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success
+        );
       } else if (kind === "error") {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       } else if (kind === "warning") {
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        await Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Warning
+        );
       }
     } catch {}
   };
@@ -303,7 +307,8 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       text: q.text,
       options: q.options,
       answerIndex: q.answerIndex,
-      selectedIndex: typeof selectedIndex === "number" ? selectedIndex : undefined,
+      selectedIndex:
+        typeof selectedIndex === "number" ? selectedIndex : undefined,
       timesUp: !!timesUp,
     };
   };
@@ -461,7 +466,11 @@ export function MetaPill({ progress, score }) {
   return (
     <View style={[s.metaPill, { backgroundColor: theme.colors.primary }]}>
       <View style={s.metaCol}>
-        <MaterialCommunityIcons name="comment-question" size={19} color="#fff" />
+        <MaterialCommunityIcons
+          name="comment-question"
+          size={19}
+          color="#fff"
+        />
         <Text style={[s.metaText, { color: "#fff" }]}>{progress}</Text>
       </View>
       <View
@@ -485,7 +494,7 @@ export function QuestionCard({ text }) {
   );
 }
 
-export function TimerBar({ barW, onLayout }) {
+export function TimerBar({ barW, onLayout, time }) {
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
   return (
@@ -499,9 +508,13 @@ export function TimerBar({ barW, onLayout }) {
         onLayout={onLayout}
       >
         <Animated.View
-          style={[s.timeFill, { backgroundColor: theme.colors.primary, width: barW }]}
+          style={[
+            s.timeFill,
+            { backgroundColor: theme.colors.primary, width: barW },
+          ]}
         />
       </View>
+      <Text style={[s.timeVal, { color: theme.colors.subtext }]}>{time}</Text>
     </View>
   );
 }
@@ -563,13 +576,19 @@ export function ToastOverlay({ toast, y, opacity }) {
       pointerEvents="none"
       style={[
         s.toastOverlay,
-        { transform: [{ translateY: y }], opacity, paddingBottom: insets.bottom },
+        {
+          transform: [{ translateY: y }],
+          opacity,
+          paddingBottom: insets.bottom,
+        },
       ]}
     >
       <View style={[s.toastCard, { backgroundColor: t.bg }]}>
         <Text style={s.toastTitle}>{t.title}</Text>
         <View style={s.toastPill}>
-          <Text style={[s.toastPillText, { color: t.pillText }]}>{toast.text}</Text>
+          <Text style={[s.toastPillText, { color: t.pillText }]}>
+            {toast.text}
+          </Text>
         </View>
       </View>
     </Animated.View>
@@ -581,7 +600,12 @@ export function HintModal({ open, onClose, hint }) {
   const s = useMemo(() => makeStyles(theme), [theme]);
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={open}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={s.modalBackdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </View>
@@ -623,25 +647,47 @@ export function SettingsModal({
   };
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={open}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={s.modalBackdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </View>
       <View style={s.modalCenter} pointerEvents="box-none">
-        <View style={[s.modalCard, { backgroundColor: theme.colors.card, paddingBottom: 12 }]}>
-          <Text style={[s.modalTitle, { color: theme.colors.text }]}>Quiz Settings</Text>
+        <View
+          style={[
+            s.modalCard,
+            { backgroundColor: theme.colors.card, paddingBottom: 12 },
+          ]}
+        >
+          <Text style={[s.modalTitle, { color: theme.colors.text }]}>
+            Quiz Settings
+          </Text>
 
           {/* Sound */}
           <View style={s.rowBetween}>
-            <Text style={[s.modalBody, { color: theme.colors.text, marginBottom: 0 }]}>
+            <Text
+              style={[
+                s.modalBody,
+                { color: theme.colors.text, marginBottom: 0 },
+              ]}
+            >
               Sound effects
             </Text>
             <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
           </View>
 
           {/* Haptics */}
-          <View style={[s.rowBetween, {marginBottom: 20}]}>
-            <Text style={[s.modalBody, { color: theme.colors.text, marginBottom: 0 }]}>
+          <View style={[s.rowBetween, { marginBottom: 20 }]}>
+            <Text
+              style={[
+                s.modalBody,
+                { color: theme.colors.text, marginBottom: 0 },
+              ]}
+            >
               Haptics
             </Text>
             <Switch value={hapticEnabled} onValueChange={setHapticEnabled} />
@@ -652,7 +698,10 @@ export function SettingsModal({
 
           <TouchableOpacity
             onPress={onClose}
-            style={[s.modalBtn, { backgroundColor: theme.colors.primary, marginTop: 20 }]}
+            style={[
+              s.modalBtn,
+              { backgroundColor: theme.colors.primary, marginTop: 20 },
+            ]}
             activeOpacity={0.9}
           >
             <Text style={s.modalBtnText}>Done</Text>
@@ -719,6 +768,13 @@ const makeStyles = (theme) =>
     timeLabel: { fontSize: 12, fontWeight: "800" },
     timeTrack: { flex: 1, height: 6, borderRadius: 8, overflow: "hidden" },
     timeFill: { height: "100%", borderRadius: 8 },
+    timeVal: {
+      width: 14,
+      textAlign: "right",
+      fontSize: 12,
+      fontWeight: "800",
+      marginLeft: 6,
+    },
 
     // option
     option: {
@@ -809,7 +865,12 @@ const makeStyles = (theme) =>
       shadowOffset: { width: 0, height: 8 },
       elevation: 6,
     },
-    modalTitle: { fontSize: 20, fontWeight: "800", marginBottom: 8, textAlign: "center" },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "800",
+      marginBottom: 8,
+      textAlign: "center",
+    },
     modalBody: { fontSize: 16, textAlign: "left", marginBottom: 10 },
     modalBtn: { borderRadius: 12, paddingVertical: 10, alignItems: "center" },
     modalBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },

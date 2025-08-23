@@ -122,10 +122,11 @@ export default function QuizPlayScreen({ navigation, route }) {
       <View style={s.content}>
         <QuestionCard text={engine.current?.text} />
 
-        <TimerBar barW={engine.barW} onLayout={engine.onTrackLayout} />
-        <Text style={[s.timeVal, { color: theme.colors.subtext }]}>
-          {engine.time}
-        </Text>
+        <TimerBar
+          barW={engine.barW}
+          onLayout={engine.onTrackLayout}
+          time={engine.time}
+        />
 
         <View style={{ gap: 10 }}>
           {engine.current?.options?.map((opt, i) => (
