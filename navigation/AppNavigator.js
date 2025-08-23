@@ -17,6 +17,7 @@ import SOSScreen from "../screens/SOSScreen";
 import GamesScreen from "../screens/GamesScreen";
 
 import { useThemeContext } from "../theme/ThemeProvider";
+import ThemeToggle from "../components/ThemeToggle";
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -243,51 +244,9 @@ function SideMenu({ navigation }) {
 
         <View style={{ flex: 1 }} />
         <View
-          style={[
-            styles.themeWrap,
-            styles.leftMargin,
-            { backgroundColor: themeKey === "dark" ? "#2a2a2dff" : "#F3F4F6" },
-          ]}
+          style={[styles.leftMargin, { marginRight: 16, marginBottom: 12 }]}
         >
-          <TouchableOpacity
-            style={[
-              styles.themeBtn,
-              themeKey === "light" && styles.themeActive,
-            ]}
-            onPress={() => setThemeKey("light")}
-          >
-            <Ionicons
-              name="sunny"
-              size={20}
-              color={themeKey === "light" ? "#fff" : "#6B7280"}
-            />
-            <Text
-              style={[
-                styles.themeText,
-                { color: themeKey === "light" ? "#fff" : "#6B7280" },
-              ]}
-            >
-              Light
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.themeBtn, themeKey === "dark" && styles.themeActive]}
-            onPress={() => setThemeKey("dark")}
-          >
-            <Ionicons
-              name="moon"
-              size={20}
-              color={themeKey === "dark" ? "#fff" : "#6B7280"}
-            />
-            <Text
-              style={[
-                styles.themeText,
-                { color: themeKey === "dark" ? "#fff" : "#6B7280" },
-              ]}
-            >
-              Dark
-            </Text>
-          </TouchableOpacity>
+          <ThemeToggle />
         </View>
       </DrawerContentScrollView>
     </SafeAreaView>
@@ -329,23 +288,4 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     marginRight: 16,
   },
-  themeWrap: {
-    borderRadius: 12,
-    padding: 6,
-    flexDirection: "row",
-    gap: 6,
-    marginBottom: 12,
-    marginRight: 16,
-  },
-  themeBtn: {
-    flex: 1,
-    borderRadius: 10,
-    paddingVertical: 8,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 6,
-  },
-  themeActive: { backgroundColor: "#0A84FF" },
-  themeText: { fontWeight: "700", fontSize: 15 },
 });

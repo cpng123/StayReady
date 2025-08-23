@@ -70,7 +70,7 @@ export default function GamesScreen({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       refreshDaily();
-      refreshStats();
+      refreshStats(); // <- important
     }, [])
   );
 
@@ -160,7 +160,7 @@ export default function GamesScreen({ navigation }) {
             <View style={{ flex: 1 }}>
               <Text style={styles.dailyTitle}>Daily Challenge</Text>
               <Text style={styles.dailySub}>
-                {(daily.data?.questions?.length ?? 10)} Questions
+                {daily.data?.questions?.length ?? 10} Questions
               </Text>
               <View style={styles.dailyBtn}>
                 <Text style={styles.dailyBtnText}>{dailyBtnText}</Text>
@@ -217,8 +217,12 @@ export default function GamesScreen({ navigation }) {
 function StatCol({ label, value, theme }) {
   return (
     <View style={pillStyles.col}>
-      <Text style={[pillStyles.value, { color: theme.colors.text }]}>{value}</Text>
-      <Text style={[pillStyles.label, { color: theme.colors.subtext }]}>{label}</Text>
+      <Text style={[pillStyles.value, { color: theme.colors.text }]}>
+        {value}
+      </Text>
+      <Text style={[pillStyles.label, { color: theme.colors.subtext }]}>
+        {label}
+      </Text>
     </View>
   );
 }
