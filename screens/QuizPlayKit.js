@@ -226,15 +226,19 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
 
   const [selected, setSelected] = useState(null);
   const [locked, setLocked] = useState(false);
+
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
+
+  // ✅ Keep refs in sync to avoid stale-closure bug
+  const scoreRef = useRef(0);
+  const correctRef = useRef(0);
 
   const [time, setTime] = useState(QUESTION_SECONDS);
   const timerRef = useRef(null);
   const quizStartRef = useRef(null);
   const [elapsedSec, setElapsedSec] = useState(0);
 
-  // bar anim
   const [trackW, setTrackW] = useState(0);
   const barW = useRef(new Animated.Value(0)).current;
 
@@ -260,7 +264,6 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
   const readyRef = useRef(false);
   const revealTimeoutRef = useRef(null);
 
-  // toast
   const [toast, setToast] = useState(null);
   const toastY = useRef(new Animated.Value(60)).current;
   const toastOpacity = useRef(new Animated.Value(0)).current;
@@ -298,7 +301,6 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     ]).start(() => setToast(null));
   };
 
-  // review collection
   const reviewRef = useRef([]);
   const recordResult = ({ selectedIndex, timesUp }) => {
     const q = current || {};
@@ -313,12 +315,10 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     };
   };
 
-  // init start time
   useEffect(() => {
     if (!quizStartRef.current) quizStartRef.current = Date.now();
   }, []);
 
-  // per-question (re)start
   useEffect(() => {
     readyRef.current = false;
     stopAllTimers();
@@ -344,15 +344,12 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       clearTimeout(revealTimeoutRef.current);
       clearTimeout(readyTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
 
   useEffect(() => {
     startBar();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackW]);
 
-  // time's up
   useEffect(() => {
     if (!readyRef.current) return;
     if (time === 0 && !locked) {
@@ -365,7 +362,6 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       showToast({ type: "timesup", text: "Time's up!" });
       revealTimeoutRef.current = setTimeout(goNext, REVEAL_DELAY_MS);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [time, locked]);
 
   const choose = (i) => {
@@ -378,8 +374,19 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     const isCorrect = i === current.answerIndex;
     if (isCorrect) {
       const xp = computeXp(time, QUESTION_SECONDS);
-      setScore((s0) => s0 + xp);
-      setCorrectCount((c) => c + 1);
+
+      // ✅ Update state AND refs in sync
+      setScore((s0) => {
+        const next = s0 + xp;
+        scoreRef.current = next;
+        return next;
+      });
+      setCorrectCount((c) => {
+        const next = c + 1;
+        correctRef.current = next;
+        return next;
+      });
+
       sfx?.play?.("correct");
       haptics?.notify?.("success");
       showToast({ type: "correct", text: `+ ${xp} XP` });
@@ -412,9 +419,13 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       );
       await sfx?.stopBg?.();
 
+      // ✅ Use refs to avoid stale values
+      const finalCorrect = correctRef.current;
+      const finalScore = scoreRef.current;
+
       onFinish?.({
-        score,
-        correctCount,
+        score: finalScore,
+        correctCount: finalCorrect,
         total,
         review: reviewRef.current.slice(),
         timeTakenSec,
@@ -432,28 +443,19 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     );
 
   return {
-    // data
     current,
     idx,
     total,
     progressText: `${Math.min(idx + 1, total)}/${total}`,
-    score,
+    score, // state for live UI
     time,
-
-    // option helpers
     choose,
     flagsFor,
-
-    // timer visuals
     barW,
     onTrackLayout,
-
-    // toast
     toast,
     toastY,
     toastOpacity,
-
-    // hint
     hintText: current?.hint?.trim() || "",
   };
 }
