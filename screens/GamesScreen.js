@@ -15,6 +15,8 @@ import ImageOverlayCard from "../components/ImageOverlayCard";
 import QuickTipsCarousel from "../components/QuickTipsCarousel";
 import QUIZ from "../data/quiz.json";
 import { pickRandomTips } from "../utils/tips";
+import { getDailyToday } from "../utils/dailyChallenge";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SCREEN_PADDING = 16;
 const GAP = 12;
@@ -50,12 +52,49 @@ export default function GamesScreen({ navigation }) {
   );
 
   const [stats] = useState({ taken: 22, accuracy: 1.0, streak: 10 });
-
-  // Build 5 random tips once
   const tips = useMemo(() => pickRandomTips(5), []);
 
-  const startDaily = () => {
-    // TODO: route to Daily Challenge flow
+  const [daily, setDaily] = useState({ loading: true, data: null });
+
+  const refreshDaily = async () => {
+    const data = await getDailyToday(QUIZ);
+    setDaily({ loading: false, data });
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshDaily();
+    }, [])
+  );
+
+  const onDailyPress = () => {
+    if (!daily.data) return;
+    const { questions, completed, key, review, meta } = daily.data;
+
+    if (completed) {
+      navigation.navigate("ReviewAnswer", {
+        title: "Daily Challenge — Review",
+        review: Array.isArray(review) ? review : [],
+        meta: meta || {
+          setId: key,
+          setTitle: "Daily Challenge",
+          categoryId: "daily",
+          categoryLabel: "Daily",
+        },
+      });
+    } else {
+      navigation.navigate("QuizPlay", {
+        mode: "daily",
+        title: "Daily Challenge",
+        customQuestions: questions,
+        meta: {
+          setId: key,
+          setTitle: "Daily Challenge",
+          categoryId: "daily",
+          categoryLabel: "Daily",
+        },
+      });
+    }
   };
 
   const openCategory = (cat) => {
@@ -77,6 +116,7 @@ export default function GamesScreen({ navigation }) {
         <View
           style={{
             backgroundColor: theme.key === "dark" ? "#2A2F3A" : "#E5E7EB",
+            width: 1,
           }}
         />
         <StatCol
@@ -87,13 +127,14 @@ export default function GamesScreen({ navigation }) {
         <View
           style={{
             backgroundColor: theme.key === "dark" ? "#2A2F3A" : "#E5E7EB",
+            width: 1,
           }}
         />
         <StatCol label="Day Streak" value={`${stats.streak}`} theme={theme} />
       </View>
 
       {/* Daily challenge with image background */}
-      <TouchableOpacity activeOpacity={0.85} onPress={startDaily}>
+      <TouchableOpacity activeOpacity={0.85} onPress={onDailyPress}>
         <ImageBackground
           source={require("../assets/General/quiz-background.jpg")}
           style={styles.dailyCard}
@@ -103,9 +144,17 @@ export default function GamesScreen({ navigation }) {
           <View style={styles.dailyRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.dailyTitle}>Daily Challenge</Text>
-              <Text style={styles.dailySub}>10 Questions</Text>
+              <Text style={styles.dailySub}>
+                {daily.data?.questions?.length ?? 10} Questions
+              </Text>
               <View style={styles.dailyBtn}>
-                <Text style={styles.dailyBtnText}>Start Challenge</Text>
+                <Text style={styles.dailyBtnText}>
+                  {daily.loading
+                    ? "Loading..."
+                    : daily.data?.completed
+                    ? "Review Answer"
+                    : "Start Challenge"}
+                </Text>
               </View>
             </View>
           </View>
@@ -243,37 +292,4 @@ const makeStyles = (theme) =>
       marginTop: 6,
       marginBottom: 4,
     },
-
-    // quick tips styles (also used by the reusable component if passed via props)
-    tipCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      borderRadius: 16,
-      padding: 14,
-      minHeight: 90,
-      shadowColor: "#000",
-      shadowOpacity: 0.06,
-      shadowRadius: 6,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 2,
-    },
-    tipBar: {
-      width: 4,
-      alignSelf: "stretch",
-      borderRadius: 3,
-      marginRight: 10,
-    },
-    tipTitle: {
-      fontWeight: "800",
-      fontSize: 14,
-      marginBottom: 4,
-      lineHeight: 18,
-    },
-    tipBodyWrap: {
-      height: 34,
-      justifyContent: "flex-start",
-      overflow: "hidden",
-    },
-    tipBody: { fontSize: 12, lineHeight: 17 },
-    tipCta: { fontSize: 12, fontWeight: "800", marginLeft: 10 },
   });

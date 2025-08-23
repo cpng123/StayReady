@@ -19,6 +19,7 @@ import { useThemeContext } from "../theme/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ConfirmModal from "../components/ConfirmModal";
 import QUIZ from "../data/quiz.json";
+import { markDailyCompleted } from "../utils/dailyChallenge";
 
 import {
   normalizeQuestions,
@@ -38,14 +39,21 @@ export default function QuizPlayScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const s = useMemo(() => makeStyles(theme), [theme]);
 
+  const mode = route?.params?.mode; // "daily" | undefined
+  const meta = route?.params?.meta || null;
+  const customQuestions = route?.params?.customQuestions;
+
   const categoryId = route?.params?.categoryId;
   const setId = route?.params?.setId;
-  const setTitle = route?.params?.title ?? "Quiz";
+  const setTitle =
+    route?.params?.title ?? (mode === "daily" ? "Daily Challenge" : "Quiz");
 
-  const questions = useMemo(
-    () => normalizeQuestions(QUIZ, categoryId, setId),
-    [categoryId, setId]
-  );
+  const questions = useMemo(() => {
+    if (Array.isArray(customQuestions) && customQuestions.length) {
+      return customQuestions;
+    }
+    return normalizeQuestions(QUIZ, categoryId, setId);
+  }, [customQuestions, categoryId, setId]);
 
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -81,7 +89,7 @@ export default function QuizPlayScreen({ navigation, route }) {
 
   const [trackW, setTrackW] = useState(0);
   const barW = useRef(new Animated.Value(0)).current;
-
+  const reviewRef = useRef([]);
   const startBar = () => {
     if (trackW <= 0) return;
     barW.stopAnimation();
@@ -297,66 +305,13 @@ export default function QuizPlayScreen({ navigation, route }) {
     ]).start(() => setToast(null));
   };
 
-  const goNext = async () => {
-    const consumed = Math.max(0, QUESTION_SECONDS - time);
-    const totalSecNext = elapsedSec + consumed;
-    setElapsedSec(totalSecNext);
-
-    setLocked(false);
-    setSelected(null);
-    setTimesUp(false);
-    hideToast();
-
-    if (idx + 1 < total) {
-      setIdx((p) => p + 1);
-    } else {
-      leavingRef.current = true;
-      const totalSec = Math.max(
-        0,
-        Math.round((Date.now() - (quizStartRef.current || Date.now())) / 1000)
-      );
-      await stopBgIfAny();
-
-      // Build review array for the result/review pages
-      const review = questions.map((q, i) => ({
-        id: q.id ?? `${setId || "set"}:${i}:${(q.text || "").slice(0, 40)}`,
-        text: q.text,
-        options: q.options,
-        answerIndex: q.answerIndex,
-        selectedIndex: Object.prototype.hasOwnProperty.call(
-          answersRef.current,
-          i
-        )
-          ? answersRef.current[i]
-          : undefined,
-        // show timesUp only if no answer was selected
-        timesUp:
-          !Object.prototype.hasOwnProperty.call(answersRef.current, i) &&
-          !!timesUpRef.current[i],
-      }));
-
-      navigation.replace?.("QuizResult", {
-        score,
-        correct: correctCount,
-        total,
-        title: setTitle,
-        timeTakenSec: totalSec,
-        review,
-        meta: {
-          categoryId,
-          setId,
-          setTitle,
-        },
-      });
-    }
-  };
-
   // Time's up path — gated by readyRef
   useEffect(() => {
     if (!readyRef.current) return;
     if (time === 0 && !locked) {
       setLocked(true);
       setTimesUp(true);
+      recordResult({ selectedIndex: undefined, timesUp: true });
       stopAllTimers();
       playSfx("timesup");
       timesUpRef.current[idx] = true;
@@ -372,6 +327,7 @@ export default function QuizPlayScreen({ navigation, route }) {
     setSelected(i);
     setLocked(true);
     stopAllTimers();
+    recordResult({ selectedIndex: i, timesUp: false });
 
     const isCorrect = i === current.answerIndex;
     if (isCorrect) {
@@ -413,6 +369,68 @@ export default function QuizPlayScreen({ navigation, route }) {
     navigation.goBack();
   };
   const handleExitCancel = () => setShowExitConfirm(false);
+  // record helper
+  const recordResult = ({ selectedIndex, timesUp }) => {
+    const q = current || {};
+    reviewRef.current[idx] = {
+      id: q.id ?? `q-${idx}`,
+      text: q.text,
+      options: q.options,
+      answerIndex: q.answerIndex,
+      selectedIndex:
+        typeof selectedIndex === "number" ? selectedIndex : undefined,
+      timesUp: !!timesUp,
+    };
+  };
+
+  const goNext = async () => {
+    const consumed = Math.max(0, QUESTION_SECONDS - time);
+    const totalSec2 = elapsedSec + consumed;
+    setElapsedSec(totalSec2);
+
+    setLocked(false);
+    setSelected(null);
+    setTimesUp(false);
+    hideToast();
+
+    if (idx + 1 < total) {
+      setIdx((p) => p + 1);
+    } else {
+      leavingRef.current = true;
+      const totalSec = Math.max(
+        0,
+        Math.round((Date.now() - (quizStartRef.current || Date.now())) / 1000)
+      );
+      await stopBgIfAny();
+
+      const finalReview = reviewRef.current.slice();
+      const passMeta = meta || {
+        setId: setId ?? "set",
+        setTitle,
+        categoryId: categoryId ?? "cat",
+        categoryLabel:
+          (QUIZ?.categories || []).find((c) => c.id === categoryId)?.title ||
+          "Quiz",
+      };
+
+      // Mark daily as completed
+      if (mode === "daily") {
+        try {
+          await markDailyCompleted(finalReview, passMeta);
+        } catch {}
+      }
+
+      navigation.replace?.("QuizResult", {
+        score,
+        correct: correctCount,
+        total,
+        title: setTitle,
+        timeTakenSec: totalSec,
+        review: finalReview,
+        meta: passMeta,
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>

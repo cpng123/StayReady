@@ -1,17 +1,47 @@
 // components/QuickTipsCarousel.js
-import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, View, Text, TouchableOpacity, Dimensions } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const SCREEN_PADDING = 16;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-export default function QuickTipsCarousel({ tips = [], theme, styles: s, onPressTip }) {
+export default function QuickTipsCarousel({
+  tips = [],
+  theme,
+  styles: externalStyles, // optional override from parent
+  onPressTip,
+}) {
   const scrollRef = useRef(null);
   const [idx, setIdx] = useState(0);
 
   const CARD_W = SCREEN_WIDTH - SCREEN_PADDING * 2;
   const ITEM_SPACING = 10;
+
+  // Build default styles + merge with parent (per-key merge)
+  const base = useMemo(() => defaultStyles(theme), [theme]);
+  const s = useMemo(
+    () => ({
+      ...base,
+      ...(externalStyles || {}),
+      tipCard: { ...base.tipCard, ...(externalStyles?.tipCard || {}) },
+      tipBar: { ...base.tipBar, ...(externalStyles?.tipBar || {}) },
+      tipTitle: { ...base.tipTitle, ...(externalStyles?.tipTitle || {}) },
+      tipBodyWrap: {
+        ...base.tipBodyWrap,
+        ...(externalStyles?.tipBodyWrap || {}),
+      },
+      tipBody: { ...base.tipBody, ...(externalStyles?.tipBody || {}) },
+    }),
+    [base, externalStyles]
+  );
 
   // Auto-advance every 3.5s
   useEffect(() => {
@@ -27,7 +57,7 @@ export default function QuickTipsCarousel({ tips = [], theme, styles: s, onPress
       });
     }, 3500);
     return () => clearInterval(t);
-  }, [tips.length]);
+  }, [tips.length, CARD_W]);
 
   const onMomentumEnd = (e) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -45,13 +75,13 @@ export default function QuickTipsCarousel({ tips = [], theme, styles: s, onPress
         decelerationRate="fast"
         snapToAlignment="start"
         onMomentumScrollEnd={onMomentumEnd}
-        contentContainerStyle={{ paddingRight: 16, paddingHorizontal: 15 }}
-        style={{ marginHorizontal: -16 }}
+        contentContainerStyle={{ paddingRight: SCREEN_PADDING, paddingHorizontal: SCREEN_PADDING - 1 }}
+        style={{ marginHorizontal: -SCREEN_PADDING }}
       >
         {tips.map((item) => (
           <TouchableOpacity
             key={item.id}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
             onPress={() => onPressTip?.(item)}
             style={{ marginRight: ITEM_SPACING, paddingVertical: 3 }}
           >
@@ -62,9 +92,7 @@ export default function QuickTipsCarousel({ tips = [], theme, styles: s, onPress
               ]}
             >
               {/* Left color bar */}
-              <View
-                style={[s.tipBar, { backgroundColor: theme.colors.primary }]}
-              />
+              <View style={[s.tipBar, { backgroundColor: theme.colors.primary }]} />
 
               {/* Text content */}
               <View style={{ flex: 1, paddingRight: 8 }}>
@@ -127,4 +155,40 @@ export default function QuickTipsCarousel({ tips = [], theme, styles: s, onPress
       </View>
     </>
   );
+}
+
+function defaultStyles(theme) {
+  return StyleSheet.create({
+    tipCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderRadius: 16,
+      padding: 14,
+      minHeight: 90,
+      shadowColor: "#000",
+      shadowOpacity: theme.key === "dark" ? 0.18 : 0.08,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
+    },
+    tipBar: {
+      width: 4,
+      alignSelf: "stretch",
+      borderRadius: 3,
+      marginRight: 10,
+      opacity: 0.9,
+    },
+    tipTitle: {
+      fontWeight: "800",
+      fontSize: 14,
+      marginBottom: 4,
+      lineHeight: 18,
+    },
+    tipBodyWrap: {
+      height: 36, // slightly taller for consistent two-line clamp
+      justifyContent: "flex-start",
+      overflow: "hidden",
+    },
+    tipBody: { fontSize: 12, lineHeight: 18 },
+  });
 }
