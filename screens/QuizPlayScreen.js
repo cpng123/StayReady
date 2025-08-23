@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ConfirmModal from "../components/ConfirmModal";
 import QUIZ from "../data/quiz.json";
 import { markDailyCompleted } from "../utils/dailyChallenge";
+import { addQuizAttempt } from "../utils/progressStats";
 
 import {
   normalizeQuestions,
@@ -419,6 +420,16 @@ export default function QuizPlayScreen({ navigation, route }) {
           await markDailyCompleted(finalReview, passMeta);
         } catch {}
       }
+
+      // record the attempt for stats
+      try {
+        await addQuizAttempt({
+          type: mode === "daily" ? "daily" : "set",
+          meta: passMeta,
+          correct: correctCount,
+          total,
+        });
+      } catch {}
 
       navigation.replace?.("QuizResult", {
         score,

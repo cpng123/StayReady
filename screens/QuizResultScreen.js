@@ -75,12 +75,28 @@ export default function QuizResultScreen() {
     }
   };
 
-  const onReturnHome = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Main", state: { routes: [{ name: "Home" }] } }],
-    });
-  };
+  const handleBackToGames = () => {
+  // reset so the user can't back-navigate to results
+  navigation.reset({
+    index: 0,
+    routes: [
+      {
+        name: "Main",
+        state: {
+          routes: [
+            {
+              name: "Tabs",
+              state: {
+                routes: [{ name: "GamesTab" }],
+                index: 0,
+              },
+            },
+          ],
+        },
+      },
+    ],
+  });
+};
 
   const onReview = () => {
     navigation.navigate("ReviewAnswer", {
@@ -256,9 +272,9 @@ export default function QuizResultScreen() {
         <TouchableOpacity
           style={[s.homeBtn, { backgroundColor: theme.colors.primary }]}
           activeOpacity={0.95}
-          onPress={onReturnHome}
+          onPress={handleBackToGames}
         >
-          <Text style={s.homeBtnText}>Return Home</Text>
+          <Text style={s.homeBtnText}>Back to Games</Text>
         </TouchableOpacity>
       </View>
     </View>
