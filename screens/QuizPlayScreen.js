@@ -12,6 +12,7 @@ import {
   Easing,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import QUIZ from "../data/quiz.json";
@@ -55,7 +56,7 @@ export default function QuizPlayScreen({ navigation, route }) {
   const [timesUp, setTimesUp] = useState(false);
   const revealTimeoutRef = useRef(null);
 
-  // --- NEW: readiness flag to prevent blue reveal on next question ---
+  // Gate to prevent time's-up from leaking across question transitions
   const readyRef = useRef(false);
 
   // Timer: numeric + smooth bar
@@ -82,9 +83,90 @@ export default function QuizPlayScreen({ navigation, route }) {
     barW.stopAnimation();
   };
 
+  // === AUDIO: refs + helpers ============================================
+  const bgRef = useRef(null);
+  const sfxCorrectRef = useRef(null);
+  const sfxWrongRef = useRef(null);
+  const sfxTimesUpRef = useRef(null);
+
+  const playSfx = async (type) => {
+    try {
+      let sound;
+      if (type === "correct") sound = sfxCorrectRef.current;
+      else if (type === "incorrect") sound = sfxWrongRef.current;
+      else if (type === "timesup") sound = sfxTimesUpRef.current;
+      if (!sound) return;
+      await sound.replayAsync();
+    } catch {}
+  };
+
+  const stopBgIfAny = async () => {
+    try {
+      if (bgRef.current) {
+        await bgRef.current.stopAsync();
+      }
+    } catch {}
+  };
+
+  const unloadAllSounds = async () => {
+    try {
+      await stopBgIfAny();
+      await bgRef.current?.unloadAsync();
+      await sfxCorrectRef.current?.unloadAsync();
+      await sfxWrongRef.current?.unloadAsync();
+      await sfxTimesUpRef.current?.unloadAsync();
+    } catch {}
+    bgRef.current = null;
+    sfxCorrectRef.current = null;
+    sfxWrongRef.current = null;
+    sfxTimesUpRef.current = null;
+  };
+
+  // Preload & start background music once (on mount)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const [bg, c, w, t] = await Promise.all([
+          Audio.Sound.createAsync(
+            require("../assets/Sound/background.mp3"),
+            { isLooping: false, volume: 0.8 },
+            null,
+            false
+          ),
+          Audio.Sound.createAsync(require("../assets/Sound/correct.mp3")),
+          Audio.Sound.createAsync(require("../assets/Sound/wrong.mp3")),
+          Audio.Sound.createAsync(require("../assets/Sound/times-up.mp3")),
+        ]);
+
+        if (!mounted) {
+          // if unmounted before finishing, unload immediately
+          bg.sound && (await bg.sound.unloadAsync());
+          c.sound && (await c.sound.unloadAsync());
+          w.sound && (await w.sound.unloadAsync());
+          t.sound && (await t.sound.unloadAsync());
+          return;
+        }
+
+        bgRef.current = bg.sound;
+        sfxCorrectRef.current = c.sound;
+        sfxWrongRef.current = w.sound;
+        sfxTimesUpRef.current = t.sound;
+
+        await bgRef.current.playAsync();
+      } catch {}
+    })();
+
+    return () => {
+      mounted = false;
+      unloadAllSounds();
+    };
+  }, []);
+  // ======================================================================
+
   useEffect(() => {
     // reset for each question
-    readyRef.current = false; // ⬅️ block times-up effect during transition
+    readyRef.current = false;
     stopAllTimers();
     clearTimeout(revealTimeoutRef.current);
 
@@ -100,7 +182,7 @@ export default function QuizPlayScreen({ navigation, route }) {
 
     startBar();
     const readyTimeout = setTimeout(() => {
-      readyRef.current = true; // ⬅️ allow times-up effect again
+      readyRef.current = true;
     }, 100);
 
     return () => {
@@ -155,7 +237,7 @@ export default function QuizPlayScreen({ navigation, route }) {
     ]).start(() => setToast(null));
   };
 
-  const goNext = () => {
+  const goNext = async () => {
     setLocked(false);
     setSelected(null);
     setTimesUp(false);
@@ -164,6 +246,8 @@ export default function QuizPlayScreen({ navigation, route }) {
     if (idx + 1 < total) {
       setIdx((p) => p + 1);
     } else {
+      // stop bg immediately on leaving to results
+      await stopBgIfAny();
       navigation.replace?.("QuizResult", {
         score,
         correct: correctCount,
@@ -173,13 +257,14 @@ export default function QuizPlayScreen({ navigation, route }) {
     }
   };
 
-  // Time's up path — now gated by readyRef so it can't fire during transition
+  // Time's up path — gated by readyRef
   useEffect(() => {
-    if (!readyRef.current) return; // ⬅️ guard
+    if (!readyRef.current) return;
     if (time === 0 && !locked) {
       setLocked(true);
       setTimesUp(true);
       stopAllTimers();
+      playSfx("timesup");
       showToast({ type: "timesup", text: "Time's up!" });
       revealTimeoutRef.current = setTimeout(goNext, REVEAL_DELAY_MS);
     }
@@ -196,8 +281,10 @@ export default function QuizPlayScreen({ navigation, route }) {
       const xp = computeXp(time, QUESTION_SECONDS);
       setScore((s0) => s0 + xp);
       setCorrectCount((c) => c + 1);
+      playSfx("correct"); 
       showToast({ type: "correct", text: `+ ${xp} XP` });
     } else {
+      playSfx("incorrect");
       showToast({ type: "incorrect", text: pickEncouragement() });
     }
 
@@ -371,7 +458,7 @@ export default function QuizPlayScreen({ navigation, route }) {
             {
               transform: [{ translateY: toastY }],
               opacity: toastOpacity,
-              paddingBottom: 8 + insets.bottom,
+              paddingBottom: insets.bottom,
             },
           ]}
         >
