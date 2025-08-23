@@ -11,11 +11,12 @@ import SplashScreen from "./screens/SplashScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
 import ResourceHubScreen from "./screens/ResourceHubScreen";
 import AppNavigator from "./navigation/AppNavigator";
-import PreparednessGuideScreen  from "./screens/PreparednessGuideScreen";
+import PreparednessGuideScreen from "./screens/PreparednessGuideScreen";
 import ExternalResourceScreen from "./screens/ExternalResourceScreen";
 import ChecklistScreen from "./screens/ChecklistScreen";
 import QuizSetsScreen from "./screens/QuizSetsScreen";
 import QuizPlayScreen from "./screens/QuizPlayScreen";
+import QuizResultScreen from "./screens/QuizResultScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -26,7 +27,10 @@ function RootNav() {
 
   return (
     // Only top/left/right so bottom tab can remain fully flush to the bottom
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.appBg }} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.colors.appBg }}
+      edges={["top", "left", "right"]}
+    >
       <StatusBar style={theme.statusBarStyle} />
       <NavigationContainer ref={navigationRef} theme={theme.navTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -34,11 +38,18 @@ function RootNav() {
           <Stack.Screen name="Main" component={AppNavigator} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
-          <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
-          <Stack.Screen name="ExternalResources" component={ExternalResourceScreen} />
+          <Stack.Screen
+            name="PreparednessGuide"
+            component={PreparednessGuideScreen}
+          />
+          <Stack.Screen
+            name="ExternalResources"
+            component={ExternalResourceScreen}
+          />
           <Stack.Screen name="Checklist" component={ChecklistScreen} />
           <Stack.Screen name="QuizSets" component={QuizSetsScreen} />
           <Stack.Screen name="QuizPlay" component={QuizPlayScreen} />
+          <Stack.Screen name="QuizResult" component={QuizResultScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
