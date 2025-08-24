@@ -1,3 +1,4 @@
+// screens/HomeScreen.js
 import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
@@ -41,25 +42,26 @@ export default function HomeScreen() {
     (async () => {
       try {
         const res = await resolveLocationLabel();
-        // Prefer precise address if OneMap succeeded; otherwise region fallback
         const label = res.address
           ? `${res.address}${res.postal ? " " + res.postal : ""}, Singapore`
-          : `${res.region} Region, Singapore`;
+          : `${res.region} ${t("home.region", "Region")}, Singapore`;
         if (mounted) setHeaderLoc(label);
       } catch {
         if (mounted) setHeaderLoc("Singapore");
       }
     })();
-    return () => { mounted = false; };
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [t]);
 
   const openDonation = async () => {
     try {
       const supported = await Linking.canOpenURL(UNICEF_URL);
       if (supported) await Linking.openURL(UNICEF_URL);
-      else Alert.alert("Unable to open link", "Please try again later.");
+      else Alert.alert(t("common.error"), t("home.donate.error_try_later"));
     } catch {
-      Alert.alert("Link error", "Could not open the donation page.");
+      Alert.alert(t("common.error"), t("home.donate.error_open"));
     }
   };
 
@@ -80,9 +82,9 @@ export default function HomeScreen() {
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) await Linking.openURL(url);
-      else Alert.alert("Not supported", `Please call ${num} manually.`);
+      else Alert.alert(t("common.not_supported"), t("home.call_manual", { num }));
     } catch {
-      Alert.alert("Dial error", "Could not open the phone dialer.");
+      Alert.alert(t("common.error"), t("home.dial_error"));
     }
   };
 
@@ -91,8 +93,8 @@ export default function HomeScreen() {
       navigation.navigate("SOSTab");
     } else {
       openConfirm(
-        `Call ${item.title}?`,
-        `Open your phone app with ${item.number} pre-filled?`,
+        t("home.confirm_call_title", { title: item.title }),
+        t("home.confirm_call_body", { number: item.number }),
         () => {
           closeConfirm();
           dialNumber(item.number);
@@ -101,21 +103,27 @@ export default function HomeScreen() {
     }
   };
 
-  const renderContact = ({ item }) => (
-    <TouchableOpacity
-      style={styles.contactCard}
-      activeOpacity={0.85}
-      onPress={() => handleContactPress(item)}
-    >
-      <Image source={item.img} style={styles.contactIcon} />
-      <View style={styles.contactTexts}>
-        <Text style={styles.contactTitle}>{item.title}</Text>
-        <Text style={styles.contactSub} numberOfLines={2}>
-          {item.subtitle}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderContact = ({ item }) => {
+    // Translate titles/subtitles by id, with English fallback from data file
+    const tTitle = t(`home.contacts.card.${item.id}.title`, item.title);
+    const tSub = t(`home.contacts.card.${item.id}.subtitle`, item.subtitle);
+
+    return (
+      <TouchableOpacity
+        style={styles.contactCard}
+        activeOpacity={0.85}
+        onPress={() => handleContactPress(item)}
+      >
+        <Image source={item.img} style={styles.contactIcon} />
+        <View style={styles.contactTexts}>
+          <Text style={styles.contactTitle}>{tTitle}</Text>
+          <Text style={styles.contactSub} numberOfLines={2}>
+            {tSub}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -132,7 +140,7 @@ export default function HomeScreen() {
               color={theme.colors.primary}
             />
             <View style={{ marginLeft: 6 }}>
-              <Text style={styles.subtle}>{t("Your Location")}</Text>
+              <Text style={styles.subtle}>{t("home.your_location")}</Text>
               <Text style={styles.locationText}>{headerLoc}</Text>
             </View>
           </View>
@@ -168,21 +176,21 @@ export default function HomeScreen() {
             />
           )}
           <View style={styles.donateOverlay}>
-            <Text style={styles.donateTitle}>
-              When Seconds{"\n"}Matters, So Does{"\n"}Your Support
-            </Text>
+            <Text style={styles.donateTitle}>{t("home.donate.title")}</Text>
             <TouchableOpacity
               style={styles.donateBtn}
               activeOpacity={0.8}
               onPress={openDonation}
             >
-              <Text style={styles.donateBtnText}>Donate Now</Text>
+              <Text style={styles.donateBtnText}>{t("home.donate.cta")}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Section Title */}
-        <Text style={styles.sectionTitle}>Emergencies Information</Text>
+        <Text style={styles.sectionTitle}>
+          {t("home.section.emergencies_info")}
+        </Text>
 
         {/* Map Card */}
         <View style={styles.mapCard}>
@@ -193,7 +201,7 @@ export default function HomeScreen() {
               color={theme.key === "dark" ? "#9CA3AF" : "#8AA0C8"}
             />
             <Text style={styles.mapPlaceholderText}>
-              Singapore Map (static)
+              {t("home.map.placeholder")}
             </Text>
           </View>
           <Ionicons
@@ -205,19 +213,19 @@ export default function HomeScreen() {
           <View style={styles.hazardBanner}>
             <Ionicons name="shield-checkmark" size={34} color="#fff" />
             <View style={{ marginLeft: 10 }}>
-              <Text style={styles.hazardTitle}>No Hazards Detected</Text>
-              <Text style={styles.hazardSubtitle}>Stay Alert, Stay Safe</Text>
+              <Text style={styles.hazardTitle}>{t("home.hazard.none")}</Text>
+              <Text style={styles.hazardSubtitle}>
+                {t("home.hazard.slogan")}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Emergency Contacts */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle2}>Emergency Contacts</Text>
+          <Text style={styles.sectionTitle2}>{t("home.contacts.title")}</Text>
         </View>
-        <Text style={styles.sectionNote}>
-          Call these numbers during a disaster or emergency only.
-        </Text>
+        <Text style={styles.sectionNote}>{t("home.contacts.note")}</Text>
 
         <FlatList
           data={CONTACTS}
@@ -233,16 +241,16 @@ export default function HomeScreen() {
         {/* Early Warning */}
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>Early Warning</Text>
+            <Text style={styles.sectionTitle2}>{t("home.early.title")}</Text>
             <Text style={styles.sectionSubtitle}>
-              Monitoring common hazards
+              {t("home.early.subtitle")}
             </Text>
           </View>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation.navigate("EarlyWarning")}
           >
-            <Text style={styles.seeMore}>See More</Text>
+            <Text style={styles.seeMore}>{t("home.see_more")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -262,16 +270,16 @@ export default function HomeScreen() {
         {/* Disaster Preparedness */}
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>Disaster Preparedness</Text>
+            <Text style={styles.sectionTitle2}>{t("home.prep.title")}</Text>
             <Text style={styles.sectionSubtitle}>
-              Learn safety tips for any emergency.
+              {t("home.prep.subtitle")}
             </Text>
           </View>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation.navigate("ResourceTab")}
           >
-            <Text style={styles.seeMore}>See More</Text>
+            <Text style={styles.seeMore}>{t("home.see_more")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -285,7 +293,7 @@ export default function HomeScreen() {
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
             <ImageOverlayCard
-              title={item.title}
+              title={t(`home.prep.topic.${item.id}`, item.title)}
               source={item.img}
               onPress={() =>
                 navigation.navigate("PreparednessGuide", { id: item.id })
@@ -298,9 +306,9 @@ export default function HomeScreen() {
         <View style={{ height: 6 }} />
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>Routine Preparations</Text>
+            <Text style={styles.sectionTitle2}>{t("home.routine.title")}</Text>
             <Text style={styles.sectionSubtitle}>
-              Build daily readiness to keep you and your family safe.
+              {t("home.routine.subtitle")}
             </Text>
           </View>
         </View>
@@ -313,23 +321,31 @@ export default function HomeScreen() {
           style={styles.edgeToEdge}
           contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 15 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
-          renderItem={({ item }) => (
-            <ImageOverlayCard
-              title={item.title}
-              source={item.img}
-              onPress={() => {
-                if (item.id === "routine-external") {
-                  navigation.navigate("ExternalResources");
-                } else if (item.id === "routine-quiz")
-                  navigation.navigate("GamesTab");
-                else if (item.id === "routine-checklist")
-                  navigation.navigate("Checklist");
-              }}
-              testID={`routine-card-${item.id}`}
-              accessibilityRole="button"
-              accessibilityLabel={item.title}
-            />
-          )}
+          renderItem={({ item }) => {
+            const key =
+              item.id === "routine-checklist"
+                ? "home.routine.card.checklist"
+                : item.id === "routine-external"
+                ? "home.routine.card.external"
+                : "home.routine.card.quiz";
+            return (
+              <ImageOverlayCard
+                title={t(key, item.title)}
+                source={item.img}
+                onPress={() => {
+                  if (item.id === "routine-external") {
+                    navigation.navigate("ExternalResources");
+                  } else if (item.id === "routine-quiz")
+                    navigation.navigate("GamesTab");
+                  else if (item.id === "routine-checklist")
+                    navigation.navigate("Checklist");
+                }}
+                testID={`routine-card-${item.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={t(key, item.title)}
+              />
+            );
+          }}
         />
 
         <View style={{ height: 20 }} />
@@ -339,8 +355,8 @@ export default function HomeScreen() {
         visible={confirm.visible}
         title={confirm.title}
         message={confirm.message}
-        confirmLabel="Proceed"
-        cancelLabel="Cancel"
+        confirmLabel={t("common.proceed", "Proceed")}
+        cancelLabel={t("common.cancel", "Cancel")}
         onCancel={closeConfirm}
         onConfirm={confirm.onConfirm}
       />
@@ -348,12 +364,10 @@ export default function HomeScreen() {
   );
 }
 
-// THEMED STYLES
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1, backgroundColor: theme.colors.appBg },
     content: { paddingTop: 10, paddingHorizontal: 16, paddingBottom: 40 },
-
     topBar: {
       flexDirection: "row",
       alignItems: "center",
@@ -370,7 +384,6 @@ const makeStyles = (theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
-
     donateCard: {
       borderRadius: 16,
       overflow: "hidden",
@@ -417,7 +430,6 @@ const makeStyles = (theme) =>
       elevation: 2,
     },
     donateBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
@@ -440,7 +452,6 @@ const makeStyles = (theme) =>
     sectionSubtitle: { color: theme.colors.subtext, fontSize: 12 },
     seeMore: { color: theme.colors.primary, fontWeight: "700" },
     edgeToEdge: { marginHorizontal: -16 },
-
     ewHeaderRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -448,10 +459,7 @@ const makeStyles = (theme) =>
       marginTop: 8,
       marginBottom: 6,
     },
-    ewHeaderLeft: {
-      flexShrink: 1,
-    },
-
+    ewHeaderLeft: { flexShrink: 1 },
     mapCard: {
       backgroundColor: theme.colors.card,
       borderRadius: 16,
@@ -490,7 +498,6 @@ const makeStyles = (theme) =>
     },
     hazardTitle: { color: "#fff", fontWeight: "800", fontSize: 15 },
     hazardSubtitle: { color: "#E9FFF1", fontSize: 12, marginTop: 2 },
-
     contactCard: {
       flexDirection: "row",
       alignItems: "center",

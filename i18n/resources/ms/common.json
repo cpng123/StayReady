@@ -1,9 +1,100 @@
 {
   "app_name": "StayReady",
+  "common": {
+    "search": "Cari",
+    "cancel": "Batal",
+    "proceed": "Teruskan",
+    "error": "Ralat"
+  },
+
   "home": {
     "your_location": "Lokasi Anda",
-    "no_hazards": "Tiada Bahaya Dikesan",
-    "stay_alert": "Sentiasa Berwaspada, Utamakan Keselamatan"
+    "region": "Zon",
+
+    "donate": {
+      "title": "Apabila setiap saat\npenting, sokongan\nanda juga penting",
+      "cta": "Derma Sekarang",
+      "error_try_later": "Sila cuba lagi nanti.",
+      "error_open": "Tidak dapat membuka halaman derma."
+    },
+
+    "section": {
+      "emergencies_info": "Maklumat Kecemasan"
+    },
+
+    "map": {
+      "placeholder": "Peta Singapura (statik)"
+    },
+
+    "hazard": {
+      "none": "Tiada Bahaya Dikesan",
+      "slogan": "Berjaga-jaga, Kekal Selamat"
+    },
+
+    "contacts": {
+      "title": "Nombor Kecemasan",
+      "note": "Hubungi nombor ini hanya semasa bencana atau kecemasan.",
+      "card": {
+        "sos":   { "title": "SOS",  "subtitle": "Aktifkan Amaran\nKecemasan yang Kuat" },
+        "995":   { "title": "995",  "subtitle": "Ambulans / Bomba\nKecemasan SCDF" },
+        "999":   { "title": "999",  "subtitle": "Tindak Balas Polis\nKecemasan SPF" },
+        "1777":  { "title": "1777", "subtitle": "Ambulans Bukan\nKecemasan" }
+      }
+    },
+
+    "early": {
+      "title": "Amaran Awal",
+      "subtitle": "Memantau bahaya biasa"
+    },
+
+    "see_more": "Lihat Lagi",
+
+    "prep": {
+      "title": "Kesediaan Bencana",
+      "subtitle": "Pelajari tip keselamatan untuk apa jua kecemasan.",
+      "topic": {
+        "flood": "Banjir Kilat",
+        "haze": "Jerebu (PM2.5)",
+        "storm": "Ribut Petir",
+        "dengue": "Pencegahan Denggi",
+        "wind": "Angin Kencang",
+        "aid": "CPR & Pertolongan Cemas",
+        "fire": "Keselamatan Kebakaran",
+        "kit": "Kit Kecemasan",
+        "disease": "Wabak Penyakit",
+        "earthquake": "Gempa Bumi"
+      }
+    },
+
+    "routine": {
+      "title": "Persediaan Rutin",
+      "subtitle": "Bina kesiapsiagaan harian untuk melindungi anda dan keluarga.",
+      "card": {
+        "checklist": "Senarai Semak StayReady",
+        "external": "Sumber Luaran",
+        "quiz": "Kuiz Keselamatan"
+      }
+    },
+
+    "confirm_call_title": "Hubungi {{title}}?",
+    "confirm_call_body": "Buka aplikasi telefon dengan {{number}} siap diisi?",
+    "call_manual": "Sila dail {{num}} secara manual.",
+    "dial_error": "Tidak dapat membuka dail telefon."
+  },
+  "nav": {
+    "sos": "SOS",
+    "resource": "Sumber",
+    "home": "Laman Utama",
+    "games": "Permainan",
+    "more": "Lagi"
+  },
+  "drawer": {
+    "checklist": "Senarai Semak",
+    "external_resources": "Sumber Luaran",
+    "bookmark": "Penanda Buku",
+    "badge_reward": "Lencana & Ganjaran",
+    "settings": "Tetapan",
+    "logout": "Log Keluar"
   },
   "settings": {
     "title": "Tetapan",
@@ -22,27 +113,41 @@
     "change_password": "Tukar Kata Laluan",
     "logout": "Log Keluar",
     "done": "Selesai",
-    "cancel": "Batal"
+    "cancel": "Batal",
+    "theme_light": "Terang",
+    "theme_dark": "Gelap"
   },
   "sos": {
     "title": "Penggera Kecemasan SOS",
     "tap_to": "Ketik untuk {{action}}",
     "alert": "aktifkan amaran",
     "stop_alarm": "hentikan amaran",
-
     "subtitle_active_line1": "Ketik untuk hentikan amaran.",
     "subtitle_active_line2": "Selepas {{delay}} saat, mesej SOS akan dihantar kepada kenalan anda.",
     "subtitle_idle_line1": "Ketik untuk aktifkan amaran.",
     "subtitle_idle_line2": "Selepas {{delay}} saat, mesej SOS akan dihantar kepada kenalan anda.",
-
     "manage_contacts": "Urus kenalan kecemasan",
-
     "guard_title": "Tambah kenalan kecemasan?",
     "guard_message": "Amaran automatik memerlukan sekurang-kurangnya satu kenalan kecemasan. Anda masih boleh mulakan amaran sekarang, tetapi tiada mesej akan dihantar.",
     "guard_add_contact": "Tambah kenalan",
     "guard_not_now": "Bukan sekarang",
-
     "button_sos": "SOS",
-    "button_stop": "HENTI"
+    "button_stop": "STOP"
+  },
+  "resource": {
+    "title": "Pusat Sumber",
+    "tagline": "Bersedia untuk apa sahaja — terokai panduan, petua dan kenalan untuk bersiap sedia menghadapi bencana, bertindak balas semasa kecemasan, dan kekal selamat dalam apa jua keadaan.",
+    "prep_titles": {
+      "flood": "Banjir Kilat",
+      "haze": "Jerebu (PM2.5)",
+      "storm": "Ribut Petir",
+      "dengue": "Pencegahan Denggi",
+      "wind": "Angin Kencang",
+      "aid": "CPR & Pertolongan Cemas",
+      "fire": "Keselamatan Kebakaran",
+      "kit": "Kit Kecemasan",
+      "disease": "Wabak Penyakit",
+      "earthquake": "Gempa Bumi"
+    }
   }
 }

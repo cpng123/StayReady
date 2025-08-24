@@ -18,6 +18,7 @@ import { useThemeContext } from "../theme/ThemeProvider";
 import TopBar from "../components/TopBar";
 import ThemeToggle from "../components/ThemeToggle";
 import { useTranslation } from "react-i18next";
+import { setAppLanguage } from "../i18n";
 
 /* ----------------------- storage keys ----------------------- */
 const K_LANG = "pref:language";
@@ -40,7 +41,9 @@ export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
 
   // prefs
-  const [language, setLanguage] = useState(i18n.language?.split("-")[0] || "en");
+  const [language, setLanguage] = useState(
+    i18n.language?.split("-")[0] || "en"
+  );
   const [notif, setNotif] = useState(true);
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
@@ -66,7 +69,7 @@ export default function SettingsScreen() {
         setLanguage(savedLang);
         setTempLanguage(savedLang);
         if (savedLang !== i18n.language) {
-          await i18n.changeLanguage(savedLang); // <- apply app-wide
+          await setAppLanguage(savedLang);
         }
 
         if (n != null) setNotif(n === "1");
@@ -107,7 +110,9 @@ export default function SettingsScreen() {
   );
 
   const SectionTitle = ({ children }) => (
-    <Text style={[s.sectionTitle, { color: theme.colors.text }]}>{children}</Text>
+    <Text style={[s.sectionTitle, { color: theme.colors.text }]}>
+      {children}
+    </Text>
   );
 
   return (
@@ -120,18 +125,26 @@ export default function SettingsScreen() {
         <View style={[s.profileCard, { backgroundColor: theme.colors.card }]}>
           <View style={s.avatar} />
           <View style={{ flex: 1 }}>
-            <Text style={[s.profileName, { color: theme.colors.text }]}>Tester</Text>
+            <Text style={[s.profileName, { color: theme.colors.text }]}>
+              Tester
+            </Text>
             <Text style={[s.profileEmail, { color: theme.colors.subtext }]}>
               example123@gmail.com
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.subtext} />
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.subtext}
+          />
         </View>
 
         <SectionTitle>{t("settings.pref_controls")}</SectionTitle>
 
         <Row
-          icon={<Ionicons name="language" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons name="language" size={18} color={theme.colors.text} />
+          }
           label={t("settings.language")}
           onPress={() => {
             setTempLanguage(language);
@@ -142,32 +155,66 @@ export default function SettingsScreen() {
               <Text style={[s.rightText, { color: theme.colors.subtext }]}>
                 {LANGS.find((l) => l.id === language)?.label || "English"}
               </Text>
-              <Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={theme.colors.subtext}
+              />
             </View>
           }
         />
 
         <Row
-          icon={<Ionicons name="color-palette-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="color-palette-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.theme")}
           onPress={() => setThemeOpen(true)}
-          right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
+          right={
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={theme.colors.subtext}
+            />
+          }
         />
 
         <Row
-          icon={<Ionicons name="notifications-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="notifications-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.notifications")}
           right={<Switch value={notif} onValueChange={setNotif} />}
         />
 
         <Row
-          icon={<Ionicons name="volume-high-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="volume-high-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.sound")}
           right={<Switch value={sound} onValueChange={setSound} />}
         />
 
         <Row
-          icon={<MaterialCommunityIcons name="vibrate" size={20} color={theme.colors.text} />}
+          icon={
+            <MaterialCommunityIcons
+              name="vibrate"
+              size={20}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.vibration")}
           right={<Switch value={vibration} onValueChange={setVibration} />}
         />
@@ -175,38 +222,82 @@ export default function SettingsScreen() {
         <SectionTitle>{t("settings.preparedness_settings")}</SectionTitle>
 
         <Row
-          icon={<Ionicons name="location-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="location-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.location")}
           onPress={() => nav.navigate("LocationSettings")}
           right={
             <View style={s.rightInline}>
-              <Text style={[s.rightText, { color: theme.colors.subtext }]}>{t("settings.country_sg")}</Text>
-              <Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />
+              <Text style={[s.rightText, { color: theme.colors.subtext }]}>
+                {t("settings.country_sg")}
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={theme.colors.subtext}
+              />
             </View>
           }
         />
 
         <Row
-          icon={<Ionicons name="call-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons name="call-outline" size={18} color={theme.colors.text} />
+          }
           label={t("settings.emergency_contacts_setup")}
           onPress={() => nav.navigate("EmergencyContacts")}
-          right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
+          right={
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={theme.colors.subtext}
+            />
+          }
         />
 
         <SectionTitle>{t("settings.account_settings")}</SectionTitle>
 
         <Row
-          icon={<Ionicons name="lock-closed-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="lock-closed-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.change_password")}
           onPress={() => nav.navigate("ChangePassword")}
-          right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
+          right={
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={theme.colors.subtext}
+            />
+          }
         />
 
         <Row
-          icon={<Ionicons name="log-out-outline" size={18} color={theme.colors.text} />}
+          icon={
+            <Ionicons
+              name="log-out-outline"
+              size={18}
+              color={theme.colors.text}
+            />
+          }
           label={t("settings.logout")}
           onPress={() => nav.navigate("Logout")}
-          right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
+          right={
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={theme.colors.subtext}
+            />
+          }
         />
 
         <View style={{ height: 24 }} />
@@ -237,8 +328,11 @@ export default function SettingsScreen() {
                     style={[
                       s.langRow,
                       {
-                        borderColor: active ? theme.colors.primary : "transparent",
-                        backgroundColor: theme.key === "dark" ? "#111418" : "#F3F4F6",
+                        borderColor: active
+                          ? theme.colors.primary
+                          : "transparent",
+                        backgroundColor:
+                          theme.key === "dark" ? "#111418" : "#F3F4F6",
                       },
                     ]}
                     activeOpacity={0.85}
@@ -247,13 +341,21 @@ export default function SettingsScreen() {
                     <Text
                       style={[
                         s.langLabel,
-                        { color: active ? theme.colors.primary : theme.colors.text },
+                        {
+                          color: active
+                            ? theme.colors.primary
+                            : theme.colors.text,
+                        },
                       ]}
                     >
                       {item.label}
                     </Text>
                     {active && (
-                      <Ionicons name="checkmark-circle" size={18} color={theme.colors.primary} />
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
                     )}
                   </TouchableOpacity>
                 );
@@ -267,8 +369,7 @@ export default function SettingsScreen() {
               onPress={async () => {
                 // Persist + apply globally
                 setLanguage(tempLanguage);
-                await AsyncStorage.setItem(K_LANG, tempLanguage);
-                await i18n.changeLanguage(tempLanguage); // <- this triggers re-render across app
+                await setAppLanguage(tempLanguage);
                 setLangOpen(false);
               }}
             >
@@ -285,10 +386,15 @@ export default function SettingsScreen() {
         animationType="fade"
         onRequestClose={() => setThemeOpen(false)}
       >
-        <Pressable style={s.modalBackdrop} onPress={() => setThemeOpen(false)} />
+        <Pressable
+          style={s.modalBackdrop}
+          onPress={() => setThemeOpen(false)}
+        />
         <View style={s.modalCenter} pointerEvents="box-none">
           <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
-            <Text style={[s.modalTitle, { color: theme.colors.text }]}>{t("settings.theme")}</Text>
+            <Text style={[s.modalTitle, { color: theme.colors.text }]}>
+              {t("settings.theme")}
+            </Text>
             <View style={{ marginTop: 6 }}>
               <ThemeToggle />
             </View>

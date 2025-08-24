@@ -1,10 +1,103 @@
 {
   "app_name": "StayReady",
+  "common": {
+    "search": "Search",
+    "cancel": "Cancel",
+    "proceed": "Proceed",
+    "error": "Error"
+  },
 
   "home": {
     "your_location": "Your Location",
-    "no_hazards": "No Hazards Detected",
-    "stay_alert": "Stay Alert, Stay Safe"
+    "region": "Region",
+
+    "donate": {
+      "title": "When Seconds\nMatter, So Does\nYour Support",
+      "cta": "Donate Now",
+      "error_try_later": "Please try again later.",
+      "error_open": "Could not open the donation page."
+    },
+
+    "section": {
+      "emergencies_info": "Emergencies Information"
+    },
+
+    "map": {
+      "placeholder": "Singapore Map (static)"
+    },
+
+    "hazard": {
+      "none": "No Hazards Detected",
+      "slogan": "Stay Alert, Stay Safe"
+    },
+
+    "contacts": {
+      "title": "Emergency Contacts",
+      "note": "Call these numbers during a disaster or emergency only.",
+      "card": {
+        "sos": { "title": "SOS", "subtitle": "Trigger Loud\nEmergency Alert" },
+        "995": {
+          "title": "995",
+          "subtitle": "SCDF Emergency\nAmbulance / Fire"
+        },
+        "999": { "title": "999", "subtitle": "SPF Emergency\nPolice Response" },
+        "1777": { "title": "1777", "subtitle": "Non-Emergency\nAmbulance" }
+      }
+    },
+
+    "early": {
+      "title": "Early Warning",
+      "subtitle": "Monitoring common hazards"
+    },
+
+    "see_more": "See More",
+
+    "prep": {
+      "title": "Disaster Preparedness",
+      "subtitle": "Learn safety tips for any emergency.",
+      "topic": {
+        "flood": "Flash Flood",
+        "haze": "Haze (PM2.5)",
+        "storm": "Thunderstorm",
+        "dengue": "Dengue Prevention",
+        "wind": "Strong Wind",
+        "aid": "CPR & First Aid",
+        "fire": "Fire Safety",
+        "kit": "Emergency Kits",
+        "disease": "Disease Outbreak",
+        "earthquake": "Earthquake"
+      }
+    },
+
+    "routine": {
+      "title": "Routine Preparations",
+      "subtitle": "Build daily readiness to keep you and your family safe.",
+      "card": {
+        "checklist": "StayReady Checklist",
+        "external": "External Resources",
+        "quiz": "Safety Quiz"
+      }
+    },
+
+    "confirm_call_title": "Call {{title}}?",
+    "confirm_call_body": "Open your phone app with {{number}} pre-filled?",
+    "call_manual": "Please call {{num}} manually.",
+    "dial_error": "Could not open the phone dialer."
+  },
+  "nav": {
+    "sos": "SOS",
+    "resource": "Resource",
+    "home": "Home",
+    "games": "Games",
+    "more": "More"
+  },
+  "drawer": {
+    "checklist": "Checklist",
+    "external_resources": "External Resources",
+    "bookmark": "Bookmark",
+    "badge_reward": "Badge & Reward",
+    "settings": "Settings",
+    "logout": "Log Out"
   },
 
   "settings": {
@@ -24,7 +117,9 @@
     "change_password": "Change Password",
     "logout": "Logout",
     "done": "Done",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "theme_light": "Light",
+    "theme_dark": "Dark"
   },
 
   "sos": {
@@ -32,20 +127,32 @@
     "tap_to": "Tap to {{action}}",
     "alert": "alert",
     "stop_alarm": "stop alarm",
-
     "subtitle_active_line1": "Tap to stop alarm.",
     "subtitle_active_line2": "{{delay}}s later, an SOS will be sent to your contacts.",
     "subtitle_idle_line1": "Tap to alert.",
     "subtitle_idle_line2": "After {{delay}}s, an SOS message will be sent to your contacts.",
-
     "manage_contacts": "Manage emergency contacts",
-
     "guard_title": "Add an emergency contact?",
     "guard_message": "Auto alerts need at least one emergency contact. You can still start the alarm now, but no messages will be sent.",
     "guard_add_contact": "Add contact",
     "guard_not_now": "Not now",
-
     "button_sos": "SOS",
     "button_stop": "STOP"
+  },
+  "resource": {
+    "title": "Resource Hub",
+    "tagline": "Stay ready for anything — explore guides, tips, and contacts to prepare for disasters, respond to emergencies, and stay safe in any situation.",
+    "prep_titles": {
+      "flood": "Flash Flood",
+      "haze": "Haze (PM2.5)",
+      "storm": "Thunderstorm",
+      "dengue": "Dengue Prevention",
+      "wind": "Strong Wind",
+      "aid": "CPR & First Aid",
+      "fire": "Fire Safety",
+      "kit": "Emergency Kits",
+      "disease": "Disease Outbreak",
+      "earthquake": "Earthquake"
+    }
   }
 }

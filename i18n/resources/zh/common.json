@@ -1,11 +1,102 @@
 {
   "app_name": "StayReady",
-  "home": {
-    "your_location": "你的位置",
-    "no_hazards": "未检测到危险",
-    "stay_alert": "保持警惕，注意安全"
+  "common": {
+    "search": "搜索",
+    "cancel": "取消",
+    "proceed": "继续",
+    "error": "错误"
   },
-"settings": {
+
+   "home": {
+    "your_location": "你的位置",
+    "region": "地区",
+
+    "donate": {
+      "title": "当每一秒\n都很重要时\n您的支持同样重要",
+      "cta": "立即捐助",
+      "error_try_later": "请稍后再试。",
+      "error_open": "无法打开捐助页面。"
+    },
+
+    "section": {
+      "emergencies_info": "紧急信息"
+    },
+
+    "map": {
+      "placeholder": "新加坡地图（静态）"
+    },
+
+    "hazard": {
+      "none": "未检测到危害",
+      "slogan": "保持警惕，注意安全"
+    },
+
+    "contacts": {
+      "title": "紧急联系",
+      "note": "仅在灾难或紧急情况下拨打这些号码。",
+      "card": {
+        "sos":   { "title": "SOS",  "subtitle": "触发响亮的\n紧急警报" },
+        "995":   { "title": "995",  "subtitle": "SCDF 紧急救护\n / 火警" },
+        "999":   { "title": "999",  "subtitle": "SPF\n紧急警务响应" },
+        "1777":  { "title": "1777", "subtitle": "非紧急救护车" }
+      }
+    },
+
+    "early": {
+      "title": "预警",
+      "subtitle": "监测常见风险"
+    },
+
+    "see_more": "查看更多",
+
+    "prep": {
+      "title": "灾害防备",
+      "subtitle": "了解应对任何紧急情况的安全提示。",
+      "topic": {
+        "flood": "突发洪水",
+        "haze": "霾（PM2.5）",
+        "storm": "雷暴",
+        "dengue": "登革热防治",
+        "wind": "强风",
+        "aid": "心肺复苏与急救",
+        "fire": "消防安全",
+        "kit": "应急物品包",
+        "disease": "传染病暴发",
+        "earthquake": "地震"
+      }
+    },
+
+    "routine": {
+      "title": "日常准备",
+      "subtitle": "通过日常准备保障您和家人的安全。",
+      "card": {
+        "checklist": "保持准备清单",
+        "external": "外部资源",
+        "quiz": "安全测验"
+      }
+    },
+
+    "confirm_call_title": "拨打 {{title}}？",
+    "confirm_call_body": "是否打开电话并预填 {{number}}？",
+    "call_manual": "请手动拨打 {{num}}。",
+    "dial_error": "无法打开电话拨号器。"
+  },
+  "nav": {
+    "sos": "SOS",
+    "resource": "资源",
+    "home": "首页",
+    "games": "游戏",
+    "more": "更多"
+  },
+  "drawer": {
+    "checklist": "清单",
+    "external_resources": "外部资源",
+    "bookmark": "书签",
+    "badge_reward": "徽章与奖励",
+    "settings": "设置",
+    "logout": "退出登录"
+  },
+  "settings": {
     "title": "设置",
     "pref_controls": "偏好与控制",
     "language": "语言",
@@ -22,7 +113,9 @@
     "change_password": "更改密码",
     "logout": "退出登录",
     "done": "完成",
-    "cancel": "取消"
+    "cancel": "取消",
+    "theme_light": "浅色",
+    "theme_dark": "深色"
   },
   "sos": {
     "title": "SOS 紧急警报",
@@ -44,5 +137,21 @@
 
     "button_sos": "SOS",
     "button_stop": "停止"
+  },
+  "resource": {
+    "title": "资源中心",
+    "tagline": "为一切做好准备——浏览指南、技巧和联系人，帮助你在灾害前做好准备、在紧急情况时及时应对，并在各种情况下保持安全。",
+    "prep_titles": {
+      "flood": "突发洪水",
+      "haze": "雾霾（PM2.5）",
+      "storm": "雷暴",
+      "dengue": "登革热防范",
+      "wind": "强风",
+      "aid": "心肺复苏与急救",
+      "fire": "消防安全",
+      "kit": "应急物资包",
+      "disease": "疾病暴发",
+      "earthquake": "地震"
+    }
   }
 }

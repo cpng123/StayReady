@@ -6,6 +6,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
+import { useTranslation } from "react-i18next";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -28,6 +29,7 @@ function EmptyScreen() {
 
 function MainTabs() {
   const { theme } = useThemeContext();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
@@ -61,7 +63,8 @@ function MainTabs() {
         name="SOSTab"
         component={SOSScreen}
         options={{
-          title: "SOS",
+          title: t("nav.sos"),
+          tabBarLabel: t("nav.sos"),
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="alarm-light"
@@ -75,7 +78,8 @@ function MainTabs() {
         name="ResourceTab"
         component={ResourceHubScreen}
         options={{
-          title: "Resource",
+          title: t("nav.resource"),
+          tabBarLabel: t("nav.resource"),
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
               name="lightbulb-on"
@@ -89,7 +93,8 @@ function MainTabs() {
         name="HomeTab"
         component={HomeScreen}
         options={{
-          title: "Home",
+         title: t("nav.home"),
+         tabBarLabel: t("nav.home"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="home" size={22} color={color} />
           ),
@@ -99,7 +104,8 @@ function MainTabs() {
         name="GamesTab"
         component={GamesScreen}
         options={{
-          title: "Games",
+         title: t("nav.games"),
+         tabBarLabel: t("nav.games"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="game-controller" size={22} color={color} />
           ),
@@ -109,7 +115,8 @@ function MainTabs() {
         name="MoreTab"
         component={EmptyScreen}
         options={{
-          title: "More",
+         title: t("nav.more"),
+         tabBarLabel: t("nav.more"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="grid" size={22} color={color} />
           ),
@@ -138,6 +145,7 @@ function Row({ icon, label, onPress, textColor }) {
 
 function SideMenu({ navigation }) {
   const { theme, themeKey, setThemeKey } = useThemeContext();
+const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.drawerBg }}>
@@ -175,7 +183,7 @@ function SideMenu({ navigation }) {
                 color={theme.colors.text}
               />
             }
-            label="Checklist"
+            label={t("drawer.checklist")}
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
@@ -190,7 +198,7 @@ function SideMenu({ navigation }) {
                 color={theme.colors.text}
               />
             }
-            label="External Resources"
+            label={t("drawer.external_resources")}
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
@@ -205,7 +213,7 @@ function SideMenu({ navigation }) {
                 color={theme.colors.text}
               />
             }
-            label="Bookmark"
+            label={t("drawer.bookmark")}
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
@@ -214,7 +222,7 @@ function SideMenu({ navigation }) {
           />
           <Row
             icon={<Ionicons name="gift" size={24} color={theme.colors.text} />}
-            label="Badge & Reward"
+            label={t("drawer.badge_reward")}
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
@@ -225,7 +233,7 @@ function SideMenu({ navigation }) {
             icon={
               <Ionicons name="settings" size={24} color={theme.colors.text} />
             }
-            label="Setting"
+            label={t("drawer.settings")}
             textColor={theme.colors.text}
             onPress={() => {
               navigation.closeDrawer();
@@ -236,7 +244,7 @@ function SideMenu({ navigation }) {
             icon={
               <Ionicons name="log-out" size={24} color={theme.colors.text} />
             }
-            label="Log Out"
+            label={t("drawer.logout")}
             textColor={theme.colors.text}
             onPress={() => {}}
           />

@@ -6,9 +6,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./navigation/RootNavigation";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { initI18n } from "./i18n";
+import i18n, { initI18n } from "./i18n";           // <-- import the configured instance
 import { I18nextProvider } from "react-i18next";
-import i18n from "i18next";
 
 import SplashScreen from "./screens/SplashScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
@@ -36,29 +35,19 @@ function RootNav() {
   const { theme } = useThemeContext();
 
   return (
-    // Only top/left/right so bottom tab can remain fully flush to the bottom
     <SafeAreaView
       style={{ flex: 1, backgroundColor: theme.colors.appBg }}
       edges={["top", "left", "right"]}
     >
       <StatusBar style={theme.statusBarStyle} />
       <NavigationContainer ref={navigationRef} theme={theme.navTheme}>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false }}
-          // initialRouteName="QuizResult"
-        >
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Main" component={AppNavigator} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
-          <Stack.Screen
-            name="PreparednessGuide"
-            component={PreparednessGuideScreen}
-          />
-          <Stack.Screen
-            name="ExternalResources"
-            component={ExternalResourceScreen}
-          />
+          <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
+          <Stack.Screen name="ExternalResources" component={ExternalResourceScreen} />
           <Stack.Screen name="Checklist" component={ChecklistScreen} />
           <Stack.Screen name="QuizSets" component={QuizSetsScreen} />
           <Stack.Screen name="QuizPlay" component={QuizPlayScreen} />
@@ -68,10 +57,7 @@ function RootNav() {
           <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
           <Stack.Screen name="RewardDetail" component={RewardDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen
-            name="EmergencyContacts"
-            component={EmergencyContactsScreen}
-          />
+          <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
           <Stack.Screen name="LocationSettings" component={LocationSettings} />
         </Stack.Navigator>
       </NavigationContainer>
@@ -84,7 +70,7 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      await initI18n();
+      await initI18n();    // ensures saved language is loaded BEFORE first render
       setReady(true);
     })();
   }, []);

@@ -1,11 +1,14 @@
+// components/ThemeToggle.js
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 export default function ThemeToggle({ containerStyle }) {
   const { theme, themeKey, setThemeKey } = useThemeContext();
+  const { t } = useTranslation();
 
   const setTheme = async (key) => {
     if (key === themeKey) return;
@@ -19,9 +22,7 @@ export default function ThemeToggle({ containerStyle }) {
     <View
       style={[
         styles.wrap,
-        {
-          backgroundColor: themeKey === "dark" ? "#2a2a2dff" : "#F3F4F6",
-        },
+        { backgroundColor: themeKey === "dark" ? "#2a2a2dff" : "#F3F4F6" },
         containerStyle,
       ]}
     >
@@ -29,6 +30,9 @@ export default function ThemeToggle({ containerStyle }) {
         style={[styles.btn, themeKey === "light" && styles.active]}
         onPress={() => setTheme("light")}
         activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityState={{ selected: themeKey === "light" }}
+        accessibilityLabel={t("settings.theme_light", "Light")}
       >
         <Ionicons
           name="sunny"
@@ -41,7 +45,7 @@ export default function ThemeToggle({ containerStyle }) {
             { color: themeKey === "light" ? "#fff" : "#6B7280" },
           ]}
         >
-          Light
+          {t("settings.theme_light", "Light")}
         </Text>
       </TouchableOpacity>
 
@@ -49,6 +53,9 @@ export default function ThemeToggle({ containerStyle }) {
         style={[styles.btn, themeKey === "dark" && styles.active]}
         onPress={() => setTheme("dark")}
         activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityState={{ selected: themeKey === "dark" }}
+        accessibilityLabel={t("settings.theme_dark", "Dark")}
       >
         <Ionicons
           name="moon"
@@ -61,7 +68,7 @@ export default function ThemeToggle({ containerStyle }) {
             { color: themeKey === "dark" ? "#fff" : "#6B7280" },
           ]}
         >
-          Dark
+          {t("settings.theme_dark", "Dark")}
         </Text>
       </TouchableOpacity>
     </View>

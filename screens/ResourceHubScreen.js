@@ -5,15 +5,14 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
   SafeAreaView,
   FlatList,
   Dimensions,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { PREPAREDNESS } from "../data/homeData";
 import ImageOverlayCard from "../components/ImageOverlayCard";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 const SCREEN_PADDING = 16;
 const GAP = 12;
@@ -23,20 +22,23 @@ const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 export default function ResourceHubScreen({ navigation }) {
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const Header = (
     <View style={styles.headerCopy}>
-      <Text style={styles.h1}>Resource Hub</Text>
+      <Text style={styles.h1}>{t("resource.title", "Resource Hub")}</Text>
       <Text style={styles.p}>
-        Stay Ready for anything — explore guides, tips, and contacts to prepare
-        for disasters, respond to emergencies, and stay safe in any situation.
+        {t(
+          "resource.tagline",
+          "Stay ready for anything — explore guides, tips, and contacts to prepare for disasters, respond to emergencies, and stay safe in any situation."
+        )}
       </Text>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Top hero (single image, no carousel) */}
+      {/* Top hero (single image) */}
       <View style={styles.hero}>
         <Image
           source={require("../assets/General/resource-hub.jpg")}
@@ -58,7 +60,7 @@ export default function ResourceHubScreen({ navigation }) {
         }}
         renderItem={({ item }) => (
           <ImageOverlayCard
-            title={item.title}
+            title={t(`resource.prep_titles.${item.id}`, item.title)}
             source={item.img}
             width={CARD_WIDTH}
             height={120}
@@ -82,19 +84,6 @@ const makeStyles = (theme) =>
       backgroundColor: theme.key === "dark" ? "#1F2937" : "#e7eef8",
     },
     heroImg: { width: SCREEN_WIDTH, height: "100%", resizeMode: "cover" },
-
-    backBtn: {
-      position: "absolute",
-      left: 12,
-      top: 12,
-      height: 36,
-      width: 36,
-      borderRadius: 8,
-      backgroundColor:
-        theme.key === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.35)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
 
     headerCopy: { paddingTop: 14, paddingBottom: 8 },
     h1: {

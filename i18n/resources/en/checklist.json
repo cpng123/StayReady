@@ -1,0 +1,140 @@
+{
+  "screen_title": "StayReady Checklist",
+
+  "filters": {
+    "safety": "Safety",
+    "firstaid": "First Aid",
+    "home": "Home",
+    "supplies": "Supplies",
+    "recovery": "Recovery"
+  },
+
+  "titles": {
+    "safe-evac": "Evacuation Plan",
+    "safe-comm": "Communication Plan",
+    "safe-shelter": "Shelter-in-Place",
+    "safe-fire": "Fire Safety & Hazards",
+    "safe-utilities": "Utilities & Electrical Safety",
+
+    "fa-kit-min": "First Aid Kit — Essentials",
+    "fa-meds": "Medications & Special Items",
+    "fa-skills": "Skills & Reference",
+    "fa-hygiene": "Hygiene & Infection Control",
+
+    "home-prep": "Home Preparation",
+    "home-electrical": "Electrical Safety",
+    "home-property": "Property Protection",
+    "home-sanitation": "Sanitation & Cleanliness",
+
+    "sup-bag": "Emergency Bag Essentials",
+    "sup-docs": "Documents & Cash",
+    "sup-tools": "Tools & Equipment",
+    "sup-hygiene": "Water, Hygiene & Food Safety",
+
+    "rec-assess": "Damage Assessment",
+    "rec-insurance": "Insurance & Assistance",
+    "rec-clean": "Cleaning & Disinfection"
+  },
+
+  "items": {
+    "safe-1":  "Identify route to higher ground",
+    "safe-2":  "Know nearest shelter/community centre",
+    "safe-3":  "Keep go-bag by the door",
+    "safe-4":  "Plan for pets (carrier/food/docs)",
+    "safe-5":  "Agree on family meetup point",
+    "safe-6":  "List out-of-area contact",
+    "safe-7":  "Save hotlines: PUB, SCDF (995), Police (999)",
+    "safe-8":  "Enable emergency alerts on your phone",
+    "safe-9":  "Secure windows/doors; close curtains",
+    "safe-10": "Prepare ventilation (avoid fumes/CO)",
+    "safe-11": "Keep radio/phone for official updates",
+    "safe-12": "Check smoke alarm works; spare batteries",
+    "safe-13": "Know extinguisher location & PASS steps",
+    "safe-14": "Keep escape paths clear (no blocked doors)",
+    "safe-15": "Never overload power strips or sockets",
+    "safe-16": "Know where to shut off main power/water/gas",
+    "safe-17": "Unplug appliances if water is rising",
+    "safe-18": "Keep extension cords off the floor",
+
+    "fae-1":  "Assorted adhesive plasters/band-aids",
+    "fae-2":  "Sterile gauze pads & roller bandage",
+    "fae-3":  "Medical tape (adhesive)",
+    "fae-4":  "Antiseptic wipes / alcohol swabs",
+    "fae-5":  "Antibiotic ointment (topical)",
+    "fae-6":  "Scissors (blunt tip) & tweezers",
+    "fae-7":  "Disposable gloves (nitrile), 4–6 pcs",
+    "fae-8":  "CPR face shield (one-way valve)",
+    "fae-9":  "Instant cold pack",
+    "fae-10": "Triangular bandage / sling",
+
+    "fam-1": "Personal prescriptions (3–7 days)",
+    "fam-2": "Pain reliever (e.g., paracetamol/ibuprofen)",
+    "fam-3": "Antihistamine (allergy), e.g., loratadine",
+    "fam-4": "Oral rehydration salts",
+    "fam-5": "Spare inhaler / EpiPen if prescribed",
+    "fam-6": "Burn gel / hydrogel dressing",
+    "fam-7": "Digital thermometer & spare battery",
+
+    "fas-1": "Know CPR steps (adult/child)",
+    "fas-2": "Learn bleeding control & shock signs",
+    "fas-3": "Pack a compact first aid handbook/app",
+    "fas-4": "Emergency contacts & GP clinic list",
+
+    "fah-1": "Hand sanitizer, soap, masks",
+    "fah-2": "Waste bags for biohazards/sharps",
+    "fah-3": "Wound cleaning (saline/water)",
+
+    "home-1": "Move important documents to higher shelves",
+    "home-2": "Move electronics and valuables to higher shelves",
+    "home-3": "Check and clear floor drains/balconies",
+    "home-4": "Secure loose items near windows",
+
+    "elec-1": "Unplug appliances if water is rising",
+    "elec-2": "Know the main power switch location",
+    "elec-3": "Switch off main power if advised/unsafe",
+    "elec-4": "Keep extension cords off the floor",
+
+    "prop-1": "Elevate furniture or place on blocks",
+    "prop-2": "Use door/window barriers if available",
+    "prop-3": "Photograph valuables for records",
+    "prop-4": "Review insurance coverage details",
+
+    "san-1": "Bag & secure rubbish; avoid clogs",
+    "san-2": "Stock trash bags & disinfectant",
+    "san-3": "Keep wet/dry wipes accessible",
+    "san-4": "Separate clean vs. contaminated items",
+
+    "sup-1":  "Pack bottled water (2L per person/day)",
+    "sup-2":  "Pack torchlight & spare batteries",
+    "sup-3":  "Pack non-perishable food (3 days)",
+    "sup-4":  "Include first aid kit",
+
+    "sup-5":  "IDs, insurance, medical info (copies)",
+    "sup-6":  "Small cash & stored value cards",
+    "sup-7":  "Emergency contacts list",
+
+    "sup-8":  "Multi-tool & duct tape",
+    "sup-9":  "Portable phone charger/power bank",
+    "sup-10": "Rain gear & ponchos",
+
+    "sup-11": "Water purification tablets/filter",
+    "sup-12": "Soap, sanitizer, masks, gloves",
+    "sup-13": "Manual can opener & utensils",
+
+    "rec-1": "Wait for official all-clear",
+    "rec-2": "Document damage with photos/videos",
+    "rec-3": "Avoid energized/wet electrical areas",
+
+    "rec-4": "Contact insurer & file claim",
+    "rec-5": "Track expenses/receipts",
+    "rec-6": "Check relief/assistance schemes",
+
+    "rec-7": "Wear gloves/boots; ventilate area",
+    "rec-8": "Discard contaminated porous items",
+    "rec-9": "Disinfect hard surfaces thoroughly"
+  },
+
+  "reset_title":   "Reset all checks?",
+  "reset_message": "This will uncheck every item in all tabs.",
+  "reset_confirm": "Reset"
+}

@@ -1,0 +1,140 @@
+{
+  "screen_title": "Senarai Semak StayReady",
+
+  "filters": {
+    "safety": "Keselamatan",
+    "firstaid": "Pertolongan Cemas",
+    "home": "Rumah",
+    "supplies": "Bekalan",
+    "recovery": "Pemulihan"
+  },
+
+  "titles": {
+    "safe-evac": "Pelan Pemindahan",
+    "safe-comm": "Pelan Komunikasi",
+    "safe-shelter": "Berlindung di Tempat",
+    "safe-fire": "Keselamatan Kebakaran & Bahaya",
+    "safe-utilities": "Utiliti & Keselamatan Elektrik",
+
+    "fa-kit-min": "Kit Pertolongan Cemas — Keperluan",
+    "fa-meds": "Ubat-ubatan & Item Khas",
+    "fa-skills": "Kemahiran & Rujukan",
+    "fa-hygiene": "Kebersihan & Kawalan Jangkitan",
+
+    "home-prep": "Persediaan Rumah",
+    "home-electrical": "Keselamatan Elektrik",
+    "home-property": "Perlindungan Harta",
+    "home-sanitation": "Kebersihan & Pembersihan",
+
+    "sup-bag": "Keperluan Beg Kecemasan",
+    "sup-docs": "Dokumen & Tunai",
+    "sup-tools": "Alat & Peralatan",
+    "sup-hygiene": "Air, Kebersihan & Keselamatan Makanan",
+
+    "rec-assess": "Penilaian Kerosakan",
+    "rec-insurance": "Insurans & Bantuan",
+    "rec-clean": "Pembersihan & Pembasmian Kuman"
+  },
+
+  "items": {
+    "safe-1": "Kenal pasti laluan ke kawasan tinggi",
+    "safe-2": "Tahu pusat perlindungan/pusat komuniti terdekat",
+    "safe-3": "Simpan beg kecemasan di tepi pintu",
+    "safe-4": "Rancang untuk haiwan peliharaan (pembawa/makanan/dokumen)",
+    "safe-5": "Persetujui lokasi pertemuan keluarga",
+    "safe-6": "Senaraikan kenalan luar kawasan",
+    "safe-7": "Simpan talian penting: PUB, SCDF (995), Polis (999)",
+    "safe-8": "Aktifkan amaran kecemasan pada telefon anda",
+    "safe-9": "Pastikan tingkap/pintu selamat; tutup langsir",
+    "safe-10": "Sediakan pengudaraan (elak asap/CO)",
+    "safe-11": "Simpan radio/telefon untuk makluman rasmi",
+    "safe-12": "Periksa penggera asap; sediakan bateri gantian",
+    "safe-13": "Tahu lokasi alat pemadam api & langkah PASS",
+    "safe-14": "Pastikan laluan keluar jelas (tiada pintu terhalang)",
+    "safe-15": "Jangan terlebih bebankan soket/plug",
+    "safe-16": "Tahu lokasi suis utama elektrik/air/gas",
+    "safe-17": "Cabut palam peralatan jika air naik",
+    "safe-18": "Jauhkan kabel sambungan dari lantai",
+
+    "fae-1": "Plaster pelekat pelbagai saiz",
+    "fae-2": "Pad kain kasa steril & pembalut gulung",
+    "fae-3": "Pita perubatan (pelekat)",
+    "fae-4": "Kain lap antiseptik / kapas alkohol",
+    "fae-5": "Salap antibiotik (sapuan kulit)",
+    "fae-6": "Gunting (hujung tumpul) & penyepit",
+    "fae-7": "Sarung tangan pakai buang (nitril), 4–6 pasang",
+    "fae-8": "Perisai muka CPR (injap sehala)",
+    "fae-9": "Pek sejuk segera",
+    "fae-10": "Pembalut tiga segi / anduh",
+
+    "fam-1": "Ubat preskripsi peribadi (3–7 hari)",
+    "fam-2": "Ubat tahan sakit (cth. parasetamol/ibuprofen)",
+    "fam-3": "Antihistamin (alergi), cth. loratadine",
+    "fam-4": "Garam rehidrasi oral",
+    "fam-5": "Inhaler/EpiPen simpanan jika dipreskripsi",
+    "fam-6": "Gel luka bakar / pembalut hidrogel",
+    "fam-7": "Termometer digital & bateri gantian",
+
+    "fas-1": "Ketahui langkah CPR (dewasa/kanak-kanak)",
+    "fas-2": "Belajar kawalan pendarahan & tanda renjatan",
+    "fas-3": "Simpan buku panduan/aplikasi pertolongan cemas",
+    "fas-4": "Senarai kenalan kecemasan & klinik GP",
+
+    "fah-1": "Pembersih tangan, sabun, pelitup muka",
+    "fah-2": "Beg buangan biohazard/barangan tajam",
+    "fah-3": "Pembersihan luka (salin/air)",
+
+    "home-1": "Alihkan dokumen penting ke rak lebih tinggi",
+    "home-2": "Alihkan elektronik & barangan berharga ke rak lebih tinggi",
+    "home-3": "Periksa & bersihkan longkang lantai/balkoni",
+    "home-4": "Pastikan barang longgar berhampiran tingkap selamat",
+
+    "elec-1": "Cabut palam peralatan jika air naik",
+    "elec-2": "Tahu lokasi suis kuasa utama",
+    "elec-3": "Tutup kuasa utama jika dinasihatkan/berbahaya",
+    "elec-4": "Jauhkan kabel sambungan dari lantai",
+
+    "prop-1": "Tinggikan perabot atau letak di atas blok",
+    "prop-2": "Guna penghadang pintu/tingkap jika ada",
+    "prop-3": "Ambil gambar barangan berharga untuk rekod",
+    "prop-4": "Semak butiran perlindungan insurans",
+
+    "san-1": "Ikat & pastikan sampah selamat; elak tersumbat",
+    "san-2": "Simpan stok beg sampah & pembasmi kuman",
+    "san-3": "Pastikan tisu basah/kering mudah dicapai",
+    "san-4": "Asingkan barang bersih vs. tercemar",
+
+    "sup-1": "Sediakan air botol (2L seorang/hari)",
+    "sup-2": "Sediakan lampu suluh & bateri gantian",
+    "sup-3": "Sediakan makanan tidak mudah rosak (3 hari)",
+    "sup-4": "Sertakan kit pertolongan cemas",
+
+    "sup-5": "Salinan ID, insurans, maklumat perubatan",
+    "sup-6": "Wang tunai kecil & kad nilai tersimpan",
+    "sup-7": "Senarai kenalan kecemasan",
+
+    "sup-8": "Alat serbaguna & pita duktus",
+    "sup-9": "Pengecas mudah alih/power bank",
+    "sup-10": "Peralatan hujan & ponco",
+
+    "sup-11": "Tablet/penapis penulen air",
+    "sup-12": "Sabun, pembersih, pelitup, sarung tangan",
+    "sup-13": "Pembuka tin manual & peralatan makan",
+
+    "rec-1": "Tunggu makluman rasmi 'selamat'",
+    "rec-2": "Rekod kerosakan dengan foto/video",
+    "rec-3": "Elak kawasan elektrik berarus/basah",
+
+    "rec-4": "Hubungi penanggung insurans & buat tuntutan",
+    "rec-5": "Jejak perbelanjaan/resit",
+    "rec-6": "Semak skim bantuan/relief",
+
+    "rec-7": "Pakai sarung tangan/boot; pastikan pengudaraan",
+    "rec-8": "Buang barangan berliang yang tercemar",
+    "rec-9": "Nyahkuman permukaan keras secara menyeluruh"
+  },
+
+  "reset_title": "Tetapkan semula semua semakan?",
+  "reset_message": "Ini akan menyahtanda setiap item dalam semua tab.",
+  "reset_confirm": "Tetapkan Semula"
+}

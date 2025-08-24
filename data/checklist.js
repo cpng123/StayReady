@@ -240,5 +240,29 @@ const RAW_SECTIONS = {
   ],
 };
 
-// Public API
-export const getSectionsByFilter = (filterId) => colorize(RAW_SECTIONS[filterId]);
+// translated filters (keeps IDs stable) 
+export const getChecklistFilters = (t) => [
+  { id: "safety",   label: t("filters.safety",   "Safety") },
+  { id: "firstaid", label: t("filters.firstaid", "First Aid") },
+  { id: "home",     label: t("filters.home",     "Home") },
+  { id: "supplies", label: t("filters.supplies", "Supplies") },
+  { id: "recovery", label: t("filters.recovery", "Recovery") },
+];
+
+export const getSectionsByFilterI18n = (filterId, t) => {
+  const base = RAW_SECTIONS[filterId] || [];
+  const localized = base.map((sec) => ({
+    ...sec,
+    // NOTE: no "checklist." prefix here
+    title: t(`titles.${sec.id}`, sec.title),
+    items: (sec.items || []).map((it) => ({
+      ...it,
+      text: t(`items.${it.id}`, it.text),
+    })),
+  }));
+  return colorize(localized);
+};
+
+// Keep this convenience alias
+export const getSectionsByFilter = (filterId, t) =>
+  getSectionsByFilterI18n(filterId, t);
