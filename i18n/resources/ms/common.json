@@ -1,0 +1,48 @@
+{
+  "app_name": "StayReady",
+  "home": {
+    "your_location": "Lokasi Anda",
+    "no_hazards": "Tiada Bahaya Dikesan",
+    "stay_alert": "Sentiasa Berwaspada, Utamakan Keselamatan"
+  },
+  "settings": {
+    "title": "Tetapan",
+    "pref_controls": "Keutamaan & Kawalan",
+    "language": "Bahasa",
+    "choose_language": "Pilih Bahasa",
+    "theme": "Tema",
+    "notifications": "Pemberitahuan",
+    "sound": "Bunyi",
+    "vibration": "Getaran",
+    "preparedness_settings": "Tetapan Kesiapsiagaan Khusus",
+    "location": "Lokasi",
+    "country_sg": "Singapura",
+    "emergency_contacts_setup": "Tetapan Kenalan Kecemasan",
+    "account_settings": "Tetapan Akaun",
+    "change_password": "Tukar Kata Laluan",
+    "logout": "Log Keluar",
+    "done": "Selesai",
+    "cancel": "Batal"
+  },
+  "sos": {
+    "title": "Penggera Kecemasan SOS",
+    "tap_to": "Ketik untuk {{action}}",
+    "alert": "aktifkan amaran",
+    "stop_alarm": "hentikan amaran",
+
+    "subtitle_active_line1": "Ketik untuk hentikan amaran.",
+    "subtitle_active_line2": "Selepas {{delay}} saat, mesej SOS akan dihantar kepada kenalan anda.",
+    "subtitle_idle_line1": "Ketik untuk aktifkan amaran.",
+    "subtitle_idle_line2": "Selepas {{delay}} saat, mesej SOS akan dihantar kepada kenalan anda.",
+
+    "manage_contacts": "Urus kenalan kecemasan",
+
+    "guard_title": "Tambah kenalan kecemasan?",
+    "guard_message": "Amaran automatik memerlukan sekurang-kurangnya satu kenalan kecemasan. Anda masih boleh mulakan amaran sekarang, tetapi tiada mesej akan dihantar.",
+    "guard_add_contact": "Tambah kenalan",
+    "guard_not_now": "Bukan sekarang",
+
+    "button_sos": "SOS",
+    "button_stop": "HENTI"
+  }
+}

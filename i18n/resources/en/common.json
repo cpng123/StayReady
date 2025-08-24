@@ -1,0 +1,51 @@
+{
+  "app_name": "StayReady",
+
+  "home": {
+    "your_location": "Your Location",
+    "no_hazards": "No Hazards Detected",
+    "stay_alert": "Stay Alert, Stay Safe"
+  },
+
+  "settings": {
+    "title": "Settings",
+    "pref_controls": "Preferences & Controls",
+    "language": "Language",
+    "choose_language": "Choose Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "sound": "Sound",
+    "vibration": "Vibration",
+    "preparedness_settings": "Preparedness-Specific Settings",
+    "location": "Location",
+    "country_sg": "Singapore",
+    "emergency_contacts_setup": "Emergency Contacts Setup",
+    "account_settings": "Account Settings",
+    "change_password": "Change Password",
+    "logout": "Logout",
+    "done": "Done",
+    "cancel": "Cancel"
+  },
+
+  "sos": {
+    "title": "SOS Emergency Alarm",
+    "tap_to": "Tap to {{action}}",
+    "alert": "alert",
+    "stop_alarm": "stop alarm",
+
+    "subtitle_active_line1": "Tap to stop alarm.",
+    "subtitle_active_line2": "{{delay}}s later, an SOS will be sent to your contacts.",
+    "subtitle_idle_line1": "Tap to alert.",
+    "subtitle_idle_line2": "After {{delay}}s, an SOS message will be sent to your contacts.",
+
+    "manage_contacts": "Manage emergency contacts",
+
+    "guard_title": "Add an emergency contact?",
+    "guard_message": "Auto alerts need at least one emergency contact. You can still start the alarm now, but no messages will be sent.",
+    "guard_add_contact": "Add contact",
+    "guard_not_now": "Not now",
+
+    "button_sos": "SOS",
+    "button_stop": "STOP"
+  }
+}

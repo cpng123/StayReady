@@ -17,12 +17,14 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { getContacts, dispatchEmergency } from "../utils/emergencyContacts";
 import { useNavigation } from "@react-navigation/native";
 import ConfirmModal from "../components/ConfirmModal";
+import { useTranslation } from "react-i18next";
 
 export default function SOSScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const isDark = theme.key === "dark";
+  const { t } = useTranslation();
 
   const soundRef = useRef(null);
   const [active, setActive] = useState(false);
@@ -175,14 +177,8 @@ export default function SOSScreen() {
         startAlarm();
       }
     } catch {
-      // If anything goes wrong reading contacts, still allow alarm to start
       startAlarm();
     }
-  };
-
-  // Long press placeholder
-  const onHold = () => {
-    // reserved for future help-message flow
   };
 
   // Layout constants
@@ -193,6 +189,16 @@ export default function SOSScreen() {
   const RING_COLORS = isDark
     ? ["#FFFFFF26", "#FFFFFF1F", "#FFFFFF14"]
     : ["#FDE5E5", "#F9D2D2", "#F6BABA"];
+
+  // i18n strings
+  const delaySeconds = 3;
+  const subtitle = active
+    ? `${t("sos.subtitle_active_line1")}\n${t("sos.subtitle_active_line2", {
+        delay: delaySeconds,
+      })}`
+    : `${t("sos.subtitle_idle_line1")}\n${t("sos.subtitle_idle_line2", {
+        delay: delaySeconds,
+      })}`;
 
   return (
     <View
@@ -211,7 +217,7 @@ export default function SOSScreen() {
         {/* Header */}
         <View style={[styles.header, { marginTop: 40 }]}>
           <Text style={[styles.title, { color: theme.colors.text }]}>
-            SOS Emergency Alarm
+            {t("sos.title")}
           </Text>
 
           <Text
@@ -220,8 +226,7 @@ export default function SOSScreen() {
               { color: isDark ? "#d4d4d4ff" : "#5F6D7E" },
             ]}
           >
-            Tap to {active ? "stop alarm" : "alert"},{"\n"}hold to send help
-            messages.
+            {subtitle}
           </Text>
         </View>
 
@@ -264,7 +269,6 @@ export default function SOSScreen() {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={onTap}
-            onLongPress={onHold}
             delayLongPress={450}
             style={[
               styles.coreWrap,
@@ -284,7 +288,7 @@ export default function SOSScreen() {
                     { color: "#B7404E", fontWeight: "700" },
                   ]}
                 >
-                  {active ? "STOP" : "SOS"}
+                  {active ? t("sos.button_stop") : t("sos.button_sos")}
                 </Text>
               </LinearGradient>
             ) : (
@@ -297,46 +301,20 @@ export default function SOSScreen() {
                 style={styles.core}
               >
                 <Text style={[styles.coreText, { color: "#fff" }]}>
-                  {active ? "STOP" : "SOS"}
+                  {active ? t("sos.button_stop") : t("sos.button_sos")}
                 </Text>
               </LinearGradient>
             )}
           </TouchableOpacity>
         </View>
 
-        {/* Bottom dock: banner + full-width contacts button */}
+        {/* Bottom dock: contacts button */}
         <View
           style={[
             styles.bottomDock,
             { left: 16, right: 16, bottom: bannerBottom },
           ]}
         >
-          {/* Banner */}
-          <View
-            style={[
-              styles.banner,
-              { backgroundColor: isDark ? "#75041cff" : "#ED5160" },
-            ]}
-          >
-            <View style={[styles.bannerIcon, { backgroundColor: "#fff" }]}>
-              <Ionicons
-                name="alert"
-                size={32}
-                color={isDark ? "#75041cff" : "#ED5160"}
-              />
-            </View>
-            <Text style={[styles.bannerText, { color: "#fff" }]}>
-              {active
-                ? `Alarm is ON.${
-                    camStatus?.granted
-                      ? " Flashlight strobing."
-                      : " Enable camera permission to use flashlight."
-                  } Raise volume for sound; vibration is active.`
-                : "Tap to activate SOS alarm (sound, vibration & light)."}
-            </Text>
-          </View>
-
-          {/* Full-width themed contacts button */}
           <TouchableOpacity
             onPress={() => navigation.navigate("EmergencyContacts")}
             activeOpacity={0.9}
@@ -348,17 +326,12 @@ export default function SOSScreen() {
           >
             <Ionicons
               name="people-outline"
-              size={18}
-              color={isDark ? "#fff" : theme.colors.primary}
+              size={22}
+              color="#fff"
               style={{ marginRight: 8 }}
             />
-            <Text
-              style={[
-                styles.contactsBtnText,
-                { color: isDark ? "#fff" : theme.colors.primary },
-              ]}
-            >
-              Manage emergency contacts
+            <Text style={[styles.contactsBtnText, { color: "#fff" }]}>
+              {t("sos.manage_contacts")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -367,10 +340,10 @@ export default function SOSScreen() {
       {/* Guardrail modal (0 contacts) */}
       <ConfirmModal
         visible={guardOpen}
-        title="Add an emergency contact?"
-        message="Auto alerts need at least one emergency contact. You can still start the alarm now, but no messages will be sent."
-        confirmLabel="Add contact"
-        cancelLabel="Not now"
+        title={t("sos.guard_title")}
+        message={t("sos.guard_message")}
+        confirmLabel={t("sos.guard_add_contact")}
+        cancelLabel={t("sos.guard_not_now")}
         onCancel={() => {
           setGuardOpen(false);
           // user chose to proceed without contacts → start alarm
@@ -390,7 +363,7 @@ const CORE_SIZE = 220;
 const styles = StyleSheet.create({
   safe: { flex: 1, paddingHorizontal: 20 },
   header: { alignItems: "center" },
-  title: { fontSize: 28, fontWeight: "800" },
+  title: { fontSize: 26, fontWeight: "800" },
   subtitle: {
     marginTop: 10,
     fontSize: 18,
@@ -399,7 +372,7 @@ const styles = StyleSheet.create({
   },
 
   centerWrap: {
-    marginTop: 32,
+    marginTop: 35,
     alignItems: "center",
     justifyContent: "center",
     height: 380,
@@ -424,35 +397,12 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
 
-  banner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginBottom: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
-  bannerIcon: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 5,
-  },
-  bannerText: { flex: 1, fontSize: 16, fontWeight: "500" },
-
   contactsBtn: {
     width: "100%",
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
+    marginBottom: 6,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -463,10 +413,10 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   contactsBtnLight: {
-    backgroundColor: "#EEF5FF",
+    backgroundColor: "#ED5160",
   },
   contactsBtnDark: {
-    backgroundColor: "#1F2430",
+    backgroundColor: "#7c0b23ff",
   },
-  contactsBtnText: { fontWeight: "800", fontSize: 14 },
+  contactsBtnText: { fontWeight: "800", fontSize: 16 },
 });

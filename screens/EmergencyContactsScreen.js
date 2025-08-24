@@ -21,6 +21,12 @@ function formatSGDisplay(e164) {
   return m ? `+65 ${m[1]} ${m[2]}` : String(e164 || "");
 }
 
+/** Create a stable random-ish id */
+function makeId(seed = "") {
+  const rand = Math.random().toString(36).slice(2, 8);
+  return `c_${Date.now()}_${rand}${seed ? "_" + seed : ""}`;
+}
+
 export default function EmergencyContactsScreen() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
@@ -34,9 +40,21 @@ export default function EmergencyContactsScreen() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmIndex, setConfirmIndex] = useState(-1);
 
+  // Load + migrate missing ids (prevents key warning)
   const load = useCallback(async () => {
-    const list = await getContacts();
-    setContacts(Array.isArray(list) ? list : []);
+    const list = (await getContacts()) || [];
+    let changed = false;
+    const fixed = list.map((c, i) => {
+      if (c && !c.id) {
+        changed = true;
+        return { ...c, id: makeId(String(i)) };
+      }
+      return c;
+    });
+    if (changed) {
+      await saveContacts(fixed);
+    }
+    setContacts(Array.isArray(fixed) ? fixed : []);
   }, []);
 
   useFocusEffect(
@@ -78,10 +96,14 @@ export default function EmergencyContactsScreen() {
     const normalized = { channel: "auto", ...payload };
 
     if (editing?.index >= 0) {
-      next[editing.index] = { ...(next[editing.index] || {}), ...normalized };
+      // preserve/ensure id on edit
+      const existing = next[editing.index] || {};
+      const id = existing.id || normalized.id || makeId(`edit_${editing.index}`);
+      next[editing.index] = { ...existing, ...normalized, id };
     } else {
+      // add new with a fresh id
       next.unshift({
-        id: String(Date.now()),
+        id: normalized.id || makeId("new"),
         ...normalized,
       });
     }
@@ -99,46 +121,24 @@ export default function EmergencyContactsScreen() {
       >
         {/* Profile icon */}
         <View style={s.avatarWrap}>
-          <Ionicons
-            name="person-circle"
-            size={42}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="person-circle" size={42} color={theme.colors.primary} />
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text
-            style={[s.name, { color: theme.colors.text }]}
-            numberOfLines={1}
-          >
+          <Text style={[s.name, { color: theme.colors.text }]} numberOfLines={1}>
             {item.name || "Unnamed"}
           </Text>
-          <Text
-            style={[s.sub, { color: theme.colors.subtext }]}
-            numberOfLines={1}
-          >
+          <Text style={[s.sub, { color: theme.colors.subtext }]} numberOfLines={1}>
             {formatSGDisplay(item.value)}
           </Text>
         </View>
 
         {/* Edit & Delete actions */}
-        <TouchableOpacity
-          onPress={() => onEdit(item, index)}
-          hitSlop={8}
-          style={s.actBtn}
-        >
-          <Ionicons
-            name="create-outline"
-            size={22}
-            color={theme.colors.primary}
-          />
+        <TouchableOpacity onPress={() => onEdit(item, index)} hitSlop={8} style={s.actBtn}>
+          <Ionicons name="create-outline" size={22} color={theme.colors.primary} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => requestDelete(index)}
-          hitSlop={8}
-          style={s.actBtn}
-        >
+        <TouchableOpacity onPress={() => requestDelete(index)} hitSlop={8} style={s.actBtn}>
           <Ionicons name="trash-outline" size={22} color="#DC2626" />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -152,9 +152,8 @@ export default function EmergencyContactsScreen() {
         No emergency contacts yet
       </Text>
       <Text style={[s.emptySub, { color: theme.colors.subtext }]}>
-        Add at least one contact. When SOS activates, we'll send an SMS first.
-        If you're online, we'll also prepare a WhatsApp message with your live
-        location link.
+        Add at least one contact. When SOS activates, we'll send an SMS first. If you're
+        online, we'll also prepare a WhatsApp message with your live location link.
       </Text>
       <TouchableOpacity
         onPress={onAdd}
@@ -170,16 +169,10 @@ export default function EmergencyContactsScreen() {
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
       {/* Header */}
       <View style={s.topBar}>
-        <TouchableOpacity
-          onPress={() => nav.goBack()}
-          style={s.backBtn}
-          hitSlop={8}
-        >
+        <TouchableOpacity onPress={() => nav.goBack()} style={s.backBtn} hitSlop={8}>
           <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={[s.title, { color: theme.colors.text }]}>
-          Emergency Contacts
-        </Text>
+        <Text style={[s.title, { color: theme.colors.text }]}>Emergency Contacts</Text>
         <TouchableOpacity onPress={onAdd} style={s.addBtn} hitSlop={8}>
           <Ionicons name="add" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
@@ -190,7 +183,7 @@ export default function EmergencyContactsScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
         data={contacts}
-        keyExtractor={(it) => it.id}
+        keyExtractor={(it, idx) => (it?.id ? String(it.id) : `fallback_${idx}`)}
         renderItem={({ item, index }) => <Item item={item} index={index} />}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         ListEmptyComponent={empty}
@@ -204,7 +197,7 @@ export default function EmergencyContactsScreen() {
         onSave={onSave}
       />
 
-      {/* Delete confirmation (uses your ConfirmModal) */}
+      {/* Delete confirmation */}
       <ConfirmModal
         visible={confirmOpen}
         title="Delete contact?"
@@ -228,18 +221,8 @@ const makeStyles = (theme) =>
       justifyContent: "space-between",
       paddingHorizontal: 12,
     },
-    backBtn: {
-      width: 40,
-      height: 40,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    addBtn: {
-      width: 40,
-      height: 40,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    backBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
+    addBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
     title: { fontSize: 18, fontWeight: "800" },
 
     row: {

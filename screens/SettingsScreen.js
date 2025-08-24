@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
 import TopBar from "../components/TopBar";
 import ThemeToggle from "../components/ThemeToggle";
+import { useTranslation } from "react-i18next";
 
 /* ----------------------- storage keys ----------------------- */
 const K_LANG = "pref:language";
@@ -36,9 +37,10 @@ export default function SettingsScreen() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t, i18n } = useTranslation();
 
   // prefs
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState(i18n.language?.split("-")[0] || "en");
   const [notif, setNotif] = useState(true);
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
@@ -58,30 +60,32 @@ export default function SettingsScreen() {
           AsyncStorage.getItem(K_SFX),
           AsyncStorage.getItem(K_HAPTIC),
         ]);
-        if (l) {
-          setLanguage(l);
-          setTempLanguage(l);
+
+        // language
+        const savedLang = (l || i18n.language || "en").split("-")[0];
+        setLanguage(savedLang);
+        setTempLanguage(savedLang);
+        if (savedLang !== i18n.language) {
+          await i18n.changeLanguage(savedLang); // <- apply app-wide
         }
+
         if (n != null) setNotif(n === "1");
         if (sfx != null) setSound(sfx === "1");
         if (hap != null) setVibration(hap === "1");
       } catch {}
     })();
-  }, []);
+  }, [i18n]);
 
   /* persist on change */
   useEffect(() => {
     AsyncStorage.setItem(K_LANG, language).catch(() => {});
   }, [language]);
-
   useEffect(() => {
     AsyncStorage.setItem(K_NOTIF, notif ? "1" : "0").catch(() => {});
   }, [notif]);
-
   useEffect(() => {
     AsyncStorage.setItem(K_SFX, sound ? "1" : "0").catch(() => {});
   }, [sound]);
-
   useEffect(() => {
     AsyncStorage.setItem(K_HAPTIC, vibration ? "1" : "0").catch(() => {});
   }, [vibration]);
@@ -108,7 +112,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
-      <TopBar title="Settings" onBack={() => nav.goBack()} />
+      <TopBar title={t("settings.title")} onBack={() => nav.goBack()} />
 
       {/* SCROLLABLE PAGE CONTENT */}
       <ScrollView contentContainerStyle={s.content}>
@@ -124,13 +128,13 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.subtext} />
         </View>
 
-        <SectionTitle>Preferences & Controls</SectionTitle>
+        <SectionTitle>{t("settings.pref_controls")}</SectionTitle>
 
         <Row
           icon={<Ionicons name="language" size={18} color={theme.colors.text} />}
-          label="Language"
+          label={t("settings.language")}
           onPress={() => {
-            setTempLanguage(language); // start from current
+            setTempLanguage(language);
             setLangOpen(true);
           }}
           right={
@@ -145,39 +149,38 @@ export default function SettingsScreen() {
 
         <Row
           icon={<Ionicons name="color-palette-outline" size={18} color={theme.colors.text} />}
-          label="Theme"
+          label={t("settings.theme")}
           onPress={() => setThemeOpen(true)}
           right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
         />
 
         <Row
           icon={<Ionicons name="notifications-outline" size={18} color={theme.colors.text} />}
-          label="Notifications"
+          label={t("settings.notifications")}
           right={<Switch value={notif} onValueChange={setNotif} />}
         />
 
         <Row
           icon={<Ionicons name="volume-high-outline" size={18} color={theme.colors.text} />}
-          label="Sound"
+          label={t("settings.sound")}
           right={<Switch value={sound} onValueChange={setSound} />}
         />
 
-        {/* Vibration now uses MaterialCommunityIcons "vibrate" */}
         <Row
           icon={<MaterialCommunityIcons name="vibrate" size={20} color={theme.colors.text} />}
-          label="Vibration"
+          label={t("settings.vibration")}
           right={<Switch value={vibration} onValueChange={setVibration} />}
         />
 
-        <SectionTitle>Preparedness-Specific Settings</SectionTitle>
+        <SectionTitle>{t("settings.preparedness_settings")}</SectionTitle>
 
         <Row
           icon={<Ionicons name="location-outline" size={18} color={theme.colors.text} />}
-          label="Location"
+          label={t("settings.location")}
           onPress={() => nav.navigate("LocationSettings")}
           right={
             <View style={s.rightInline}>
-              <Text style={[s.rightText, { color: theme.colors.subtext }]}>Singapore</Text>
+              <Text style={[s.rightText, { color: theme.colors.subtext }]}>{t("settings.country_sg")}</Text>
               <Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />
             </View>
           }
@@ -185,28 +188,27 @@ export default function SettingsScreen() {
 
         <Row
           icon={<Ionicons name="call-outline" size={18} color={theme.colors.text} />}
-          label="Emergency Contacts Setup"
+          label={t("settings.emergency_contacts_setup")}
           onPress={() => nav.navigate("EmergencyContacts")}
           right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
         />
 
-        <SectionTitle>Account Settings</SectionTitle>
+        <SectionTitle>{t("settings.account_settings")}</SectionTitle>
 
         <Row
           icon={<Ionicons name="lock-closed-outline" size={18} color={theme.colors.text} />}
-          label="Change Password"
+          label={t("settings.change_password")}
           onPress={() => nav.navigate("ChangePassword")}
           right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
         />
 
         <Row
           icon={<Ionicons name="log-out-outline" size={18} color={theme.colors.text} />}
-          label="Logout"
+          label={t("settings.logout")}
           onPress={() => nav.navigate("Logout")}
           right={<Ionicons name="chevron-forward" size={16} color={theme.colors.subtext} />}
         />
 
-        {/* extra bottom padding for nice scroll end */}
         <View style={{ height: 24 }} />
       </ScrollView>
 
@@ -220,7 +222,10 @@ export default function SettingsScreen() {
         <Pressable style={s.modalBackdrop} onPress={() => setLangOpen(false)} />
         <View style={s.modalCenter} pointerEvents="box-none">
           <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
-            <Text style={[s.modalTitle, { color: theme.colors.text }]}>Choose Language</Text>
+            <Text style={[s.modalTitle, { color: theme.colors.text }]}>
+              {t("settings.choose_language")}
+            </Text>
+
             <FlatList
               data={LANGS}
               keyExtractor={(x) => x.id}
@@ -255,15 +260,19 @@ export default function SettingsScreen() {
               }}
               contentContainerStyle={{ paddingTop: 8 }}
             />
+
             <TouchableOpacity
               style={[s.modalBtn, { backgroundColor: theme.colors.primary }]}
               activeOpacity={0.9}
-              onPress={() => {
+              onPress={async () => {
+                // Persist + apply globally
                 setLanguage(tempLanguage);
+                await AsyncStorage.setItem(K_LANG, tempLanguage);
+                await i18n.changeLanguage(tempLanguage); // <- this triggers re-render across app
                 setLangOpen(false);
               }}
             >
-              <Text style={s.modalBtnText}>Done</Text>
+              <Text style={s.modalBtnText}>{t("settings.done")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -279,7 +288,7 @@ export default function SettingsScreen() {
         <Pressable style={s.modalBackdrop} onPress={() => setThemeOpen(false)} />
         <View style={s.modalCenter} pointerEvents="box-none">
           <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
-            <Text style={[s.modalTitle, { color: theme.colors.text }]}>Theme</Text>
+            <Text style={[s.modalTitle, { color: theme.colors.text }]}>{t("settings.theme")}</Text>
             <View style={{ marginTop: 6 }}>
               <ThemeToggle />
             </View>
@@ -288,7 +297,7 @@ export default function SettingsScreen() {
               activeOpacity={0.9}
               onPress={() => setThemeOpen(false)}
             >
-              <Text style={s.modalBtnText}>Done</Text>
+              <Text style={s.modalBtnText}>{t("settings.done")}</Text>
             </TouchableOpacity>
           </View>
         </View>

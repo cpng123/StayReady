@@ -1,0 +1,48 @@
+{
+  "app_name": "StayReady",
+  "home": {
+    "your_location": "你的位置",
+    "no_hazards": "未检测到危险",
+    "stay_alert": "保持警惕，注意安全"
+  },
+"settings": {
+    "title": "设置",
+    "pref_controls": "偏好与控制",
+    "language": "语言",
+    "choose_language": "选择语言",
+    "theme": "主题",
+    "notifications": "通知",
+    "sound": "声音",
+    "vibration": "震动",
+    "preparedness_settings": "应急相关设置",
+    "location": "位置",
+    "country_sg": "新加坡",
+    "emergency_contacts_setup": "紧急联系人设置",
+    "account_settings": "账户设置",
+    "change_password": "更改密码",
+    "logout": "退出登录",
+    "done": "完成",
+    "cancel": "取消"
+  },
+  "sos": {
+    "title": "SOS 紧急警报",
+    "tap_to": "点按以{{action}}",
+    "alert": "发出警报",
+    "stop_alarm": "停止警报",
+
+    "subtitle_active_line1": "点按以停止警报。",
+    "subtitle_active_line2": "{{delay}} 秒后，系统将把 SOS 信息发送给你的联系人。",
+    "subtitle_idle_line1": "点按以发出警报。",
+    "subtitle_idle_line2": "{{delay}} 秒后，系统会向你的联系人发送一条 SOS 信息。",
+
+    "manage_contacts": "管理紧急联系人",
+
+    "guard_title": "要添加紧急联系人吗？",
+    "guard_message": "自动告警至少需要 1 位紧急联系人。你仍可现在启动警报，但不会发送任何消息。",
+    "guard_add_contact": "添加联系人",
+    "guard_not_now": "暂不添加",
+
+    "button_sos": "SOS",
+    "button_stop": "停止"
+  }
+}

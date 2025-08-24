@@ -21,6 +21,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import { resolveLocationLabel } from "../utils/locationService";
+import { useTranslation } from "react-i18next";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 const HOME_WARNINGS = getHomeWarnings(4);
@@ -28,6 +29,7 @@ const UNICEF_URL =
   "https://help.unicef.org/?country=SG&&campaignid=20648257412&gad_source=1&gad_campaignid=20642170995&gbraid=0AAAAADCOMi5mkgs50IleVtR5hH2KuG99d&gclid=Cj0KCQjwwZDFBhCpARIsAB95qO1fDQ_3Zci8KlH2BnokWscSyGWcXPp0eIsVwbqGRySaNc0yEdvi0pEaAjXdEALw_wcB&gclsrc=aw.ds";
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -130,7 +132,7 @@ export default function HomeScreen() {
               color={theme.colors.primary}
             />
             <View style={{ marginLeft: 6 }}>
-              <Text style={styles.subtle}>Your Location</Text>
+              <Text style={styles.subtle}>{t("Your Location")}</Text>
               <Text style={styles.locationText}>{headerLoc}</Text>
             </View>
           </View>

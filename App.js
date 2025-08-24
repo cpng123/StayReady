@@ -1,11 +1,14 @@
 // App.js
 import "react-native-gesture-handler";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./navigation/RootNavigation";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { initI18n } from "./i18n";
+import { I18nextProvider } from "react-i18next";
+import i18n from "i18next";
 
 import SplashScreen from "./screens/SplashScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
@@ -65,7 +68,10 @@ function RootNav() {
           <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
           <Stack.Screen name="RewardDetail" component={RewardDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
+          <Stack.Screen
+            name="EmergencyContacts"
+            component={EmergencyContactsScreen}
+          />
           <Stack.Screen name="LocationSettings" component={LocationSettings} />
         </Stack.Navigator>
       </NavigationContainer>
@@ -74,11 +80,24 @@ function RootNav() {
 }
 
 export default function App() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      await initI18n();
+      setReady(true);
+    })();
+  }, []);
+
+  if (!ready) return null;
+
   return (
-    <ThemeProvider>
-      <SafeAreaProvider>
-        <RootNav />
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <I18nextProvider i18n={i18n}>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <RootNav />
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </I18nextProvider>
   );
 }
