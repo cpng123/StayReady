@@ -17,11 +17,13 @@ import {
   getDemoLocationEnabled,
   setDemoLocationEnabled,
 } from "../utils/locationService";
+import { useTranslation } from "react-i18next";
 
 export default function LocationSettings() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [loc, setLoc] = useState(null);
@@ -39,7 +41,7 @@ export default function LocationSettings() {
       setLoc(label);
       setDemoOn(demo);
     } catch (e) {
-      setErr(e?.message || "Failed to get location.");
+      setErr(e?.message || t("location.error_fetch", { ns: "common" }));
     } finally {
       setLoading(false);
     }
@@ -61,6 +63,7 @@ export default function LocationSettings() {
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
+      {/* Top Bar */}
       <View style={s.topBar}>
         <TouchableOpacity
           onPress={() => nav.goBack()}
@@ -69,14 +72,18 @@ export default function LocationSettings() {
         >
           <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={[s.title, { color: theme.colors.text }]}>Location</Text>
+        <Text style={[s.title, { color: theme.colors.text }]}>
+          {t("location.title", { ns: "common" })}
+        </Text>
         <View style={{ width: 40 }} />
       </View>
 
+      {/* Body */}
       <View style={s.body}>
+        {/* Current Location */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
-            Current position
+            {t("location.current_position", { ns: "common" })}
           </Text>
 
           {loading ? (
@@ -88,15 +95,23 @@ export default function LocationSettings() {
                   { color: theme.colors.subtext, marginLeft: 8 },
                 ]}
               >
-                Fetching GPS Location…
+                {t("location.fetching", { ns: "common" })}
               </Text>
             </View>
           ) : err ? (
             <Text style={[s.err, { color: "#DC2626" }]}>{err}</Text>
           ) : (
             <>
-              <Row label="Coordinates" value={coordText} theme={theme} />
-              <Row label="Region" value={loc?.region || "-"} theme={theme} />
+              <Row
+                label={t("location.coordinates", { ns: "common" })}
+                value={coordText}
+                theme={theme}
+              />
+              <Row
+                label={t("location.region", { ns: "common" })}
+                value={loc?.region || "-"}
+                theme={theme}
+              />
 
               {loc?.mocked && (
                 <Text
@@ -105,7 +120,7 @@ export default function LocationSettings() {
                     { color: theme.colors.subtext, marginTop: 8 },
                   ]}
                 >
-                  Using demo location (Marina Bay) for testing.
+                  {t("location.demo_using", { ns: "common" })}
                 </Text>
               )}
             </>
@@ -119,31 +134,31 @@ export default function LocationSettings() {
             activeOpacity={0.9}
             onPress={load}
           >
-            <Text style={s.btnText}>Refresh</Text>
+            <Text style={s.btnText}>
+              {t("location.refresh", { ns: "common" })}
+            </Text>
           </TouchableOpacity>
         </View>
 
+        {/* Demo Testing */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
-            Testing
+            {t("location.testing", { ns: "common" })}
           </Text>
           <View style={s.rowBetween}>
             <Text style={[s.label, { color: theme.colors.text }]}>
-              Use demo Singapore location
+              {t("location.demo_toggle_label", { ns: "common" })}
             </Text>
             <Switch value={demoOn} onValueChange={onToggleDemo} />
           </View>
           <Text style={[s.small, { color: theme.colors.subtext }]}>
-            Enable this to simulate a Singapore location (Marina Bay), even if
-            you're overseas. This makes reverse-geocoding and location features
-            testable without GPS spoofing.
+            {t("location.demo_desc", { ns: "common" })}
           </Text>
         </View>
 
+        {/* Note */}
         <Text style={[s.note, { color: theme.colors.subtext }]}>
-          OneMap token is fetched automatically using the embedded demo account
-          and cached for a few days. The app falls back to a coarse N/E/W/C/S
-          region label if the network is unavailable.
+          {t("location.onemap_note", { ns: "common" })}
         </Text>
       </View>
     </SafeAreaView>

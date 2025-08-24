@@ -187,5 +187,49 @@
     "interactive_sub": "See how much you know about\nstaying safe.",
     "interactive_cta": "Play & Learn",
     "external_resources": "External Resources"
+  },
+  "location": {
+    "title": "Location",
+    "current_position": "Current position",
+    "fetching": "Fetching GPS Location…",
+    "coordinates": "Coordinates",
+    "region": "Region",
+    "demo_using": "Using demo location (Marina Bay) for testing.",
+    "refresh": "Refresh",
+    "testing": "Testing",
+    "demo_toggle_label": "Use demo Singapore location",
+    "demo_desc": "Enable this to simulate a Singapore location (Marina Bay), even if you're overseas. This makes reverse-geocoding and location features testable without GPS spoofing.",
+    "onemap_note": "OneMap token is fetched automatically using the embedded demo account and cached for a few days. The app falls back to a coarse N/E/W/C/S region label if the network is unavailable.",
+    "error_fetch": "Failed to get location.",
+    "region_names": {
+      "north": "North",
+      "south": "South",
+      "east": "East",
+      "west": "West",
+      "central": "Central"
+    }
+  },
+  "emergency_contacts": {
+    "title": "Emergency Contacts",
+    "unnamed": "Unnamed",
+    "empty_title": "No emergency contacts yet",
+    "empty_sub": "Add at least one contact. When SOS activates, we'll send an SMS first. If you're online, we'll also prepare a WhatsApp message with your live location link.",
+    "add_contact": "Add Contact",
+    "delete_confirm_title": "Delete contact?",
+    "delete_confirm_msg": "This contact will be removed from your emergency list.",
+    "delete": "Delete"
+  },
+  "contact_editor": {
+    "title_add": "Add Emergency Contact",
+    "title_edit": "Edit Emergency Contact",
+    "label_name": "Name",
+    "placeholder_name": "e.g., Mom",
+    "label_mobile": "Mobile (Singapore only)",
+    "placeholder_digits": "9XXXXXXX",
+    "error_name_required": "Please enter a name.",
+    "error_digits_invalid": "Enter a valid SG mobile number (8 digits, starts with 8 or 9).",
+    "error_number_invalid": "Invalid number.",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

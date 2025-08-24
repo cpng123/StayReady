@@ -14,6 +14,7 @@ import { useThemeContext } from "../theme/ThemeProvider";
 import { getContacts, saveContacts } from "../utils/emergencyContacts";
 import ContactEditorModal from "../components/ContactEditorModal";
 import ConfirmModal from "../components/ConfirmModal";
+import { useTranslation } from "react-i18next";
 
 /** Format +65XXXXXXXX to "+65 9XXX XXXX" for display */
 function formatSGDisplay(e164) {
@@ -31,6 +32,7 @@ export default function EmergencyContactsScreen() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const [contacts, setContacts] = useState([]);
   const [editing, setEditing] = useState(null); // {index, item} | null
@@ -126,7 +128,7 @@ export default function EmergencyContactsScreen() {
 
         <View style={{ flex: 1 }}>
           <Text style={[s.name, { color: theme.colors.text }]} numberOfLines={1}>
-            {item.name || "Unnamed"}
+            {item.name || t("emergency_contacts.unnamed", "Unnamed")}
           </Text>
           <Text style={[s.sub, { color: theme.colors.subtext }]} numberOfLines={1}>
             {formatSGDisplay(item.value)}
@@ -149,18 +151,20 @@ export default function EmergencyContactsScreen() {
     <View style={s.emptyWrap}>
       <Ionicons name="people-outline" size={36} color={theme.colors.subtext} />
       <Text style={[s.emptyTitle, { color: theme.colors.text }]}>
-        No emergency contacts yet
+        {t("emergency_contacts.empty_title", "No emergency contacts yet")}
       </Text>
       <Text style={[s.emptySub, { color: theme.colors.subtext }]}>
-        Add at least one contact. When SOS activates, we'll send an SMS first. If you're
-        online, we'll also prepare a WhatsApp message with your live location link.
+        {t(
+          "emergency_contacts.empty_sub",
+          "Add at least one contact. When SOS activates, we'll send an SMS first. If you're online, we'll also prepare a WhatsApp message with your live location link."
+        )}
       </Text>
       <TouchableOpacity
         onPress={onAdd}
         activeOpacity={0.9}
         style={[s.primaryBtn, { backgroundColor: theme.colors.primary }]}
       >
-        <Text style={s.primaryText}>Add Contact</Text>
+        <Text style={s.primaryText}>{t("emergency_contacts.add_contact", "Add Contact")}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -172,7 +176,9 @@ export default function EmergencyContactsScreen() {
         <TouchableOpacity onPress={() => nav.goBack()} style={s.backBtn} hitSlop={8}>
           <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={[s.title, { color: theme.colors.text }]}>Emergency Contacts</Text>
+        <Text style={[s.title, { color: theme.colors.text }]}>
+          {t("emergency_contacts.title", "Emergency Contacts")}
+        </Text>
         <TouchableOpacity onPress={onAdd} style={s.addBtn} hitSlop={8}>
           <Ionicons name="add" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
@@ -200,10 +206,13 @@ export default function EmergencyContactsScreen() {
       {/* Delete confirmation */}
       <ConfirmModal
         visible={confirmOpen}
-        title="Delete contact?"
-        message="This contact will be removed from your emergency list."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title={t("emergency_contacts.delete_confirm_title", "Delete contact?")}
+        message={t(
+          "emergency_contacts.delete_confirm_msg",
+          "This contact will be removed from your emergency list."
+        )}
+        confirmLabel={t("emergency_contacts.delete", "Delete")}
+        cancelLabel={t("common.cancel", "Cancel")}
         onConfirm={doDelete}
         onCancel={() => setConfirmOpen(false)}
       />

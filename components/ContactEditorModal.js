@@ -7,13 +7,16 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Pressable,             // ⬅️ add this
+  Pressable,
 } from "react-native";
 import { normalizeSGToE164, isValidSGMobileDigits } from "../utils/phone";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 export default function ContactEditorModal({ open, onClose, onSave, initial }) {
   const { theme } = useThemeContext();
+  const { t } = useTranslation();
+
   const [name, setName] = useState(initial?.name || "");
   const initDigits = /^\+65\d{8}$/.test(initial?.value || "")
     ? (initial.value || "").slice(-8)
@@ -34,12 +37,20 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
   };
 
   const save = () => {
-    if (!name.trim()) return setErr("Please enter a name.");
-    if (!isValidSGMobileDigits(digits))
-      return setErr("Enter a valid SG mobile number (8 digits, starts with 8 or 9).");
+    if (!name.trim()) {
+      return setErr(t("contact_editor.error_name_required", "Please enter a name."));
+    }
+    if (!isValidSGMobileDigits(digits)) {
+      return setErr(
+        t(
+          "contact_editor.error_digits_invalid",
+          "Enter a valid SG mobile number (8 digits, starts with 8 or 9)."
+        )
+      );
+    }
 
     const e164 = normalizeSGToE164(digits);
-    if (!e164) return setErr("Invalid number.");
+    if (!e164) return setErr(t("contact_editor.error_number_invalid", "Invalid number."));
 
     onSave?.({
       id: initial?.id,
@@ -58,14 +69,18 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
       {/* Card */}
       <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
         <Text style={[styles.title, { color: theme.colors.text }]}>
-          {initial ? "Edit Emergency Contact" : "Add Emergency Contact"}
+          {initial
+            ? t("contact_editor.title_edit", "Edit Emergency Contact")
+            : t("contact_editor.title_add", "Add Emergency Contact")}
         </Text>
 
-        <Text style={[styles.label, { color: theme.colors.subtext }]}>Name</Text>
+        <Text style={[styles.label, { color: theme.colors.subtext }]}>
+          {t("contact_editor.label_name", "Name")}
+        </Text>
         <TextInput
           value={name}
           onChangeText={setName}
-          placeholder="e.g., Mom"
+          placeholder={t("contact_editor.placeholder_name", "e.g., Mom")}
           placeholderTextColor={theme.colors.subtext}
           style={[
             styles.input,
@@ -74,7 +89,7 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
         />
 
         <Text style={[styles.label, { color: theme.colors.subtext, marginTop: 10 }]}>
-          Mobile (Singapore only)
+          {t("contact_editor.label_mobile", "Mobile (Singapore only)")}
         </Text>
         <View style={styles.phoneRow}>
           <View style={[styles.prefix, { borderColor: theme.colors.subtext }]}>
@@ -83,7 +98,7 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
           <TextInput
             value={digits}
             onChangeText={handleChangeDigits}
-            placeholder="9XXXXXXX"
+            placeholder={t("contact_editor.placeholder_digits", "9XXXXXXX")}
             placeholderTextColor={theme.colors.subtext}
             keyboardType="number-pad"
             maxLength={8}
@@ -103,10 +118,12 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
           activeOpacity={0.9}
           style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
         >
-          <Text style={styles.primaryBtnText}>Save</Text>
+          <Text style={styles.primaryBtnText}>{t("contact_editor.save", "Save")}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onClose} activeOpacity={0.9} style={styles.secondaryBtn}>
-          <Text style={[styles.secondaryBtnText, { color: theme.colors.text }]}>Cancel</Text>
+          <Text style={[styles.secondaryBtnText, { color: theme.colors.text }]}>
+            {t("contact_editor.cancel", "Cancel")}
+          </Text>
         </TouchableOpacity>
       </View>
     </Modal>

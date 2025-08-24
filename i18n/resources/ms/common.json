@@ -193,5 +193,49 @@
     "interactive_cta": "Main & Belajar",
 
     "external_resources": "Sumber Luaran"
+  },
+  "location": {
+    "title": "Lokasi",
+    "current_position": "Kedudukan semasa",
+    "fetching": "Mengambil lokasi GPS…",
+    "coordinates": "Koordinat",
+    "region": "Wilayah",
+    "demo_using": "Menggunakan lokasi demo (Marina Bay) untuk ujian.",
+    "refresh": "Muat semula",
+    "testing": "Pengujian",
+    "demo_toggle_label": "Guna lokasi demo Singapura",
+    "demo_desc": "Aktifkan untuk mensimulasikan lokasi Singapura (Marina Bay), walaupun anda di luar negara. Ini membolehkan geopengekodan songsang dan ciri lokasi diuji tanpa pemalsuan GPS.",
+    "onemap_note": "Token OneMap diambil secara automatik menggunakan akaun demo terbina dalam dan disimpan untuk beberapa hari. Jika rangkaian tiada, aplikasi akan kembali kepada label wilayah kasar Timur/Barat/Selatan/Utara/Pusat.",
+    "error_fetch": "Gagal mendapatkan lokasi.",
+    "region_names": {
+      "north": "Utara",
+      "south": "Selatan",
+      "east": "Timur",
+      "west": "Barat",
+      "central": "Tengah"
+    }
+  },
+  "emergency_contacts": {
+    "title": "Kenalan Kecemasan",
+    "unnamed": "Tiada Nama",
+    "empty_title": "Belum ada kenalan kecemasan",
+    "empty_sub": "Sila tambah sekurang-kurangnya satu kenalan. Apabila SOS diaktifkan, kami akan menghantar SMS terlebih dahulu. Jika anda dalam talian, kami juga akan menyediakan mesej WhatsApp dengan pautan lokasi langsung anda.",
+    "add_contact": "Tambah Kenalan",
+    "delete_confirm_title": "Padam kenalan?",
+    "delete_confirm_msg": "Kenalan ini akan dialih keluar daripada senarai kenalan kecemasan anda.",
+    "delete": "Padam"
+  },
+  "contact_editor": {
+    "title_add": "Tambah Kenalan Kecemasan",
+    "title_edit": "Edit Kenalan Kecemasan",
+    "label_name": "Nama",
+    "placeholder_name": "contoh: Ibu",
+    "label_mobile": "Nombor Telefon (Singapura sahaja)",
+    "placeholder_digits": "9XXXXXXX",
+    "error_name_required": "Sila masukkan nama.",
+    "error_digits_invalid": "Masukkan nombor telefon Singapura yang sah (8 digit, bermula dengan 8 atau 9).",
+    "error_number_invalid": "Nombor telefon tidak sah.",
+    "save": "Simpan",
+    "cancel": "Batal"
   }
 }

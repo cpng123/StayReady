@@ -36,18 +36,25 @@ export default function HomeScreen() {
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
   // Dynamic header location label
-  const [headerLoc, setHeaderLoc] = useState("Singapore");
+  const [headerLoc, setHeaderLoc] = useState(
+    t("settings.country_sg", "Singapore")
+  );
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         const res = await resolveLocationLabel();
+        const country = t("settings.country_sg", "Singapore");
+        const regionName = t(
+          `location.region_names.${String(res.region || "").toLowerCase()}`,
+          res.region
+        );
         const label = res.address
-          ? `${res.address}${res.postal ? " " + res.postal : ""}, Singapore`
-          : `${res.region} ${t("home.region", "Region")}, Singapore`;
+          ? `${res.address}${res.postal ? " " + res.postal : ""}, ${country}`
+          : `${regionName} ${t("home.region", "Region")}, ${country}`;
         if (mounted) setHeaderLoc(label);
       } catch {
-        if (mounted) setHeaderLoc("Singapore");
+        if (mounted) setHeaderLoc(t("settings.country_sg", "Singapore"));
       }
     })();
     return () => {
@@ -82,7 +89,8 @@ export default function HomeScreen() {
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) await Linking.openURL(url);
-      else Alert.alert(t("common.not_supported"), t("home.call_manual", { num }));
+      else
+        Alert.alert(t("common.not_supported"), t("home.call_manual", { num }));
     } catch {
       Alert.alert(t("common.error"), t("home.dial_error"));
     }

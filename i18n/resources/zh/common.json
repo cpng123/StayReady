@@ -166,12 +166,54 @@
     "title_suffix": "{{title}} 防灾准备",
     "why_title": "为什么会发生 {{topic}}",
     "quick_facts": "关键数据",
-
     "interactive_learning": "互动学习",
     "interactive_title": "测试你的知识",
     "interactive_sub": "看看你对安全防护\n了解多少。",
     "interactive_cta": "开始学习",
-
     "external_resources": "外部资源"
+  },
+  "location": {
+    "title": "位置",
+    "current_position": "当前位置",
+    "fetching": "正在获取 GPS 位置…",
+    "coordinates": "坐标",
+    "region": "区域",
+    "demo_using": "正在使用演示位置（Marina Bay）进行测试。",
+    "refresh": "刷新",
+    "testing": "测试",
+    "demo_toggle_label": "使用新加坡演示位置",
+    "demo_desc": "启用此选项以模拟新加坡位置（Marina Bay），即使您身在海外。这样无需伪造 GPS 也能测试逆地理编码与定位功能。",
+    "onemap_note": "OneMap 令牌将通过内置演示账号自动获取并缓存数天。若网络不可用，应用会回退到东/西/南/北/中等粗略区域标签。",
+    "error_fetch": "获取位置失败。",
+    "region_names": {
+      "north": "北部",
+      "south": "南部",
+      "east": "东部",
+      "west": "西部",
+      "central": "中部"
+    }
+  },
+  "emergency_contacts": {
+    "title": "紧急联系人",
+    "unnamed": "未命名",
+    "empty_title": "还没有紧急联系人",
+    "empty_sub": "请至少添加一位联系人。当 SOS 被触发时，我们会先发送短信。如果您在线，我们还会准备一条包含实时位置链接的 WhatsApp 消息。",
+    "add_contact": "添加联系人",
+    "delete_confirm_title": "删除联系人？",
+    "delete_confirm_msg": "该联系人将会从您的紧急联系人列表中移除。",
+    "delete": "删除"
+  },
+  "contact_editor": {
+    "title_add": "添加紧急联系人",
+    "title_edit": "编辑紧急联系人",
+    "label_name": "姓名",
+    "placeholder_name": "例如：妈妈",
+    "label_mobile": "手机号（仅限新加坡）",
+    "placeholder_digits": "9XXXXXXX",
+    "error_name_required": "请输入姓名。",
+    "error_digits_invalid": "请输入有效的新加坡手机号码（8位数字，以8或9开头）。",
+    "error_number_invalid": "无效的电话号码。",
+    "save": "保存",
+    "cancel": "取消"
   }
 }
