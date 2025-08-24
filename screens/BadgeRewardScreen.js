@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Pressable,
   Share,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -20,7 +21,11 @@ import BadgeCard from "../components/BadgeCard";
 import BadgeModal from "../components/BadgeModal";
 import { buildBadgeList, buildSharePayload } from "../utils/badges";
 import RewardCard from "../components/RewardCard";
-import { getRewards } from "../utils/rewards";
+import {
+  getRewards,
+  getRedeemedTotal,
+  computeAvailablePoints,
+} from "../utils/rewards";
 import {
   BADGE_SORTS,
   REWARD_SORTS,
@@ -65,8 +70,11 @@ export default function BadgeRewardScreen() {
 
   const load = useCallback(async () => {
     const { items, summary } = await buildBadgeList();
+    const redeemedTotal = await getRedeemedTotal();
+    // Show *available* points (earned - redeemed)
+    const available = computeAvailablePoints(summary.points, redeemedTotal);
     setItems(items);
-    setSummary(summary);
+    setSummary({ ...summary, points: available });
   }, []);
 
   useFocusEffect(
@@ -104,13 +112,24 @@ export default function BadgeRewardScreen() {
   );
   const keyExtractor = useCallback((it) => it.id, []);
   const renderReward = useCallback(
-    ({ item }) => <RewardCard item={item} theme={theme} />,
-    [theme]
+    ({ item }) => (
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() =>
+          nav.navigate("RewardDetail", {
+            item,
+            pointsAvailable: summary.points, // pass available balance
+          })
+        }
+      >
+        <RewardCard item={item} theme={theme} />
+      </TouchableOpacity>
+    ),
+    [nav, summary.points, theme]
   );
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
-
       {/* HERO */}
       <View style={s.heroWrap}>
         <ImageBackground
@@ -127,7 +146,11 @@ export default function BadgeRewardScreen() {
           />
 
           {/* Back (left) */}
-          <Pressable onPress={() => nav.goBack()} style={s.backBtn} hitSlop={10}>
+          <Pressable
+            onPress={() => nav.goBack()}
+            style={s.backBtn}
+            hitSlop={10}
+          >
             <Ionicons name="chevron-back" size={26} color="#fff" />
           </Pressable>
 
@@ -175,14 +198,17 @@ export default function BadgeRewardScreen() {
           onChange={setTab}
         />
         <Text style={[s.sortHint, { color: theme.colors.subtext }]}>
-          Sort: {tab === "badge" ? BADGE_SORTS[badgeSortIx] : REWARD_SORTS[rewardSortIx]}
+          Sort:
+          {tab === "badge"
+            ? BADGE_SORTS[badgeSortIx]
+            : REWARD_SORTS[rewardSortIx]}
         </Text>
       </View>
 
       {/* Content */}
       {tab === "badge" ? (
         <FlatList
-          contentContainerStyle={{ padding: 14, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 24 }}
           data={sortedBadges}
           keyExtractor={keyExtractor}
           renderItem={renderBadge}
@@ -193,7 +219,7 @@ export default function BadgeRewardScreen() {
         />
       ) : (
         <FlatList
-          contentContainerStyle={{ padding: 14, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 24 }}
           data={sortedRewards}
           keyExtractor={(r) => r.id}
           renderItem={renderReward}
@@ -309,5 +335,10 @@ const makeStyles = (theme) =>
       backgroundColor: "rgba(255,255,255,0.75)",
       marginHorizontal: 6,
     },
-    sortHint: { marginTop: 8, marginBottom: -6, fontSize: 12, fontWeight: "800" },
+    sortHint: {
+      marginTop: 8,
+      marginBottom: 2,
+      fontSize: 12,
+      fontWeight: "800",
+    },
   });

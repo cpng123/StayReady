@@ -20,6 +20,7 @@ import QuizResultScreen from "./screens/QuizResultScreen";
 import ReviewAnswerScreen from "./screens/ReviewAnswerScreen";
 import BookmarkScreen from "./screens/BookmarkScreen";
 import BadgeRewardScreen from "./screens/BadgeRewardScreen";
+import RewardDetailScreen from "./screens/RewardDetailScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
@@ -60,6 +61,7 @@ function RootNav() {
           <Stack.Screen name="ReviewAnswer" component={ReviewAnswerScreen} />
           <Stack.Screen name="Bookmark" component={BookmarkScreen} />
           <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
+          <Stack.Screen name="RewardDetail" component={RewardDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
