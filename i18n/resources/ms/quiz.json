@@ -1,0 +1,2100 @@
+{
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "flood",
+      "title": "Banjir Kilat",
+      "sets": [
+        {
+          "id": "flood-before",
+          "title": "Sebelum Air Naik",
+          "description": "Bersedia untuk banjir kilat dengan langkah rumah dan perancangan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "flood-b-1",
+              "prompt": "Tindakan manakah yang paling mengurangkan kerosakan banjir di rumah?",
+              "options": [
+                "Simpan barang di rak bawah untuk akses cepat",
+                "Alihkan dokumen penting dan elektronik ke rak lebih tinggi",
+                "Buka pintu balkoni untuk membiarkan air mengalir",
+                "Hidupkan semua lampu untuk pantau paras air"
+              ],
+              "correctIndex": 1,
+              "hint": "Letakkan dokumen dan barang berharga di tempat tinggi; air boleh merosakkan kertas dan elektronik."
+            },
+            {
+              "id": "flood-b-2",
+              "prompt": "Mengapa anda harus elakkan menyimpan barang di lantai berhampiran longkang atau balkoni semasa musim hujan?",
+              "options": [
+                "Untuk memastikan lantai kemas",
+                "Kerana pencuci suka lantai kosong",
+                "Ia boleh menghalang saliran dan menyebabkan banjir dalam rumah",
+                "Tiada sebab tertentu"
+              ],
+              "correctIndex": 2,
+              "hint": "Saluran air tersumbat menyebabkan air bertakung dan mengalir ke dalam rumah."
+            },
+            {
+              "id": "flood-b-3",
+              "prompt": "Jika pihak berkuasa mengeluarkan amaran banjir, apakah yang perlu anda lakukan dahulu?",
+              "options": [
+                "Pandulah ke jalan pintas rendah",
+                "Semak nasihat tempatan dan sediakan beg kecemasan",
+                "Buka tingkap untuk menyejukkan rumah",
+                "Hidupkan penyiram di luar"
+              ],
+              "correctIndex": 1,
+              "hint": "Pantau saluran rasmi dan sediakan barang penting sekiranya perlu berpindah dengan cepat."
+            },
+            {
+              "id": "flood-b-4",
+              "prompt": "Kasut manakah paling selamat jika anda perlu berjalan dalam air cetek?",
+              "options": [
+                "Berkaki ayam untuk lebih cengkaman",
+                "Selipar",
+                "Kasut kalis air bertutup penuh",
+                "Kasut tumit tinggi untuk kekalkan kaki kering"
+              ],
+              "correctIndex": 2,
+              "hint": "Kasut bertutup melindungi dari serpihan, pencemaran dan gelincir."
+            },
+            {
+              "id": "flood-b-5",
+              "prompt": "Di mana anda harus letakkan beg kecemasan di rumah?",
+              "options": [
+                "Di rak paling tinggi di bilik tidur",
+                "Di dalam kabinet berkunci",
+                "Di tepi pintu atau tempat mudah dicapai",
+                "Hanya di dalam but kereta"
+              ],
+              "correctIndex": 2,
+              "hint": "Letakkan barang penting di tempat yang mudah dicapai untuk pemindahan segera."
+            }
+          ]
+        },
+        {
+          "id": "flood-driving",
+          "title": "Memandu Dalam Banjir",
+          "description": "Ketahui perkara yang patut dan tidak patut dilakukan apabila jalan raya banjir.",
+          "image": "",
+          "questions": [
+            {
+              "id": "flood-d-1",
+              "prompt": "Anda berdepan jalan banjir dengan kedalaman yang tidak diketahui. Apa yang perlu anda lakukan?",
+              "options": [
+                "Pandu perlahan di tengah",
+                "Ikut rapat di belakang bas",
+                "Pusing balik dan guna laluan lain",
+                "Pecut untuk elakkan enjin mati"
+              ],
+              "correctIndex": 2,
+              "hint": "Jangan masuk ke dalam air banjir — kenderaan boleh terapung walaupun dengan 30 cm air."
+            },
+            {
+              "id": "flood-d-2",
+              "prompt": "Jika air naik dengan cepat di sekeliling kereta yang diparkir, tindakan paling selamat ialah:",
+              "options": [
+                "Tunggu bantuan di dalam kereta",
+                "Alihkan kereta ke tempat lebih tinggi jika selamat, atau tinggalkan kawasan dengan berjalan kaki",
+                "Buka pintu untuk biar air masuk",
+                "Berdiri di atas bumbung kereta"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan terperangkap; naik ke kawasan tinggi jika selamat untuk berbuat demikian."
+            },
+            {
+              "id": "flood-d-3",
+              "prompt": "Mengapa berbahaya untuk memandu melepasi penghadang jalan yang ditutup?",
+              "options": [
+                "Ia hanya memperlahankan trafik",
+                "Ia menandakan kawasan penggambaran",
+                "Ia menunjukkan bahaya seperti jalan runtuh atau air dalam",
+                "Ia diletakkan secara rawak"
+              ],
+              "correctIndex": 2,
+              "hint": "Penghadang menunjukkan bahaya serius. Hormati penutupan jalan."
+            },
+            {
+              "id": "flood-d-4",
+              "prompt": "Selepas melalui air cetek, anda harus:",
+              "options": [
+                "Tekan brek dengan kuat berulang kali untuk uji ABS",
+                "Uji brek dengan perlahan untuk keringkannya",
+                "Pecut untuk hembus air keluar dari ekzos",
+                "Matikan enjin serta-merta"
+              ],
+              "correctIndex": 1,
+              "hint": "Menekan brek perlahan membantu mengeringkan dan memastikan ia berfungsi."
+            },
+            {
+              "id": "flood-d-5",
+              "prompt": "Yang manakah BENAR tentang bahaya elektrik dalam air banjir?",
+              "options": [
+                "Ia jarang berlaku di luar bangunan",
+                "Air banjir boleh menyembunyikan wayar hidup; elakkan sentuhan",
+                "Tayar getah melindungi anda sepenuhnya",
+                "Hanya air garam yang mengalirkan elektrik"
+              ],
+              "correctIndex": 1,
+              "hint": "Air banjir mungkin dialiri elektrik; elakkan sentuh dan laporkan bahaya."
+            }
+          ]
+        },
+        {
+          "id": "flood-after",
+          "title": "Selepas Banjir",
+          "description": "Langkah untuk kekal selamat semasa pembersihan dan pemulihan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "flood-a-1",
+              "prompt": "Sebelum masuk semula ke rumah yang dilanda banjir, anda harus:",
+              "options": [
+                "Hidupkan kuasa utama untuk semak lampu",
+                "Periksa kerosakan struktur dan bau gas",
+                "Cepat-cepat sapu lumpur keluar",
+                "Buka semua soket untuk pengudaraan"
+              ],
+              "correctIndex": 1,
+              "hint": "Pastikan struktur selamat dan utiliti terkawal sebelum masuk semula."
+            },
+            {
+              "id": "flood-a-2",
+              "prompt": "Semasa pembersihan, PPE yang disyorkan ialah:",
+              "options": [
+                "Tangan kosong dan sandal",
+                "Sarung tangan, but, dan pelitup muka jika perlu",
+                "Cermin mata hitam sahaja",
+                "Seluar pendek untuk gerakan bebas"
+              ],
+              "correctIndex": 1,
+              "hint": "Lindungi daripada pencemaran, objek tajam dan kulat."
+            },
+            {
+              "id": "flood-a-3",
+              "prompt": "Keselamatan makanan selepas banjir bermaksud:",
+              "options": [
+                "Bilas makanan dalam tin dengan air paip sahaja",
+                "Simpan semua makanan yang kekal sejuk",
+                "Buang makanan mudah rosak yang melebihi 5°C >2 jam atau terkena air banjir",
+                "Rasa makanan untuk pastikan"
+              ],
+              "correctIndex": 2,
+              "hint": "Makanan yang tercemar atau melebihi suhu selamat perlu dibuang."
+            },
+            {
+              "id": "flood-a-4",
+              "prompt": "Peralatan elektrik yang direndam air harus:",
+              "options": [
+                "Digunakan selepas dijemur di bawah matahari",
+                "Diuji dengan dipalamkan",
+                "Diperiksa oleh juruteknik bertauliah",
+                "Digoncang untuk keluarkan air"
+              ],
+              "correctIndex": 2,
+              "hint": "Air merosakkan penebat; periksa dahulu sebelum digunakan."
+            },
+            {
+              "id": "flood-a-5",
+              "prompt": "Pernyataan manakah tentang kulat adalah BENAR?",
+              "options": [
+                "Kulat hanya mula tumbuh selepas seminggu",
+                "Kering dan bersihkan dalam 24–48 jam untuk elak pertumbuhan kulat",
+                "Peluntur sentiasa menjadikan barang selamat disimpan",
+                "Hanya permaidani yang tumbuh kulat"
+              ],
+              "correctIndex": 1,
+              "hint": "Pengeringan dan pembersihan cepat mencegah kulat; sesetengah barang berliang mungkin perlu dibuang."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "haze",
+      "title": "Jerebu (PM2.5)",
+      "sets": [
+        {
+          "id": "haze-basics",
+          "title": "Pengetahuan Asas Jerebu",
+          "description": "Fahami PM2.5 dan cara mengurangkan pendedahan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "haze-b-1",
+              "prompt": "Apa maksud PM2.5?",
+              "options": [
+                "Zarah bersaiz 2.5 mikrometer atau lebih kecil",
+                "2.5% pencemaran",
+                "Zarah yang boleh dilihat dengan mata kasar",
+                "Kepekatan ozon"
+              ],
+              "correctIndex": 0,
+              "hint": "PM2.5 ialah zarah halus yang boleh masuk jauh ke dalam paru-paru."
+            },
+            {
+              "id": "haze-b-2",
+              "prompt": "Cara terbaik untuk kurangkan pendedahan di luar semasa PM2.5 tinggi?",
+              "options": [
+                "Berjalan laju",
+                "Kurangkan masa di luar atau ubah jadual aktiviti",
+                "Minum lebih banyak kopi",
+                "Tahan nafas"
+              ],
+              "correctIndex": 1,
+              "hint": "Hadkan aktiviti luar dan tempohnya."
+            },
+            {
+              "id": "haze-b-3",
+              "prompt": "Di rumah, apa yang membantu memperbaiki kualiti udara semasa jerebu?",
+              "options": [
+                "Buka semua tingkap",
+                "Guna penapis udara dengan penapis HEPA",
+                "Bakar colok untuk tutup bau",
+                "Didihkan air di dapur"
+              ],
+              "correctIndex": 1,
+              "hint": "Penapis HEPA berkesan menghapuskan zarah halus."
+            },
+            {
+              "id": "haze-b-4",
+              "prompt": "Jenis pelitup muka manakah yang menapis PM2.5 dengan lebih baik apabila dipakai dengan betul?",
+              "options": [
+                "Pelitup kain",
+                "N95 / respirator",
+                "Pelitup pembedahan yang longgar",
+                "Tiada pelitup diperlukan"
+              ],
+              "correctIndex": 1,
+              "hint": "Respirator (contoh: N95) yang dipakai dengan betul menapis zarah halus dengan berkesan."
+            },
+            {
+              "id": "haze-b-5",
+              "prompt": "Siapa yang perlu ambil langkah berjaga-jaga tambahan semasa jerebu?",
+              "options": [
+                "Hanya orang dewasa sihat",
+                "Kanak-kanak, warga emas, wanita hamil dan mereka yang ada masalah jantung/pernafasan",
+                "Hanya atlet",
+                "Tiada sesiapa"
+              ],
+              "correctIndex": 1,
+              "hint": "Golongan sensitif lebih terjejas dan perlu perlindungan tambahan."
+            }
+          ]
+        },
+        {
+          "id": "haze-health",
+          "title": "Perlindungan Kesihatan",
+          "description": "Uruskan simptom dan lindungi golongan sensitif.",
+          "image": "",
+          "questions": [
+            {
+              "id": "haze-h-1",
+              "prompt": "Jika anda mengalami iritasi mata atau tekak akibat jerebu, langkah pertama ialah:",
+              "options": [
+                "Abaikan saja",
+                "Tingkatkan senaman di luar",
+                "Kurangkan pendedahan dan berehat di kawasan udara bersih",
+                "Ambil antibiotik secara rawak"
+              ],
+              "correctIndex": 2,
+              "hint": "Kurangkan pendedahan dan berehat; dapatkan nasihat doktor jika simptom berterusan."
+            },
+            {
+              "id": "haze-h-2",
+              "prompt": "Untuk penghidap asma semasa jerebu, penting untuk:",
+              "options": [
+                "Berhenti guna inhaler",
+                "Sentiasa bawa ubat penenang dan ikut pelan rawatan",
+                "Kongsi ubat dengan orang lain",
+                "Elak jumpa doktor"
+              ],
+              "correctIndex": 1,
+              "hint": "Ikut pelan asma anda dan pastikan inhaler mudah dicapai."
+            },
+            {
+              "id": "haze-h-3",
+              "prompt": "Kenapa kekal terhidrat semasa jerebu membantu?",
+              "options": [
+                "Ia menghapuskan semua zarah dari paru-paru",
+                "Ia menyokong kesihatan dan keselesaan umum",
+                "Ia menjadikan udara lebih jelas",
+                "Ia menggantikan pelitup muka"
+              ],
+              "correctIndex": 1,
+              "hint": "Kekal terhidrat membantu keselesaan walaupun tidak menapis udara."
+            },
+            {
+              "id": "haze-h-4",
+              "prompt": "Aktiviti dalaman manakah yang meningkatkan PM2.5?",
+              "options": [
+                "Menyedut hampagas dengan penapis HEPA",
+                "Menggoreng atau membakar lilin / colok",
+                "Menggunakan penapis udara",
+                "Mengemop"
+              ],
+              "correctIndex": 1,
+              "hint": "Pembakaran dan menggoreng menghasilkan zarah; elakkan semasa jerebu."
+            },
+            {
+              "id": "haze-h-5",
+              "prompt": "Apa patut sekolah lakukan semasa jerebu teruk?",
+              "options": [
+                "Teruskan sukan luar",
+                "Alihkan aktiviti ke dalam dengan udara bersih",
+                "Buka tingkap seluas-luasnya",
+                "Batalkan semua kelas sentiasa"
+              ],
+              "correctIndex": 1,
+              "hint": "Alihkan aktiviti ke dalam dan kurangkan intensiti jika perlu."
+            }
+          ]
+        },
+        {
+          "id": "haze-home",
+          "title": "Amalan Rumah & Tempat Kerja",
+          "description": "Kekalkan persekitaran dalaman yang bersih.",
+          "image": "",
+          "questions": [
+            {
+              "id": "haze-p-1",
+              "prompt": "Menutup celah pintu/tingkap membantu kerana:",
+              "options": [
+                "Ia mengurangkan kemasukan zarah dari luar",
+                "Ia menyejukkan penghawa dingin",
+                "Ia menghalang bunyi",
+                "Ia hanya untuk cantik"
+              ],
+              "correctIndex": 0,
+              "hint": "Mengurangkan kemasukan udara luar meningkatkan kualiti udara dalam rumah."
+            },
+            {
+              "id": "haze-p-2",
+              "prompt": "Penapis udara ditentukan saiznya berdasarkan:",
+              "options": [
+                "Warna",
+                "Kadar CADR dan saiz bilik",
+                "Nama jenama",
+                "Harga sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Padankan CADR dengan saiz bilik untuk keberkesanan."
+            },
+            {
+              "id": "haze-p-3",
+              "prompt": "Semasa guna penghawa dingin ketika jerebu, tetapan yang disyorkan ialah:",
+              "options": [
+                "Buka pengambilan udara segar",
+                "Mod edaran semula udara jika boleh",
+                "Buka tingkap",
+                "Suhu paling rendah sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Mod edaran semula mengurangkan kemasukan udara luar yang berasap."
+            },
+            {
+              "id": "haze-p-4",
+              "prompt": "Cara mudah untuk buat bilik udara bersih sementara ialah:",
+              "options": [
+                "Buka semua tingkap di setiap bilik",
+                "Gunakan penapis HEPA di bilik kecil yang tertutup",
+                "Guna kipas untuk tiup udara luar ke dalam",
+                "Nyalakan lilin berbau wangi"
+              ],
+              "correctIndex": 1,
+              "hint": "Tapis udara dalam ruang kecil yang tertutup untuk kesan lebih baik."
+            },
+            {
+              "id": "haze-p-5",
+              "prompt": "Penapis HEPA harus:",
+              "options": [
+                "Dibasuh dengan air setiap minggu",
+                "Diganti atau dibersihkan ikut arahan pengeluar",
+                "Tidak pernah diganti",
+                "Dijemur bawah matahari"
+              ],
+              "correctIndex": 1,
+              "hint": "Ikut jadual pengeluar untuk prestasi optimum."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "storm",
+      "title": "Ribut Petir",
+      "sets": [
+        {
+          "id": "storm-lightning",
+          "title": "Keselamatan Kilat",
+          "description": "Kurangkan risiko kilat di luar dan dalam bangunan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "storm-l-1",
+              "prompt": "Jika terdengar guruh, anda harus:",
+              "options": [
+                "Habiskan permainan dahulu",
+                "Cari perlindungan di bangunan kukuh atau dalam kenderaan berbumbung logam",
+                "Berlindung di bawah pokok tinggi yang bersendirian",
+                "Berbaring di tanah"
+              ],
+              "correctIndex": 1,
+              "hint": "Masuk ke tempat perlindungan yang sesuai; elakkan objek tinggi yang terpencil."
+            },
+            {
+              "id": "storm-l-2",
+              "prompt": "Semasa di dalam rumah ketika kilat, elakkan:",
+              "options": [
+                "Menggunakan telefon berwayar dan peralatan elektrik",
+                "Dekat dengan paip air",
+                "Kedua-dua A dan B",
+                "Tiada satu pun"
+              ],
+              "correctIndex": 2,
+              "hint": "Elakkan sentuhan dengan wayar dan paip yang boleh mengalirkan kilat."
+            },
+            {
+              "id": "storm-l-3",
+              "prompt": "Peraturan 30–30 bermaksud:",
+              "options": [
+                "Tunggu 30 minit selepas ribut bermula",
+                "Jika masa antara kilat dan guruh kurang 30 saat, cari perlindungan; tunggu 30 minit selepas guruh terakhir",
+                "Jarakkan 30m dari pokok",
+                "Guna 30% usaha"
+              ],
+              "correctIndex": 1,
+              "hint": "Ia menganggarkan risiko kilat berdasarkan masa dari kilat ke bunyi."
+            },
+            {
+              "id": "storm-l-4",
+              "prompt": "Jika seseorang dipanah petir:",
+              "options": [
+                "Jangan sentuh mereka—mereka menyimpan cas elektrik",
+                "Mulakan CPR jika perlu dan hubungi kecemasan",
+                "Alihkan mereka dengan menarik objek logam",
+                "Curahkan air ke atas mereka"
+              ],
+              "correctIndex": 1,
+              "hint": "Menyentuh mereka adalah selamat; mulakan CPR dan dapatkan bantuan."
+            },
+            {
+              "id": "storm-l-5",
+              "prompt": "Tempat paling selamat semasa kilat ialah:",
+              "options": [
+                "Padang terbuka",
+                "Pantai",
+                "Di dalam kereta dengan tingkap tertutup",
+                "Di bawah gazebo"
+              ],
+              "correctIndex": 2,
+              "hint": "Kereta bertindak sebagai sangkar Faraday; elakkan menyentuh permukaan logam."
+            }
+          ]
+        },
+        {
+          "id": "storm-during",
+          "title": "Semasa Ribut Petir",
+          "description": "Bahaya lain selain kilat: angin kencang, banjir, serpihan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "storm-d-1",
+              "prompt": "Angin kencang menghampiri; anda harus:",
+              "options": [
+                "Berdiri di tepi tingkap untuk melihat",
+                "Amankan atau bawa masuk barang-barang yang longgar",
+                "Berdiri di bawah pokok",
+                "Pergi ke balkoni"
+              ],
+              "correctIndex": 1,
+              "hint": "Barang yang longgar boleh menjadi peluru; simpan dengan selamat."
+            },
+            {
+              "id": "storm-d-2",
+              "prompt": "Jika hujan batu bermula, tempat paling selamat ialah:",
+              "options": [
+                "Di bawah pokok",
+                "Tempat letak kereta terbuka",
+                "Di dalam bangunan kukuh jauh dari tingkap",
+                "Di balkoni dengan payung"
+              ],
+              "correctIndex": 2,
+              "hint": "Berlindung di dalam dan jauh dari kaca."
+            },
+            {
+              "id": "storm-d-3",
+              "prompt": "Talian elektrik tumbang selepas ribut. Anda harus:",
+              "options": [
+                "Alihkan dengan kayu",
+                "Anggap ia berarus dan jauhi; hubungi pihak berkuasa",
+                "Pandu perlahan-lahan di atasnya",
+                "Curah air ke atasnya"
+              ],
+              "correctIndex": 1,
+              "hint": "Sentiasa anggap talian beraliran elektrik."
+            },
+            {
+              "id": "storm-d-4",
+              "prompt": "Jika hujan lebat menyebabkan banjir kilat:",
+              "options": [
+                "Bergerak ke tempat rendah",
+                "Segera ke tempat yang lebih tinggi",
+                "Bersembunyi di ruang bawah tanah",
+                "Berlindung di terowong bawah tanah"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan kawasan rendah; cari tempat tinggi."
+            },
+            {
+              "id": "storm-d-5",
+              "prompt": "Semasa amaran cuaca buruk, dapatkan maklumat dari:",
+              "options": [
+                "Agensi rasmi dan media yang dipercayai",
+                "Khabar angin dari media sosial rawak",
+                "Pesanan yang tidak dikenali",
+                "Tiada tempat"
+              ],
+              "correctIndex": 0,
+              "hint": "Gunakan saluran rasmi untuk arahan yang tepat."
+            }
+          ]
+        },
+        {
+          "id": "storm-after",
+          "title": "Selepas Ribut",
+          "description": "Kembali dengan selamat, pembersihan dan kesejahteraan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "storm-a-1",
+              "prompt": "Apabila pulang ke rumah, berhati-hati dengan:",
+              "options": [
+                "Kaca pecah dan serpihan tajam",
+                "Talian elektrik yang tumbang",
+                "Kebocoran gas",
+                "Semua di atas"
+              ],
+              "correctIndex": 3,
+              "hint": "Pelbagai bahaya wujud selepas ribut; berhati-hatilah."
+            },
+            {
+              "id": "storm-a-2",
+              "prompt": "Jika bumbung anda bocor, perkara pertama yang perlu dibuat ialah:",
+              "options": [
+                "Panjat semasa ribut untuk tampal",
+                "Letak baldi dan lindungi barangan berharga; atur pembaikan profesional kemudian",
+                "Abaikan saja",
+                "Tutup bekalan air"
+              ],
+              "correctIndex": 1,
+              "hint": "Lindungi barangan dan tunggu keadaan selamat untuk baiki."
+            },
+            {
+              "id": "storm-a-3",
+              "prompt": "Untuk elak keracunan karbon monoksida dari generator:",
+              "options": [
+                "Jalankan di luar jauh dari tingkap",
+                "Jalankan dalam garaj dengan pintu terbuka",
+                "Guna di dapur",
+                "Selamat digunakan di mana-mana"
+              ],
+              "correctIndex": 0,
+              "hint": "Operasikan generator di luar dan jauh dari bukaan."
+            },
+            {
+              "id": "storm-a-4",
+              "prompt": "Kesihatan emosi selepas bencana ialah:",
+              "options": [
+                "Tidak penting",
+                "Kebimbangan biasa; dapatkan sokongan jika perlu",
+                "Hanya untuk kanak-kanak",
+                "Selesai dengan tidur"
+              ],
+              "correctIndex": 1,
+              "hint": "Reaksi tekanan adalah normal; dapatkan bantuan jika perlu."
+            },
+            {
+              "id": "storm-a-5",
+              "prompt": "Mendokumentasi kerosakan membantu dalam:",
+              "options": [
+                "Tiada apa-apa",
+                "Tuntutan insurans dan bantuan",
+                "Hanya media sosial",
+                "Untuk hiburan"
+              ],
+              "correctIndex": 1,
+              "hint": "Ambil gambar/video untuk tuntutan."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dengue",
+      "title": "Pencegahan Denggi",
+      "sets": [
+        {
+          "id": "dengue-home",
+          "title": "Di Rumah",
+          "description": "Hapuskan tempat pembiakan dan lindungi keluarga anda.",
+          "image": "",
+          "questions": [
+            {
+              "id": "den-h-1",
+              "prompt": "Nyamuk Aedes membiak dalam:",
+              "options": [
+                "Sungai yang mengalir",
+                "Air bertakung yang bersih",
+                "Hanya longkang kotor",
+                "Tanah kering"
+              ],
+              "correctIndex": 1,
+              "hint": "Mereka lebih suka air bertakung bersih dalam bekas kecil."
+            },
+            {
+              "id": "den-h-2",
+              "prompt": "Amalan terbaik untuk mencegah pembiakan di rumah:",
+              "options": [
+                "Tukar air dalam pasu bunga setiap minggu dan sental bekas",
+                "Biarkan air dalam baldi",
+                "Simpan barangan yang boleh menakung air di luar",
+                "Abaikan piring pasu bunga"
+              ],
+              "correctIndex": 0,
+              "hint": "Tukar air dan sental untuk menghapuskan telur."
+            },
+            {
+              "id": "den-h-3",
+              "prompt": "Perlindungan diri yang berkesan termasuk:",
+              "options": [
+                "Penyembur nyamuk dengan DEET/icaridin",
+                "Memakai seluar pendek di luar rumah",
+                "Berdiri dekat tumbuhan",
+                "Tiada apa yang membantu"
+              ],
+              "correctIndex": 0,
+              "hint": "Guna penyembur dan tutup kulit yang terdedah."
+            },
+            {
+              "id": "den-h-4",
+              "prompt": "Jika anda mengalami demam dan sakit kepala teruk, anda harus:",
+              "options": [
+                "Makan ubat tahan sakit secara rawak",
+                "Dapatkan nasihat perubatan, terutamanya jika tinggal di kawasan kluster",
+                "Pergi berenang",
+                "Derma darah"
+              ],
+              "correctIndex": 1,
+              "hint": "Penilaian awal membantu pengurusan denggi."
+            },
+            {
+              "id": "den-h-5",
+              "prompt": "Barang mana yang perlu disimpan di tempat terlindung untuk elakkan pembiakan?",
+              "options": [
+                "Bekas air bertutup",
+                "Baldi dan tong terbuka",
+                "Botol bertutup rapat",
+                "Alat kering"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan bekas terbuka yang menakung air."
+            }
+          ]
+        },
+        {
+          "id": "dengue-community",
+          "title": "Komuniti",
+          "description": "Bekerjasama dengan jiran untuk kurangkan risiko.",
+          "image": "",
+          "questions": [
+            {
+              "id": "den-c-1",
+              "prompt": "Amalan mingguan mudah ialah 5-langkah 'Mozzie Wipeout'. Salah satu contohnya ialah:",
+              "options": [
+                "Terbalikkan baldi dan lap bahagian bibirnya",
+                "Isikan pasir dalam longkang",
+                "Sembur minyak wangi",
+                "Tanam lebih banyak tumbuhan"
+              ],
+              "correctIndex": 0,
+              "hint": "Terbalikkan dan lap bekas untuk menghapuskan telur."
+            },
+            {
+              "id": "den-c-2",
+              "prompt": "Tapak pembinaan boleh kurangkan pembiakan nyamuk dengan:",
+              "options": [
+                "Membiarkan takungan air",
+                "Amalan kebersihan dan saliran yang baik",
+                "Mengumpul tayar berisi air",
+                "Abaikan pemeriksaan"
+              ],
+              "correctIndex": 1,
+              "hint": "Kebersihan dan saliran yang baik amat penting."
+            },
+            {
+              "id": "den-c-3",
+              "prompt": "Apabila fogging dijalankan anda harus:",
+              "options": [
+                "Ikut arahan tempatan; tutup tingkap; tutup makanan",
+                "Buka tingkap seluas-luasnya",
+                "Biarkan haiwan peliharaan keluar",
+                "Berdiri dalam kabus"
+              ],
+              "correctIndex": 0,
+              "hint": "Kurangkan pendedahan dan ikut arahan pihak berkuasa."
+            },
+            {
+              "id": "den-c-4",
+              "prompt": "Pelaporan komuniti membantu dengan:",
+              "options": [
+                "Membuat orang lain marah",
+                "Membolehkan agensi bertindak terhadap tempat pembiakan",
+                "Menyebarkan khabar angin",
+                "Tiada apa-apa"
+              ],
+              "correctIndex": 1,
+              "hint": "Laporan mencetuskan pemeriksaan dan tindakan."
+            },
+            {
+              "id": "den-c-5",
+              "prompt": "Nyamuk Aedes biasanya menggigit pada:",
+              "options": [
+                "Waktu subuh dan senja",
+                "Tengah malam sahaja",
+                "Tidak pernah di dalam rumah",
+                "Hanya di luar rumah"
+              ],
+              "correctIndex": 0,
+              "hint": "Mereka menggigit pada waktu siang; gunakan penyembur nyamuk mengikut keperluan."
+            }
+          ]
+        },
+        {
+          "id": "dengue-care",
+          "title": "Gejala & Penjagaan",
+          "description": "Kenal pasti tanda bahaya dan tahu apa perlu dilakukan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "den-s-1",
+              "prompt": "Tanda bahaya denggi teruk termasuk:",
+              "options": [
+                "Muntah berterusan, pendarahan, sakit perut yang teruk",
+                "Gatal pada kaki sahaja",
+                "Bersin",
+                "Batuk ringan"
+              ],
+              "correctIndex": 0,
+              "hint": "Dapatkan rawatan segera jika terdapat tanda bahaya."
+            },
+            {
+              "id": "den-s-2",
+              "prompt": "Minuman yang disyorkan untuk hidrasi ialah:",
+              "options": [
+                "Alkohol",
+                "Garam rehidrasi oral (ORS) atau air",
+                "Minuman bergula tinggi",
+                "Kopi sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Hidrasi penting; ORS menggantikan bendalir."
+            },
+            {
+              "id": "den-s-3",
+              "prompt": "Ubat yang harus dielakkan tanpa nasihat doktor ialah:",
+              "options": [
+                "Paracetamol (acetaminophen)",
+                "Ibuprofen/aspirin",
+                "ORS",
+                "Antihistamin"
+              ],
+              "correctIndex": 1,
+              "hint": "NSAID boleh meningkatkan risiko pendarahan dalam kes denggi."
+            },
+            {
+              "id": "den-s-4",
+              "prompt": "Kiraan platelet rendah. Anda harus:",
+              "options": [
+                "Abaikan nasihat doktor",
+                "Ikut arahan perubatan dan elakkan kecederaan",
+                "Bermain sukan lasak",
+                "Ambil suplemen secara rawak untuk tingkatkan platelet"
+              ],
+              "correctIndex": 1,
+              "hint": "Ikut pelan penjagaan dan elakkan risiko pendarahan."
+            },
+            {
+              "id": "den-s-5",
+              "prompt": "Rehat membantu kerana:",
+              "options": [
+                "Ia membuang virus dengan segera",
+                "Ia menyokong pemulihan dan pemantauan tanda bahaya",
+                "Ia menghalang rasa dahaga",
+                "Ia menggantikan bendalir"
+              ],
+              "correctIndex": 1,
+              "hint": "Rehat dan pemantauan adalah penting."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wind",
+      "title": "Angin Kencang",
+      "sets": [
+        {
+          "id": "wind-prep",
+          "title": "Persediaan Awal",
+          "description": "Amankan barang dan rancang untuk angin kencang.",
+          "image": "",
+          "questions": [
+            {
+              "id": "wind-p-1",
+              "prompt": "Sebelum angin kencang, anda harus:",
+              "options": [
+                "Bawa masuk atau ikat barang longgar di balkoni",
+                "Gantung lebih banyak hiasan",
+                "Biarkan tingkap terbuka",
+                "Letak kereta di bawah pokok"
+              ],
+              "correctIndex": 0,
+              "hint": "Barang longgar boleh menjadi peluru berbahaya."
+            },
+            {
+              "id": "wind-p-2",
+              "prompt": "Tingkap harus:",
+              "options": [
+                "Ditekap dengan pita sahaja",
+                "Dikunci dengan betul; elak buka semasa angin kencang",
+                "Dibuang",
+                "Dibiarkan sedikit terbuka"
+              ],
+              "correctIndex": 1,
+              "hint": "Kunci tingkap; pita tidak mencegah keretakan dengan kuat."
+            },
+            {
+              "id": "wind-p-3",
+              "prompt": "Platform kerja tinggi harus:",
+              "options": [
+                "Digunakan seperti biasa",
+                "Ditarik masuk atau diamankan",
+                "Membawa lebih beban",
+                "Dibiarkan terangkat"
+              ],
+              "correctIndex": 1,
+              "hint": "Amankan peralatan untuk elakkan kerosakan atau kecederaan."
+            },
+            {
+              "id": "wind-p-4",
+              "prompt": "Semasa amaran dikeluarkan, semak kemas kini daripada:",
+              "options": [
+                "Agensi cuaca rasmi",
+                "Sembang rawak",
+                "Blog yang tidak disahkan",
+                "Tiada"
+              ],
+              "correctIndex": 0,
+              "hint": "Percayakan sumber rasmi."
+            },
+            {
+              "id": "wind-p-5",
+              "prompt": "Rak pakaian di koridor/balkoni:",
+              "options": [
+                "Harus dibuang atau diamankan",
+                "Selamat dalam angin",
+                "Membantu menyekat angin",
+                "Boleh digantung dengan lebih barang"
+              ],
+              "correctIndex": 0,
+              "hint": "Elakkan daripada jatuh atau terbang."
+            }
+          ]
+        },
+        {
+          "id": "wind-during",
+          "title": "Semasa Angin Kencang",
+          "description": "Tinggal di dalam rumah dan elakkan bahaya.",
+          "image": "",
+          "questions": [
+            {
+              "id": "wind-d-1",
+              "prompt": "Jika anda berada di luar semasa angin bertiup kencang, anda harus:",
+              "options": [
+                "Berpindah ke tempat perlindungan yang kukuh",
+                "Berdiri dekat papan tanda",
+                "Panjat pokok",
+                "Guna payung dekat wayar elektrik"
+              ],
+              "correctIndex": 0,
+              "hint": "Cari perlindungan yang selamat jauh dari bahaya."
+            },
+            {
+              "id": "wind-d-2",
+              "prompt": "Di bangunan tinggi anda harus berada:",
+              "options": [
+                "Dekat tingkap",
+                "Jauh dari tingkap dan kaca",
+                "Di atas bumbung",
+                "Di tepi balkoni sempit"
+              ],
+              "correctIndex": 1,
+              "hint": "Kaca mungkin pecah—elakkan kawasan tersebut."
+            },
+            {
+              "id": "wind-d-3",
+              "prompt": "Penunggang basikal harus:",
+              "options": [
+                "Teruskan seperti biasa",
+                "Elakkan menunggang semasa angin kuat",
+                "Menunggang dengan satu tangan",
+                "Pegang payung"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan berbasikal semasa angin kencang."
+            },
+            {
+              "id": "wind-d-4",
+              "prompt": "Jika papan tanda longgar, anda harus:",
+              "options": [
+                "Berdiri di bawahnya",
+                "Lapor dan elakkan kawasan tersebut",
+                "Tarik sendiri",
+                "Abaikan sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan dan laporkan bahaya kepada pihak berkuasa."
+            },
+            {
+              "id": "wind-d-5",
+              "prompt": "Lif semasa gangguan kuasa:",
+              "options": [
+                "Harus digunakan untuk pemindahan",
+                "Mungkin berisiko; guna tangga jika dinasihatkan",
+                "Sentiasa selamat",
+                "Paling sesuai untuk kanak-kanak"
+              ],
+              "correctIndex": 1,
+              "hint": "Kehilangan kuasa boleh perangkap pengguna—ikut panduan bangunan."
+            }
+          ]
+        },
+        {
+          "id": "wind-after",
+          "title": "Selepas Kejadian Angin",
+          "description": "Periksa dan pulih dengan selamat.",
+          "image": "",
+          "questions": [
+            {
+              "id": "wind-a-1",
+              "prompt": "Selepas angin reda, periksa:",
+              "options": [
+                "Balkoni untuk barang longgar dan kerosakan",
+                "Kotak surat sahaja",
+                "Tiada apa-apa",
+                "Rumah rakan dahulu"
+              ],
+              "correctIndex": 0,
+              "hint": "Periksa bahaya dan amankan barang."
+            },
+            {
+              "id": "wind-a-2",
+              "prompt": "Dahan yang jatuh atas wayar elektrik:",
+              "options": [
+                "Alihkan sendiri",
+                "Elak dan hubungi pihak berkuasa",
+                "Potong sendiri",
+                "Sembur dengan air"
+              ],
+              "correctIndex": 1,
+              "hint": "Anggap wayar masih ada arus elektrik."
+            },
+            {
+              "id": "wind-a-3",
+              "prompt": "Jika kaca pecah dalam rumah:",
+              "options": [
+                "Vakum dengan berhati-hati dan pakai sarung tangan",
+                "Berjalan tanpa kasut",
+                "Gunakan tangan untuk kutip serpihan",
+                "Abaikan serpihan kecil"
+              ],
+              "correctIndex": 0,
+              "hint": "PPE melindungi kecederaan; kutip kaca dengan selamat."
+            },
+            {
+              "id": "wind-a-4",
+              "prompt": "Dokumentasi insurans harus termasuk:",
+              "options": [
+                "Gambar/video dan resit",
+                "Hanya panggilan telefon",
+                "Cuma ingatan",
+                "Tiada"
+              ],
+              "correctIndex": 0,
+              "hint": "Bukti mempercepatkan tuntutan."
+            },
+            {
+              "id": "wind-a-5",
+              "prompt": "Kanak-kanak dan haiwan peliharaan harus:",
+              "options": [
+                "Bermain dengan barang yang jatuh",
+                "Dijauhkan dari serpihan sehingga dibersihkan",
+                "Bantu bersihkan kaca dengan tangan kosong",
+                "Teroka atas bumbung"
+              ],
+              "correctIndex": 1,
+              "hint": "Jauhkan mereka daripada bahaya."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aid",
+      "title": "CPR & Pertolongan Cemas",
+      "sets": [
+        {
+          "id": "aid-basics",
+          "title": "Asas Pertolongan Cemas",
+          "description": "Keselamatan tempat kejadian dan tindakan awal.",
+          "image": "",
+          "questions": [
+            {
+              "id": "aid-b-1",
+              "prompt": "Apabila tiba di tempat kejadian, perkara pertama yang harus dilakukan:",
+              "options": [
+                "Mulakan CPR serta-merta",
+                "Pastikan tempat kejadian selamat",
+                "Jerit kepada orang sekeliling",
+                "Periksa dompet untuk ID"
+              ],
+              "correctIndex": 1,
+              "hint": "Jangan jadi mangsa kedua—periksa keselamatan dahulu."
+            },
+            {
+              "id": "aid-b-2",
+              "prompt": "Nombor kecemasan penting di SG termasuk:",
+              "options": ["995 (SCDF), 999 (Polis)", "123", "411", "611"],
+              "correctIndex": 0,
+              "hint": "Ketahui nombor kecemasan tempatan."
+            },
+            {
+              "id": "aid-b-3",
+              "prompt": "Kebersihan tangan penting kerana:",
+              "options": [
+                "Nampak profesional",
+                "Mengurangkan risiko jangkitan kepada penyelamat dan mangsa",
+                "Mengeringkan kulit",
+                "Menggantikan sarung tangan"
+              ],
+              "correctIndex": 1,
+              "hint": "Basuh tangan atau guna pembasmi kuman, dan pakai sarung tangan jika ada."
+            },
+            {
+              "id": "aid-b-4",
+              "prompt": "Urutan pemeriksaan utama selalunya:",
+              "options": [
+                "Saluran pernafasan, Pernafasan, Peredaran (ABC)",
+                "Peredaran, Saluran pernafasan, Pernafasan",
+                "Pernafasan, Saluran pernafasan, Peredaran",
+                "Tiada"
+              ],
+              "correctIndex": 0,
+              "hint": "ABC bantu kenal pasti ancaman nyawa dengan cepat."
+            },
+            {
+              "id": "aid-b-5",
+              "prompt": "Jika seseorang tidak sedar tetapi bernafas seperti biasa:",
+              "options": [
+                "Letakkan dalam posisi pemulihan dan pantau",
+                "Mulakan tekanan dada",
+                "Beri air",
+                "Goncang kuat-kuat"
+              ],
+              "correctIndex": 0,
+              "hint": "Pastikan saluran udara terbuka dan pantau pernafasan."
+            }
+          ]
+        },
+        {
+          "id": "aid-bleed-burn",
+          "title": "Pendarahan & Melecur",
+          "description": "Kawal pendarahan dan rawat luka melecur.",
+          "image": "",
+          "questions": [
+            {
+              "id": "aid-bb-1",
+              "prompt": "Langkah pertama untuk kawal pendarahan teruk:",
+              "options": [
+                "Tekan terus dengan kain/bandage bersih",
+                "Basuh dan tunggu",
+                "Sapukan serbuk",
+                "Keluarkan objek yang tertanam"
+              ],
+              "correctIndex": 0,
+              "hint": "Tekanan langsung adalah penting; jangan keluarkan objek tertanam."
+            },
+            {
+              "id": "aid-bb-2",
+              "prompt": "Tourniquet boleh digunakan apabila:",
+              "options": [
+                "Pendarahan mengancam nyawa dan tidak berhenti dengan tekanan",
+                "Untuk luka kecil",
+                "Lebam biasa",
+                "Hidung berdarah"
+              ],
+              "correctIndex": 0,
+              "hint": "Hanya untuk pendarahan anggota yang teruk dan tidak terkawal."
+            },
+            {
+              "id": "aid-bb-3",
+              "prompt": "Untuk melecur haba, rawatan awal ialah:",
+              "options": [
+                "Letak ais secara langsung",
+                "Sejukkan luka di bawah air sejuk mengalir selama 10–20 minit",
+                "Pecahkan lepuh",
+                "Sapukan mentega"
+              ],
+              "correctIndex": 1,
+              "hint": "Menyejukkan luka mengurangkan kerosakan; elakkan ais/mentega."
+            },
+            {
+              "id": "aid-bb-4",
+              "prompt": "Percikan bahan kimia ke mata:",
+              "options": [
+                "Tutup dan tunggu",
+                "Bilas dengan air bersih selama sekurang-kurangnya 15 minit",
+                "Gosok mata",
+                "Guna ubat titis mata rawak"
+              ],
+              "correctIndex": 1,
+              "hint": "Bilas segera amat penting; dapatkan rawatan perubatan."
+            },
+            {
+              "id": "aid-bb-5",
+              "prompt": "Tanda-tanda kejutan termasuk:",
+              "options": [
+                "Kulit pucat dan lembap, nadi laju, pening",
+                "Ketawa",
+                "Ruam gatal sahaja",
+                "Bibir biru sahaja"
+              ],
+              "correctIndex": 0,
+              "hint": "Rawat kejutan: baringkan, kekalkan suhu badan, dan dapatkan bantuan."
+            }
+          ]
+        },
+        {
+          "id": "aid-cpr",
+          "title": "CPR & Tercekik",
+          "description": "Kenal pasti henti jantung dan bertindak.",
+          "image": "",
+          "questions": [
+            {
+              "id": "aid-c-1",
+              "prompt": "Henti jantung dewasa: mulakan CPR dengan tekanan dada pada:",
+              "options": [
+                "60/min, 2 cm dalam",
+                "100–120/min, 5–6 cm dalam",
+                "140/min, 1 cm dalam",
+                "80/min, cetek"
+              ],
+              "correctIndex": 1,
+              "hint": "Tekan dengan kuat dan laju di tengah dada."
+            },
+            {
+              "id": "aid-c-2",
+              "prompt": "Guna AED dengan cara:",
+              "options": [
+                "Hidupkan dan ikut arahan",
+                "Elakkan gunanya",
+                "Pegang pad di tangan",
+                "Tunggu profesional sahaja"
+              ],
+              "correctIndex": 0,
+              "hint": "AED direka untuk penyelamat awam; ikut arahan yang diberi."
+            },
+            {
+              "id": "aid-c-3",
+              "prompt": "Dewasa yang masih sedar dan tercekik:",
+              "options": [
+                "Beri tamparan belakang dan tolakan abdomen",
+                "Mulakan CPR serta-merta",
+                "Beri air",
+                "Tampar kepala perlahan"
+              ],
+              "correctIndex": 0,
+              "hint": "Gunakan tamparan belakang/tolakan abdomen jika tidak boleh batuk/bernafas."
+            },
+            {
+              "id": "aid-c-4",
+              "prompt": "Jika kanak-kanak menjadi tidak sedar semasa tercekik:",
+              "options": [
+                "Masukkan jari secara buta",
+                "Mulakan CPR dan periksa objek semasa membuka saluran udara",
+                "Goncang mereka",
+                "Gantungkan terbalik"
+              ],
+              "correctIndex": 1,
+              "hint": "Mulakan CPR dan semak mulut semasa membuka saluran udara."
+            },
+            {
+              "id": "aid-c-5",
+              "prompt": "Hentikan CPR apabila:",
+              "options": [
+                "Anda letih",
+                "Mangsa menunjukkan tanda-tanda hidup atau diserahkan kepada profesional",
+                "Selepas 1 minit",
+                "Muzik berhenti"
+              ],
+              "correctIndex": 1,
+              "hint": "Teruskan sehingga ada tanda hidup, AED memberi arahan, atau bantuan tiba."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fire",
+      "title": "Keselamatan Kebakaran",
+      "sets": [
+        {
+          "id": "fire-prevent",
+          "title": "Pencegahan Kebakaran",
+          "description": "Kurangkan risiko kebakaran di rumah dan tempat kerja.",
+          "image": "",
+          "questions": [
+            {
+              "id": "fire-p-1",
+              "prompt": "Keselamatan dapur termasuk:",
+              "options": [
+                "Berada berhampiran dan jauhkan bahan mudah terbakar",
+                "Tinggalkan dapur tanpa pengawasan pada api kecil",
+                "Pakai lengan longgar",
+                "Simpan aerosol berhampiran haba"
+              ],
+              "correctIndex": 0,
+              "hint": "Jangan biarkan masakan tanpa pengawasan; jauhkan bahan mudah terbakar."
+            },
+            {
+              "id": "fire-p-2",
+              "prompt": "Keselamatan elektrik termasuk:",
+              "options": [
+                "Elakkan menyumbat soket secara berlebihan",
+                "Guna wayar rosak",
+                "Lalukan wayar di bawah permaidani secara kekal",
+                "Guna suis dengan tangan basah"
+              ],
+              "correctIndex": 0,
+              "hint": "Elakkan soket yang terlalu padat dan wayar rosak."
+            },
+            {
+              "id": "fire-p-3",
+              "prompt": "Pembuangan rokok sepatutnya:",
+              "options": [
+                "Ke dalam pasu bunga",
+                "Ke dalam bekas abu yang dalam atau air; padam sepenuhnya",
+                "Di mana-mana sahaja",
+                "Terus ke tong sampah"
+              ],
+              "correctIndex": 1,
+              "hint": "Buang dengan selamat untuk elak api membara."
+            },
+            {
+              "id": "fire-p-4",
+              "prompt": "Lilin sepatutnya:",
+              "options": [
+                "Dibiarkan menyala semasa tidur",
+                "Dijauhkan dari langsir dan jangan ditinggalkan tanpa pengawasan",
+                "Diletakkan berhampiran kertas",
+                "Diletakkan atas TV"
+              ],
+              "correctIndex": 1,
+              "hint": "Jauhkan dari bahan mudah terbakar dan jangan biarkan tanpa pengawasan."
+            },
+            {
+              "id": "fire-p-5",
+              "prompt": "Latihan pelan keluar sepatutnya dilakukan:",
+              "options": [
+                "Tidak perlu",
+                "Sekurang-kurangnya sekali setahun bersama keluarga",
+                "Hanya untuk kanak-kanak",
+                "Hanya di pejabat"
+              ],
+              "correctIndex": 1,
+              "hint": "Latihan membantu semua orang keluar dengan cepat."
+            }
+          ]
+        },
+        {
+          "id": "fire-ext",
+          "title": "Pemadam & Penggera",
+          "description": "Kenali penggera dan cara guna pemadam.",
+          "image": "",
+          "questions": [
+            {
+              "id": "fire-e-1",
+              "prompt": "Penggunaan pemadam kebakaran, PASS bermaksud:",
+              "options": [
+                "Tolak, Arah, Sapu, Sembur",
+                "Tarik, Arah, Picit, Sapu",
+                "Tekan, Arah, Sembur, Berhenti",
+                "Tarik, Maklumkan, Ayun, Sembur"
+              ],
+              "correctIndex": 1,
+              "hint": "Tarik pin, Arahkan ke dasar api, Picit pemegang, Sapu kiri ke kanan."
+            },
+            {
+              "id": "fire-e-2",
+              "prompt": "Api jenis mana selamat dipadam dengan air?",
+              "options": [
+                "Elektrik",
+                "Minyak/gemuk",
+                "Bahan mudah terbakar biasa (kayu/kertas)",
+                "Cecair mudah terbakar"
+              ],
+              "correctIndex": 2,
+              "hint": "Air untuk kebakaran Kelas A; bukan untuk elektrik/minyak."
+            },
+            {
+              "id": "fire-e-3",
+              "prompt": "Penggera asap berbunyi setiap minit bermaksud:",
+              "options": [
+                "Bunyi gembira",
+                "Bateri lemah atau kerosakan—semak manual",
+                "Amaran cuaca",
+                "Alat jiran"
+              ],
+              "correctIndex": 1,
+              "hint": "Tukar bateri atau peranti mengikut arahan."
+            },
+            {
+              "id": "fire-e-4",
+              "prompt": "Penggera CO mengesan:",
+              "options": [
+                "Gas karbon monoksida",
+                "Karbon dioksida",
+                "Gas asli sahaja",
+                "Minyak wangi"
+              ],
+              "correctIndex": 0,
+              "hint": "CO tidak berwarna/berbau dan boleh membawa maut."
+            },
+            {
+              "id": "fire-e-5",
+              "prompt": "Jika kuali terbakar (minyak):",
+              "options": [
+                "Tuang air",
+                "Tutup dengan penutup, matikan api",
+                "Alihkan kuali ke luar",
+                "Tambah alkohol"
+              ],
+              "correctIndex": 1,
+              "hint": "Tutup api; jangan gunakan air untuk api minyak."
+            }
+          ]
+        },
+        {
+          "id": "fire-during",
+          "title": "Semasa Kebakaran",
+          "description": "Apa yang perlu dilakukan ketika kebakaran berlaku.",
+          "image": "",
+          "questions": [
+            {
+              "id": "fire-d-1",
+              "prompt": "Asap di koridor; anda perlu:",
+              "options": [
+                "Buka pintu luas-luas",
+                "Rasa pintu dengan belakang tangan dan merangkak rendah",
+                "Lari menegak melalui asap",
+                "Matikan penggera"
+              ],
+              "correctIndex": 1,
+              "hint": "Merangkak rendah; periksa kepanasan pintu sebelum buka."
+            },
+            {
+              "id": "fire-d-2",
+              "prompt": "Jika pakaian terbakar, ingat:",
+              "options": [
+                "Lari laju",
+                "Berhenti, Baring, dan Berguling",
+                "Lompat ke katil",
+                "Jerit sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Padam api dengan berguling."
+            },
+            {
+              "id": "fire-d-3",
+              "prompt": "Dalam kebakaran bangunan tinggi, nasihat biasanya:",
+              "options": [
+                "Guna lif",
+                "Guna tangga, bukan lif",
+                "Tunggu dan tengok",
+                "Patah balik untuk barang"
+              ],
+              "correctIndex": 1,
+              "hint": "Lif boleh gagal; guna tangga."
+            },
+            {
+              "id": "fire-d-4",
+              "prompt": "Jika bilik penuh asap dan pintu keluar terhalang:",
+              "options": [
+                "Pecahkan tingkap sepenuhnya",
+                "Tutup celah pintu, hubungi bantuan, beri isyarat di tingkap",
+                "Sembunyi diam-diam di tandas",
+                "Sambung tidur"
+              ],
+              "correctIndex": 1,
+              "hint": "Halang asap, hubungi dan beri isyarat untuk diselamatkan."
+            },
+            {
+              "id": "fire-d-5",
+              "prompt": "Selepas keluar bangunan, anda perlu:",
+              "options": [
+                "Masuk semula untuk ambil barang",
+                "Kembali untuk ambil haiwan peliharaan segera",
+                "Pergi ke tempat berkumpul dan maklumkan kepada penyelamat",
+                "Tinggalkan kawasan terus"
+              ],
+              "correctIndex": 2,
+              "hint": "Pastikan semua selamat dan maklumkan kepada penyelamat."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kit",
+      "title": "Kit Kecemasan",
+      "sets": [
+        {
+          "id": "kit-go",
+          "title": "Keperluan Go-Bag",
+          "description": "Sediakan kit kecemasan untuk pemindahan segera.",
+          "image": "",
+          "questions": [
+            {
+              "id": "kit-g-1",
+              "prompt": "Go-bag biasa termasuk:",
+              "options": [
+                "Air, makanan, lampu suluh, radio, kit pertolongan cemas, salinan ID",
+                "Hanya snek",
+                "Hanya wang tunai",
+                "Hanya pakaian"
+              ],
+              "correctIndex": 0,
+              "hint": "Bawa keperluan untuk beberapa hari dan dokumen penting."
+            },
+            {
+              "id": "kit-g-2",
+              "prompt": "Cadangan air ialah kira-kira:",
+              "options": [
+                "0.5 L setiap orang setiap hari",
+                "2 L setiap orang setiap hari",
+                "5 L setiap orang setiap hari untuk minuman sahaja",
+                "Tiada air diperlukan"
+              ],
+              "correctIndex": 1,
+              "hint": "Sediakan sekurang-kurangnya 2L air setiap orang setiap hari untuk diminum."
+            },
+            {
+              "id": "kit-g-3",
+              "prompt": "Untuk maklumat semasa gangguan elektrik, sediakan:",
+              "options": [
+                "Radio bateri atau radio yang boleh diputarkan",
+                "Surat khabar lama",
+                "Sebuah TV",
+                "Komputer meja"
+              ],
+              "correctIndex": 0,
+              "hint": "Radio mudah alih memberi maklumat tanpa elektrik."
+            },
+            {
+              "id": "kit-g-4",
+              "prompt": "Pencahayaan haruslah:",
+              "options": [
+                "Lilin sahaja",
+                "Lampu suluh LED dengan bateri tambahan",
+                "Lampu api terbuka",
+                "Tiada langsung"
+              ],
+              "correctIndex": 1,
+              "hint": "Lampu LED lebih selamat dan cekap."
+            },
+            {
+              "id": "kit-g-5",
+              "prompt": "Wang tunai dalam nota kecil berguna kerana:",
+              "options": [
+                "ATM/NETS mungkin tidak berfungsi",
+                "Nampak cantik",
+                "Untuk beli kereta",
+                "Tidak berguna"
+              ],
+              "correctIndex": 0,
+              "hint": "Pembayaran elektronik mungkin tidak tersedia."
+            }
+          ]
+        },
+        {
+          "id": "kit-water-food",
+          "title": "Bekalan Air & Makanan",
+          "description": "Simpan dan putarkan bekalan dengan selamat.",
+          "image": "",
+          "questions": [
+            {
+              "id": "kit-w-1",
+              "prompt": "Apabila menyimpan air di rumah:",
+              "options": [
+                "Guna bekas makanan gred selamat dan bersih",
+                "Guna botol bahan kimia terpakai",
+                "Biarkan bekas tidak bertutup",
+                "Tukar setahun sekali tanpa mengira"
+              ],
+              "correctIndex": 0,
+              "hint": "Guna bekas selamat dan pastikan tertutup rapat."
+            },
+            {
+              "id": "kit-w-2",
+              "prompt": "Putaran makanan bermaksud:",
+              "options": [
+                "Makan yang paling lama dahulu dan ganti",
+                "Buang semua setiap bulan",
+                "Tidak pernah semak tarikh",
+                "Simpan buah segar sahaja"
+              ],
+              "correctIndex": 0,
+              "hint": "FIFO (First In, First Out) elak makanan rosak."
+            },
+            {
+              "id": "kit-w-3",
+              "prompt": "Keselamatan makanan dalam tin selepas banjir:",
+              "options": [
+                "Simpan jika label masih utuh",
+                "Buang jika kemek, berkarat, atau terdedah kepada air banjir tanpa dibersih",
+                "Simpan semuanya",
+                "Bilas dan simpan selamanya"
+              ],
+              "correctIndex": 1,
+              "hint": "Tin yang rosak mungkin tidak selamat."
+            },
+            {
+              "id": "kit-w-4",
+              "prompt": "Pembuka tin manual penting kerana:",
+              "options": [
+                "Nampak bergaya",
+                "Bekalan elektrik mungkin terputus",
+                "Tin boleh buka sendiri",
+                "Tidak perlu"
+              ],
+              "correctIndex": 1,
+              "hint": "Boleh buka tin tanpa elektrik."
+            },
+            {
+              "id": "kit-w-5",
+              "prompt": "Untuk bayi atau diet khas:",
+              "options": [
+                "Abaikan keperluan",
+                "Sertakan susu formula atau makanan yang sesuai",
+                "Harapkan jiran",
+                "Tidak perlu merancang"
+              ],
+              "correctIndex": 1,
+              "hint": "Rancang mengikut keperluan individu."
+            }
+          ]
+        },
+        {
+          "id": "kit-special",
+          "title": "Keperluan Khas",
+          "description": "Rancang untuk ubat, haiwan peliharaan dan aksesibiliti.",
+          "image": "",
+          "questions": [
+            {
+              "id": "kit-s-1",
+              "prompt": "Ubat untuk penyakit kronik perlu:",
+              "options": [
+                "Disimpan bersama salinan preskripsi",
+                "Ditinggalkan di klinik",
+                "Dilangkau",
+                "Dikongsi"
+              ],
+              "correctIndex": 0,
+              "hint": "Simpan bekalan kecil dan dokumen penting."
+            },
+            {
+              "id": "kit-s-2",
+              "prompt": "Untuk haiwan peliharaan, bawa:",
+              "options": [
+                "Tiada apa-apa",
+                "Makanan, tali, sangkar, rekod vaksinasi",
+                "Mainan sahaja",
+                "Air sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Sediakan keperluan pemindahan untuk haiwan peliharaan."
+            },
+            {
+              "id": "kit-s-3",
+              "prompt": "Orang guna alat bantuan mobiliti perlu:",
+              "options": [
+                "Harap pada jiran",
+                "Sediakan alat ganti/bateri dan rancang laluan mesra akses",
+                "Tidak merancang langsung",
+                "Tinggalkan alat tersebut"
+              ],
+              "correctIndex": 1,
+              "hint": "Rancang keperluan mobiliti dan kuasa."
+            },
+            {
+              "id": "kit-s-4",
+              "prompt": "Dokumen penting harus:",
+              "options": [
+                "Hanya salinan asal",
+                "Salinan (kertas + digital) dalam beg kalis air",
+                "Berselerak dalam rumah",
+                "Ditinggalkan dengan kawan sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Simpan salinan yang selamat dan mudah diakses."
+            },
+            {
+              "id": "kit-s-5",
+              "prompt": "Power bank perlu:",
+              "options": [
+                "Dibiarkan kosong",
+                "Dicas dan diuji secara berkala",
+                "Dilarang digunakan",
+                "Digunakan sekali setahun"
+              ],
+              "correctIndex": 1,
+              "hint": "Pastikan sentiasa sedia dengan mengecas dan mengujinya."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "disease",
+      "title": "Wabak Penyakit",
+      "sets": [
+        {
+          "id": "dis-hygiene",
+          "title": "Kebersihan & Pencegahan",
+          "description": "Kurangkan penularan penyakit berjangkit.",
+          "image": "",
+          "questions": [
+            {
+              "id": "dis-h-1",
+              "prompt": "Cara terbaik mencuci tangan ialah:",
+              "options": [
+                "Bilas cepat dengan air",
+                "Cuci dengan sabun selama 20 saat atau guna pensanitasi (≥60% alkohol)",
+                "Guna sarung tangan sahaja",
+                "Lap pada pakaian"
+              ],
+              "correctIndex": 1,
+              "hint": "Kebersihan tangan yang betul mengurangkan penularan."
+            },
+            {
+              "id": "dis-h-2",
+              "prompt": "Apabila sakit, anda patut:",
+              "options": [
+                "Pergi kerja/sekolah seperti biasa",
+                "Duduk di rumah dan berehat; dapatkan nasihat jika teruk",
+                "Kongsi minuman",
+                "Abaikan gejala"
+              ],
+              "correctIndex": 1,
+              "hint": "Duduk di rumah untuk elakkan jangkitan kepada orang lain."
+            },
+            {
+              "id": "dis-h-3",
+              "prompt": "Etika pernafasan bermaksud:",
+              "options": [
+                "Tutup batuk/bersin, pakai pelitup muka jika perlu",
+                "Batuk terbuka",
+                "Berbisik",
+                "Tiada apa-apa"
+              ],
+              "correctIndex": 0,
+              "hint": "Menutup dan memakai pelitup muka mengurangkan penyebaran titisan."
+            },
+            {
+              "id": "dis-h-4",
+              "prompt": "Permukaan yang kerap disentuh perlu:",
+              "options": [
+                "Dibersihkan dan dinyahkuman dengan kerap",
+                "Diabaikan",
+                "Dibasuh setahun sekali",
+                "Diliputi kertas"
+              ],
+              "correctIndex": 0,
+              "hint": "Pembersihan berkala mengurangkan risiko jangkitan."
+            },
+            {
+              "id": "dis-h-5",
+              "prompt": "Pengudaraan membantu kerana:",
+              "options": [
+                "Ia menumpukan aerosol",
+                "Ia mencairkan dan menghapuskan pencemaran dalam bangunan",
+                "Ia sentiasa menambah kelembapan",
+                "Ia menggantikan pelitup muka"
+              ],
+              "correctIndex": 1,
+              "hint": "Pengudaraan yang baik mengurangkan kepekatan bawaan udara."
+            }
+          ]
+        },
+        {
+          "id": "dis-isolation",
+          "title": "Pengasingan & Penjagaan",
+          "description": "Langkah apabila ahli keluarga jatuh sakit.",
+          "image": "",
+          "questions": [
+            {
+              "id": "dis-i-1",
+              "prompt": "Ahli keluarga yang sakit sepatutnya:",
+              "options": [
+                "Berkongsi bilik rapat",
+                "Diasingkan dalam bilik dan bilik air berasingan jika boleh",
+                "Bertemu pelawat",
+                "Masak untuk semua"
+              ],
+              "correctIndex": 1,
+              "hint": "Pengasingan mengurangkan penularan."
+            },
+            {
+              "id": "dis-i-2",
+              "prompt": "Penjaga harus:",
+              "options": [
+                "Guna PPE yang sesuai dan amalkan kebersihan tangan",
+                "Elakkan pelitup muka",
+                "Guna tisu semula",
+                "Abaikan gejala"
+              ],
+              "correctIndex": 0,
+              "hint": "Lindungi penjaga dan orang lain."
+            },
+            {
+              "id": "dis-i-3",
+              "prompt": "Pemantauan termasuk:",
+              "options": [
+                "Semak suhu dan gejala",
+                "Agak-agak sahaja",
+                "Timbang berat sahaja",
+                "Tiada apa-apa"
+              ],
+              "correctIndex": 0,
+              "hint": "Pantau perubahan dan dapatkan rawatan jika bertambah buruk."
+            },
+            {
+              "id": "dis-i-4",
+              "prompt": "Nasihat perubatan penting jika:",
+              "options": [
+                "Mengalami sesak nafas atau sakit dada",
+                "Letih ringan",
+                "Tiada demam selepas 1 jam",
+                "Lapar"
+              ],
+              "correctIndex": 0,
+              "hint": "Dapatkan rawatan segera jika gejala teruk."
+            },
+            {
+              "id": "dis-i-5",
+              "prompt": "Sampah dari bilik orang sakit harus:",
+              "options": [
+                "Dikongsi terbuka",
+                "Dibungkus dan diikat dengan kemas",
+                "Dibasuh dan diguna semula",
+                "Dibuang longgar"
+              ],
+              "correctIndex": 1,
+              "hint": "Bungkus kemas untuk kurangkan pencemaran."
+            }
+          ]
+        },
+        {
+          "id": "dis-vax",
+          "title": "Vaksin & Maklumat",
+          "description": "Guna sumber yang boleh dipercayai dan fahami vaksin.",
+          "image": "",
+          "questions": [
+            {
+              "id": "dis-v-1",
+              "prompt": "Vaksinasi membantu dengan:",
+              "options": [
+                "Selalu menyebabkan penyakit",
+                "Mengurangkan risiko penyakit teruk dan penyebaran",
+                "Hanya bantu kanak-kanak",
+                "Tiada kesan"
+              ],
+              "correctIndex": 1,
+              "hint": "Vaksin mengurangkan risiko komplikasi dan penularan."
+            },
+            {
+              "id": "dis-v-2",
+              "prompt": "Maklumat kesihatan yang boleh dipercayai patut datang dari:",
+              "options": [
+                "Agensi kesihatan rasmi dan penyedia yang dipercayai",
+                "Pos rawak",
+                "Pesanan tidak disahkan",
+                "Khabar angin selebriti"
+              ],
+              "correctIndex": 0,
+              "hint": "Guna sumber yang sah untuk elak maklumat palsu."
+            },
+            {
+              "id": "dis-v-3",
+              "prompt": "Jika anda rasa tidak sihat selepas vaksinasi:",
+              "options": [
+                "Lapor reaksi teruk kepada penyedia kesihatan",
+                "Rahsiakan",
+                "Panik",
+                "Percaya teori konspirasi"
+              ],
+              "correctIndex": 0,
+              "hint": "Dapatkan nasihat jika ada reaksi serius."
+            },
+            {
+              "id": "dis-v-4",
+              "prompt": "Penyimpanan vaksin di rumah (jika berkenaan):",
+              "options": [
+                "Ikut arahan (contohnya: dalam peti sejuk) jika dibekalkan untuk kegunaan di rumah",
+                "Di ambang tingkap",
+                "Dalam peti beku sentiasa",
+                "Dalam poket"
+              ],
+              "correctIndex": 0,
+              "hint": "Ikuti panduan penyimpanan jika berkenaan."
+            },
+            {
+              "id": "dis-v-5",
+              "prompt": "Kenapa perlu rekod vaksinasi anda?",
+              "options": [
+                "Untuk suka-suka",
+                "Untuk tahu jadual/booster dan keperluan kerja/perjalanan",
+                "Tiada sebab",
+                "Sebab semua orang buat"
+              ],
+              "correctIndex": 1,
+              "hint": "Rekod bantu bukti status dan panduan dos seterusnya."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "earthquake",
+      "title": "Gempa Bumi",
+      "sets": [
+        {
+          "id": "eq-before",
+          "title": "Sebelum Gempa Bumi",
+          "description": "Kurangkan risiko di rumah dan rancang lebih awal.",
+          "image": "",
+          "questions": [
+            {
+              "id": "eq-b-1",
+              "prompt": "Perabot berat harus:",
+              "options": [
+                "Dibiarkan bebas berdiri",
+                "Dipakukan ke dinding",
+                "Diletakkan atas roda",
+                "Diletakkan atas blok"
+              ],
+              "correctIndex": 1,
+              "hint": "Memakukan dapat mencegah jatuh ketika gegaran."
+            },
+            {
+              "id": "eq-b-2",
+              "prompt": "Pelan kecemasan termasuk:",
+              "options": [
+                "Tempat berkumpul, nombor hubungan, bekalan",
+                "Nombor hubungan sahaja",
+                "Bekalan sahaja",
+                "Peta sahaja"
+              ],
+              "correctIndex": 0,
+              "hint": "Pelan lengkap membantu respons yang lebih baik."
+            },
+            {
+              "id": "eq-b-3",
+              "prompt": "Pemanas air dan paip gas harus:",
+              "options": [
+                "Dibiarkan sahaja",
+                "Dipastikan selamat dan guna sambungan fleksibel jika disarankan",
+                "Hanya gunakan yang keras",
+                "Dibiarkan terbuka"
+              ],
+              "correctIndex": 1,
+              "hint": "Mengikat kemudahan ini mengurangkan risiko kebocoran dan kebakaran."
+            },
+            {
+              "id": "eq-b-4",
+              "prompt": "Latihan kecemasan membantu dengan:",
+              "options": [
+                "Membuang masa",
+                "Membangunkan memori otot untuk Meniarap, Lindung, Pegang",
+                "Membuat jiran marah",
+                "Tiada"
+              ],
+              "correctIndex": 1,
+              "hint": "Latihan meningkatkan kelajuan tindak balas."
+            },
+            {
+              "id": "eq-b-5",
+              "prompt": "Letakkan kasut dekat katil kerana:",
+              "options": [
+                "Ia kelihatan cantik",
+                "Mungkin ada kaca pecah di lantai selepas gegaran",
+                "Untuk lari lebih laju",
+                "Untuk menunjuk"
+              ],
+              "correctIndex": 1,
+              "hint": "Lindungi kaki daripada serpihan."
+            }
+          ]
+        },
+        {
+          "id": "eq-during",
+          "title": "Semasa Gempa Bumi",
+          "description": "Lindungi diri apabila gegaran bermula.",
+          "image": "",
+          "questions": [
+            {
+              "id": "eq-d-1",
+              "prompt": "Di dalam bangunan semasa gegaran anda harus:",
+              "options": [
+                "Lari keluar",
+                "Meniarap, Lindung, dan Pegang di bawah perabot kukuh",
+                "Guna lif",
+                "Berdiri di pintu di bangunan moden"
+              ],
+              "correctIndex": 1,
+              "hint": "Lindungi kepala/leher dan pegang sehingga gegaran berhenti."
+            },
+            {
+              "id": "eq-d-2",
+              "prompt": "Jika di atas katil semasa gegaran bermula:",
+              "options": [
+                "Lari ke pintu",
+                "Terus berada di atas katil dan lindungi kepala dengan bantal",
+                "Lompat keluar tingkap",
+                "Sembunyi dalam almari"
+              ],
+              "correctIndex": 1,
+              "hint": "Kekal di tempat untuk elak pijak serpihan."
+            },
+            {
+              "id": "eq-d-3",
+              "prompt": "Di luar berhampiran bangunan:",
+              "options": [
+                "Bergerak ke kawasan terbuka jauh dari bangunan dan talian elektrik",
+                "Berdiri berhampiran dinding",
+                "Berlindung di bawah jambatan",
+                "Pegang papan tanda"
+              ],
+              "correctIndex": 0,
+              "hint": "Elakkan serpihan jatuh dan talian elektrik."
+            },
+            {
+              "id": "eq-d-4",
+              "prompt": "Jika dalam kereta semasa gegaran:",
+              "options": [
+                "Berhenti di tempat selamat jauh dari jejambat/talian elektrik",
+                "Memandu lebih laju",
+                "Berhenti di bawah jambatan",
+                "Tinggalkan kereta dalam trafik"
+              ],
+              "correctIndex": 0,
+              "hint": "Kekal dalam kereta sehingga gegaran berhenti."
+            },
+            {
+              "id": "eq-d-5",
+              "prompt": "Selepas gegaran berhenti, jangka:",
+              "options": [
+                "Tiada gegaran lagi",
+                "Gegaran susulan—bersedia untuk Meniarap, Lindung, Pegang lagi",
+                "Salji",
+                "Hujan"
+              ],
+              "correctIndex": 1,
+              "hint": "Gegaran susulan boleh berlaku dalam beberapa minit atau hari."
+            }
+          ]
+        },
+        {
+          "id": "eq-after",
+          "title": "Selepas Gempa Bumi",
+          "description": "Periksa kecederaan, bahaya, dan langkah pemulihan.",
+          "image": "",
+          "questions": [
+            {
+              "id": "eq-a-1",
+              "prompt": "Keutamaan utama selepas gegaran berhenti:",
+              "options": [
+                "Semak media sosial",
+                "Periksa kecederaan dan beri pertolongan cemas",
+                "Cari cenderamata",
+                "Tidur"
+              ],
+              "correctIndex": 1,
+              "hint": "Tumpu isu yang mengancam nyawa dahulu."
+            },
+            {
+              "id": "eq-a-2",
+              "prompt": "Jika anda bau gas atau dengar bunyi mendesis:",
+              "options": [
+                "Buka lampu untuk lihat lebih jelas",
+                "Elakkan percikan api; tutup gas jika selamat; keluar dan lapor",
+                "Nyalakan lilin",
+                "Abaikan sahaja"
+              ],
+              "correctIndex": 1,
+              "hint": "Kebocoran gas boleh menyala; elakkan percikan api dan beri pengudaraan."
+            },
+            {
+              "id": "eq-a-3",
+              "prompt": "Jika terperangkap di bawah runtuhan anda harus:",
+              "options": [
+                "Jerit tanpa henti",
+                "Ketuk paip/dinding dan tutup mulut untuk elakkan debu",
+                "Guna pemetik api untuk melihat",
+                "Gerakkan runtuhan dengan kuat"
+              ],
+              "correctIndex": 1,
+              "hint": "Jimat tenaga dan elakkan habuk/kebakaran."
+            },
+            {
+              "id": "eq-a-4",
+              "prompt": "Menggunakan telefon selepas bencana:",
+              "options": [
+                "Buat panggilan panjang",
+                "Guna teks/amaran untuk kurangkan beban rangkaian",
+                "Tonton video",
+                "Abaikan tahap bateri"
+              ],
+              "correctIndex": 1,
+              "hint": "Mesej teks lebih mudah sampai dan guna jalur lebar yang rendah."
+            },
+            {
+              "id": "eq-a-5",
+              "prompt": "Membersihkan kaca pecah memerlukan:",
+              "options": [
+                "Tangan kosong",
+                "Sarung tangan dan kasut tapak tebal",
+                "Selipar",
+                "Tiada perlindungan"
+              ],
+              "correctIndex": 1,
+              "hint": "Lindungi diri semasa kerja pembersihan."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
