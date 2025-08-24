@@ -32,6 +32,7 @@ import {
   sortBadges,
   sortRewards,
 } from "../utils/sorters";
+import { useTranslation } from "react-i18next";
 
 /* ---------- constants ---------- */
 
@@ -46,11 +47,12 @@ export default function BadgeRewardScreen() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const [tab, setTab] = useState("badge");
   const [summary, setSummary] = useState({ badgesEarned: 0, points: 0 });
   const [items, setItems] = useState([]);
-  const [rewards, setRewards] = useState(getRewards());
+  const [rewards, setRewards] = useState(getRewards(t));
 
   // Sort state
   const [badgeSortIx, setBadgeSortIx] = useState(0);
@@ -69,7 +71,7 @@ export default function BadgeRewardScreen() {
   const [showModal, setShowModal] = useState(false);
 
   const load = useCallback(async () => {
-    const { items, summary } = await buildBadgeList();
+    const { items, summary } = await buildBadgeList(t);
     const redeemedTotal = await getRedeemedTotal();
     // Show *available* points (earned - redeemed)
     const available = computeAvailablePoints(summary.points, redeemedTotal);
@@ -93,9 +95,10 @@ export default function BadgeRewardScreen() {
   const shareBadge = useCallback(async () => {
     if (!activeBadge?.achieved) return;
     try {
-      await Share.share(buildSharePayload(activeBadge));
+      // Localized share payload (buildSharePayload is backward compatible)
+      await Share.share(buildSharePayload(activeBadge, t));
     } catch {}
-  }, [activeBadge]);
+  }, [activeBadge, t]);
 
   const sortedBadges = useMemo(
     () => sortBadges(items, badgeSortIx),
@@ -128,6 +131,10 @@ export default function BadgeRewardScreen() {
     [nav, summary.points, theme]
   );
 
+  // Current sort label value – we keep array value as fallback
+  const sortValue =
+    tab === "badge" ? BADGE_SORTS[badgeSortIx] : REWARD_SORTS[rewardSortIx];
+
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
       {/* HERO */}
@@ -155,7 +162,9 @@ export default function BadgeRewardScreen() {
           </Pressable>
 
           {/* Title (center) */}
-          <Text style={s.heroTitle}>Badge &amp; Reward</Text>
+          <Text style={s.heroTitle}>
+            {t("badges.title", "Badges & Rewards")}
+          </Text>
 
           {/* Sort (right) */}
           <Pressable onPress={cycleSort} style={s.sortBtn} hitSlop={10}>
@@ -169,7 +178,9 @@ export default function BadgeRewardScreen() {
               <Image source={ICONS.badges} style={s.statIconImg} />
               <View style={s.statTextCol}>
                 <Text style={s.statValue}>{summary.badgesEarned}</Text>
-                <Text style={s.statLabel}>BADGES</Text>
+                <Text style={s.statLabel}>
+                  {t("badges.stats.badges", "BADGES")}
+                </Text>
               </View>
             </View>
 
@@ -180,7 +191,9 @@ export default function BadgeRewardScreen() {
               <Image source={ICONS.points} style={s.statIconImg} />
               <View style={s.statTextCol}>
                 <Text style={s.statValue}>{summary.points}</Text>
-                <Text style={s.statLabel}>POINTS</Text>
+                <Text style={s.statLabel}>
+                  {t("badges.stats.points", "POINTS")}
+                </Text>
               </View>
             </View>
           </View>
@@ -191,17 +204,25 @@ export default function BadgeRewardScreen() {
       <View style={{ paddingHorizontal: 14, marginTop: 12, marginBottom: 2 }}>
         <SegmentToggle
           options={[
-            { id: "badge", label: "Badge" },
-            { id: "rewards", label: "Rewards" },
+            { id: "badge", label: t("badges.tabs.badge", "Badges") },
+            { id: "rewards", label: t("badges.tabs.rewards", "Rewards") },
           ]}
           value={tab}
           onChange={setTab}
         />
         <Text style={[s.sortHint, { color: theme.colors.subtext }]}>
-          Sort:
+          {t("badges.sort")}{" "}
           {tab === "badge"
-            ? BADGE_SORTS[badgeSortIx]
-            : REWARD_SORTS[rewardSortIx]}
+            ? t(
+                `badges.sortOptions.${BADGE_SORTS[badgeSortIx].toLowerCase()}`,
+                BADGE_SORTS[badgeSortIx]
+              )
+            : t(
+                `rewards.sortOptions.${REWARD_SORTS[
+                  rewardSortIx
+                ].toLowerCase()}`,
+                REWARD_SORTS[rewardSortIx]
+              )}
         </Text>
       </View>
 
@@ -237,6 +258,7 @@ export default function BadgeRewardScreen() {
         onClose={closeBadge}
         onShare={shareBadge}
         theme={theme}
+        t={t}
       />
     </SafeAreaView>
   );

@@ -175,8 +175,36 @@ export const REWARDS_DATA = [
   },
 ];
 
-export function getRewards() {
-  return REWARDS_DATA.slice();
+/** Localized getter (single export) */
+export function getRewards(t) {
+  // `t` is optional: if not provided, we just return the raw English values.
+  const hasT = typeof t === "function";
+  return REWARDS_DATA.map((r) => {
+    const baseKey = `rewards.catalog.${r.id}`;
+    const title = hasT
+      ? t(`${baseKey}.title`, { defaultValue: r.title })
+      : r.title;
+    const desc = hasT
+      ? t(`${baseKey}.desc`, { defaultValue: r.desc })
+      : r.desc;
+    const longDesc = hasT
+      ? t(`${baseKey}.longDesc`, { defaultValue: r.longDesc || r.desc })
+      : (r.longDesc || r.desc);
+    const details = hasT
+      ? t(`${baseKey}.details`, {
+          defaultValue: r.details,
+          returnObjects: true,
+        })
+      : r.details;
+
+    return {
+      ...r,
+      title,
+      desc,
+      longDesc,
+      details: Array.isArray(details) ? details : r.details,
+    };
+  });
 }
 
 /** Redemption helpers */

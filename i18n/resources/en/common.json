@@ -231,5 +231,222 @@
     "error_number_invalid": "Invalid number.",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "badges": {
+    "title": "Badges & Rewards",
+    "tabs": {
+      "badge": "Badges",
+      "rewards": "Rewards"
+    },
+    "stats": {
+      "badges": "BADGES",
+      "points": "POINTS"
+    },
+    "modal": {
+      "share": "Share",
+      "close": "Close",
+      "locked_msg": "You're almost there — unlock this by “{{desc}}”.",
+      "unlocked_msg": "Impressive progress! You've “{{desc}}” like a champ!"
+    },
+    "sort": "Sort:",
+    "sortOptions": {
+      "default": "Default",
+      "unlocked": "Unlocked",
+      "locked": "Locked"
+    },
+    "templates": {
+      "quiz": {
+        "title_first": "First Quiz",
+        "title_many": "Knowledge Seeker",
+        "desc_first": "Complete your first quiz",
+        "desc_many": "Complete {{count}} quizzes"
+      },
+      "perfect": {
+        "title_first": "Perfectionist",
+        "title_many": "Consistent Ace",
+        "desc_first": "Get a perfect quiz score",
+        "desc_many": "Get {{count}} perfect scores"
+      },
+      "daily": {
+        "title_first": "Daily Challenger",
+        "title_many": "Daily Grinder",
+        "desc_many": "Complete {{count}} daily challenge{{s}}"
+      },
+      "xp": {
+        "title": "XP Collector",
+        "desc": "Earn {{count}} XP in total"
+      },
+      "fast": {
+        "title_first": "Fast Learner",
+        "title_many": "Speed Runner",
+        "desc_first": "Finish a quiz under 1 minute",
+        "desc_many": "Finish {{count}} quizzes under 1 minute"
+      },
+      "streak": {
+        "title_first": "On a Roll",
+        "title_many": "Streak Keeper",
+        "desc": "{{count}}-day streak"
+      }
+    },
+    "points_suffix": "points",
+    "share": {
+      "title": "Unlocked: {{title}}",
+      "message": "I just unlocked the \"{{title}}\" badge! {{desc}}"
+    }
+  },
+
+  "rewards": {
+    "sortOptions": {
+      "default": "Default",
+      "price ↑": "Price ↑",
+      "price ↓": "Price ↓"
+    },
+    "includes": "Includes:",
+    "points_required": "Points Required",
+    "redeem_now": "Redeem Now",
+    "modal": {
+      "success": {
+        "title": "Redeemed Successfully!",
+        "msg": "{{price}} points have been deducted from your balance."
+      },
+      "insufficient": {
+        "title": "Not enough points",
+        "msg": "You need {{need}} points, but you only have {{have}}."
+      },
+      "error": {
+        "title": "Something went wrong",
+        "msg": "Please try again in a moment."
+      },
+      "done": "Done",
+      "close": "Close"
+    },
+    "catalog": {
+      "r1": {
+        "title": "Mini First Aid Kit",
+        "desc": "Compact and portable. Fits into a bag for everyday readiness.",
+        "longDesc": "Multi-award-winning Mini First Aid ... act confidently.",
+        "details": [
+          "2 × Low-Adherent Wound Pads",
+          "2 × Conforming Bandages",
+          "1 × Pair of Shears (rounded tip, paramedic-recommended)",
+          "1 × Adhesive Tape Roll",
+          "2 × Burn Gel Sachets",
+          "20 × Children's Washproof Plasters",
+          "20 × Unprinted Washproof Plasters, 7cm × 2cm",
+          "4 × Elbow / Knee Plasters",
+          "4 × Non-Alcohol Wipes",
+          "1 × Metal Tweezers",
+          "6 × Safety Pins",
+          "1 × Information Leaflet (first-aid quick guide)",
+          "10 × Bravery Stickers",
+          "Zipped soft case (water-resistant), 16 × 12 × 5 cm"
+        ]
+      },
+      "r2": {
+        "title": "Emergency Whistle & Torch",
+        "desc": "120 dB electronic whistle with built-in LED torch for signalling.",
+        "longDesc": "Be heard and be seen. ... when you need it most.",
+        "details": [
+          "Electronic whistle body with integrated LED torch (up to 120 dB)",
+          "3 whistle tones and 3 volume levels",
+          "Torch modes: High / Low / Strobe",
+          "Rechargeable Li-ion battery (≈300 mAh), 1.5–2 h full charge",
+          "Runtime: up to ~2 h siren use / ~3–4 h torch (mode-dependent)",
+          "USB charging cable",
+          "Wrist lanyard and belt/clip pouch",
+          "IPX4 splash-resistant housing",
+          "Weight ≈ 60 g; compact 13 × 3 × 3 cm",
+          "User quick-start guide"
+        ]
+      },
+      "r3": {
+        "title": "Reusable Face Masks",
+        "desc": "Washable adult mask with PM2.5 filters and adjustable fit.",
+        "longDesc": "A comfortable, reusable mask ... crowded spaces.",
+        "details": [
+          "1 × Reusable adult mask (3-layer cotton/poly blend)",
+          "2 × PM2.5 activated-carbon filters (insertable)",
+          "Adjustable ear loops for comfort",
+          "Mouldable nose wire to improve seal & reduce glasses fog",
+          "Washable; recommended to remove filter before washing",
+          "Typical filter replacement: every 3–7 days of use (conditions vary)",
+          "Resealable storage pouch for hygiene on the go",
+          "One size fits most (unisex)"
+        ]
+      },
+      "r4": {
+        "title": "Emergency Water Pouches",
+        "desc": "UHT-sterilized drinking water in foil pouches. 5-year shelf life.",
+        "longDesc": "Clean drinking water is the #1 priority ... minimal fuss.",
+        "details": [
+          "62 × 125 ml foil pouches (total ≈ 7.75 L)",
+          "Ultra-high temperature (UHT) sterilized water",
+          "5-year shelf life (store in a cool, dry place)",
+          "Heat-sealed, easy-tear pouches; no bottle opener required",
+          "Compact for go-bags or car kits; portion-controlled to reduce waste",
+          "Lot/expiry printed on outer pack",
+          "Complies with common emergency-relief packaging standards",
+          "Intended for emergency use and short-term hydration"
+        ]
+      },
+      "r5": {
+        "title": "Survival Blanket",
+        "desc": "Reflective thermal blanket to retain body heat in cold, wind or rain.",
+        "longDesc": "A lightweight mylar emergency blanket ... home emergency drawers.",
+        "details": [
+          "1 × Thermal emergency blanket (approx. 210 × 130 cm)",
+          "Reflective mylar surface—retains up to 90% body heat",
+          "Waterproof and windproof; blocks rain and spray",
+          "High-visibility reflective finish for signalling",
+          "Reusable if handled gently; tear-resistant film",
+          "Packed size ≈ 12 × 8 × 2 cm; weight ≈ 55 g",
+          "Multi-use: wrap, shelter roof, ground sheet, poncho or signal panel"
+        ]
+      },
+      "don-src-1": {
+        "title": "$1 Donation to Red Cross",
+        "desc": "Support emergency relief efforts.",
+        "longDesc": "Exchange your points ... no real money is transferred.",
+        "details": [
+          "No physical item will be shipped",
+          "In-app confirmation of your support (demo only)",
+          "Not tax-deductible; for demonstration/education",
+          "Helps illustrate how points could translate into real-world impact"
+        ]
+      },
+      "don-scdf-1": {
+        "title": "$1 Donation to SCDF Community Program",
+        "desc": "Supports local emergency preparedness programs.",
+        "longDesc": "Direct your points toward community readiness ...",
+        "details": [
+          "No physical item will be shipped",
+          "In-app confirmation of your support (demo only)",
+          "Not tax-deductible; for demonstration/education",
+          "Encourages a culture of preparedness and volunteerism"
+        ]
+      },
+      "don-src-5": {
+        "title": "$5 Donation to Red Cross",
+        "desc": "Support emergency relief efforts.",
+        "longDesc": "Make a bigger impact ... no real transaction occurs.",
+        "details": [
+          "No physical item will be shipped",
+          "In-app confirmation of your support (demo only)",
+          "Not tax-deductible; for demonstration/education",
+          "Shows how higher tiers could create greater impact"
+        ]
+      },
+      "don-scdf-5": {
+        "title": "$5 Donation to SCDF Community Program",
+        "desc": "Supports local emergency preparedness programs.",
+        "longDesc": "Convert your points into a larger symbolic contribution ...",
+        "details": [
+          "No physical item will be shipped",
+          "In-app confirmation of your support (demo only)",
+          "Not tax-deductible; for demonstration/education",
+          "Highlights how loyalty points could fuel preparedness initiatives"
+        ]
+      }
+    }
   }
 }

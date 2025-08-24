@@ -1,12 +1,19 @@
 // utils/sorters.js
 
-// Badge sort modes shown in UI (keep order in sync with cycle logic)
+// Exported sort labels (default English)
 export const BADGE_SORTS = ["Default", "Unlocked", "Locked"];
+export const REWARD_SORTS = ["Default", "Price ↑", "Price ↓"];
+
+/**
+ * Sort badges based on the selected mode
+ * @param {Array} items - Badge items array
+ * @param {number} modeIndex - Sort index: 0=Default, 1=Unlocked first, 2=Locked first
+ */
 export function sortBadges(items = [], modeIndex = 0) {
   if (modeIndex === 1) {
     // Unlocked first
     return [...items].sort((a, b) =>
-      a.achieved === b.achieved ? 0 : b.achieved ? 1 : -1
+      a.achieved === b.achieved ? 0 : b.achieved ? -1 : 1
     );
   }
   if (modeIndex === 2) {
@@ -18,8 +25,11 @@ export function sortBadges(items = [], modeIndex = 0) {
   return items;
 }
 
-// Reward sort modes shown in UI
-export const REWARD_SORTS = ["Default", "Price ↑", "Price ↓"];
+/**
+ * Sort rewards based on price
+ * @param {Array} items - Reward items array
+ * @param {number} modeIndex - Sort index: 0=Default, 1=Price ↑, 2=Price ↓
+ */
 export function sortRewards(items = [], modeIndex = 0) {
   if (modeIndex === 1) {
     // Price low → high

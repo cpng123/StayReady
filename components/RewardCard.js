@@ -1,12 +1,14 @@
-// components/RewardCard.js
 import React, { useMemo } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const CARD_H = 86;
 const IMG_W = 96;
 
 export default function RewardCard({ item, theme }) {
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
+
   return (
     <View style={[s.card, { backgroundColor: theme.colors.card }]}>
       <View style={s.imgWrap}>
@@ -21,7 +23,7 @@ export default function RewardCard({ item, theme }) {
           {item.desc}
         </Text>
         <Text style={[s.points, { color: theme.colors.primary }]}>
-          {item.points} points
+          {item.points} {t("badges.points_suffix", "points")}
         </Text>
       </View>
     </View>
@@ -33,7 +35,7 @@ const makeStyles = (theme) =>
     card: {
       height: CARD_H,
       borderRadius: 14,
-      overflow: "hidden", // left corners apply to image
+      overflow: "hidden",
       flexDirection: "row",
       alignItems: "stretch",
       shadowColor: "#000",
@@ -50,18 +52,8 @@ const makeStyles = (theme) =>
       overflow: "hidden",
       alignSelf: "stretch",
     },
-    img: {
-      width: "100%",
-      height: "100%",
-      resizeMode: "cover", // full container height, flush-left
-      // right edge stays square (no right rounding)
-    },
-    right: {
-      flex: 1,
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-      justifyContent: "center",
-    },
+    img: { width: "100%", height: "100%", resizeMode: "cover" },
+    right: { flex: 1, paddingVertical: 10, paddingHorizontal: 12, justifyContent: "center" },
     title: { fontWeight: "800", fontSize: 15, marginBottom: 2 },
     desc: { fontSize: 12, fontWeight: "600" },
     points: { marginTop: 6, fontSize: 12, fontWeight: "900" },

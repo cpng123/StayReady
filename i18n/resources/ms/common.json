@@ -237,5 +237,229 @@
     "error_number_invalid": "Nombor telefon tidak sah.",
     "save": "Simpan",
     "cancel": "Batal"
+  },
+  "badges": {
+    "badges": {
+      "title": "Lencana & Ganjaran",
+      "tabs": {
+        "badge": "Lencana",
+        "rewards": "Ganjaran"
+      },
+      "stats": {
+        "badges": "LENCIANA",
+        "points": "MATA"
+      },
+      "modal": {
+        "share": "Kongsi",
+        "close": "Tutup",
+        "locked_msg": "Hampir berjaya — buka dengan melengkapkan “{{desc}}”.",
+        "unlocked_msg": "Hebat! Anda telah “{{desc}}” seperti seorang juara!"
+      }
+    },
+    "sort": "Susun:",
+    "sortOptions": {
+      "default": "Lalai",
+      "unlocked": "Dibuka Dahulu",
+      "locked": "Terkunci Dahulu"
+    },
+    "templates": {
+      "quiz": {
+        "title_first": "Kuiz Pertama",
+        "title_many": "Pencari Ilmu",
+        "desc_first": "Lengkapkan kuiz pertama anda",
+        "desc_many": "Lengkapkan {{count}} kuiz"
+      },
+      "perfect": {
+        "title_first": "Sempurna",
+        "title_many": "Skor Konsisten",
+        "desc_first": "Dapatkan markah penuh untuk satu kuiz",
+        "desc_many": "Dapatkan {{count}} skor sempurna"
+      },
+      "daily": {
+        "title_first": "Pencabar Harian",
+        "title_many": "Pejuang Harian",
+        "desc_many": "Lengkapkan {{count}} cabaran harian"
+      },
+      "xp": {
+        "title": "Pengumpul XP",
+        "desc": "Kumpulkan {{count}} XP secara keseluruhan"
+      },
+      "fast": {
+        "title_first": "Pelajar Pantas",
+        "title_many": "Pelari Laju",
+        "desc_first": "Lengkapkan satu kuiz dalam masa kurang 1 minit",
+        "desc_many": "Lengkapkan {{count}} kuiz dalam masa kurang 1 minit"
+      },
+      "streak": {
+        "title_first": "Momentum Berterusan",
+        "title_many": "Penjejak Siri",
+        "desc": "Siri {{count}} hari"
+      }
+    },
+    "points_suffix": "mata",
+    "share": {
+      "title": "Dibuka: {{title}}",
+      "message": "Saya baru sahaja membuka lencana \"{{title}}\"! {{desc}}"
+    }
+  },
+
+  "rewards": {
+    "sortOptions": {
+      "default": "Lalai",
+      "price ↑": "Harga ↑",
+      "price ↓": "Harga ↓"
+    },
+    "includes": "Termasuk:",
+    "points_required": "Mata Diperlukan",
+    "redeem_now": "Tebus Sekarang",
+    "modal": {
+      "success": {
+        "title": "Penebusan Berjaya!",
+        "msg": "{{price}} mata telah ditolak daripada baki anda."
+      },
+      "insufficient": {
+        "title": "Mata tidak mencukupi",
+        "msg": "Anda perlukan {{need}} mata, tetapi hanya ada {{have}}."
+      },
+      "error": {
+        "title": "Ralat berlaku",
+        "msg": "Sila cuba lagi sebentar lagi."
+      },
+      "done": "Selesai",
+      "close": "Tutup"
+    },
+    "catalog": {
+      "r1": {
+        "title": "Kit Pertolongan Cemas Mini",
+        "desc": "Kecil dan mudah dibawa. Sesuai dimasukkan ke dalam beg untuk persediaan harian.",
+        "longDesc": "Kit Pertolongan Cemas Mini yang memenangi anugerah ini direka khas untuk keluarga. Saiznya kecil dan sesuai disimpan dalam beg bayi, beg galas, kotak sarung tangan kereta atau di rumah. Mengandungi item penting yang disyorkan oleh paramedik—sedia digunakan untuk membersihkan, menutup dan melindungi luka kecil, merawat melecur, dan menyokong terseliuh ringan sehingga rawatan lanjut. Panduan rujukan pantas disertakan untuk membantu anda bertindak dengan yakin.",
+        "details": [
+          "2 × Pad Luka Tidak Melekat",
+          "2 × Balutan Elastik",
+          "1 × Gunting Perubatan (hujung bulat, disyorkan paramedik)",
+          "1 × Gulungan Pita Pelekat",
+          "2 × Gel Luka Melecur",
+          "20 × Plaster Kanak-Kanak Kalish Air",
+          "20 × Plaster Kalish Air Tanpa Corak, 7cm × 2cm",
+          "4 × Plaster Siku / Lutut",
+          "4 × Tisu Pembasmi Kuman Tanpa Alkohol",
+          "1 × Penyepit Logam",
+          "6 × Pin Keselamatan",
+          "1 × Risalah Maklumat (panduan cepat pertolongan cemas)",
+          "10 × Pelekat Keberanian",
+          "Beg kalis air berzip, 16 × 12 × 5 cm"
+        ]
+      },
+
+      "r2": {
+        "title": "Wisell & Lampu Suluh Kecemasan",
+        "desc": "Wisell elektronik 120 dB dengan lampu LED terbina untuk memberi isyarat.",
+        "longDesc": "Kekal kelihatan dan kedengaran. Wisel elektronik bebas sentuhan ini menghasilkan bunyi sehingga 120 dB, jauh lebih kuat daripada wisel biasa, dan dilengkapi dengan lampu LED terbina untuk isyarat kecemasan dalam keadaan kurang cahaya. Sesuai untuk kecemasan, aktiviti luar, kawalan orang ramai atau berjalan malam. Boleh dicas semula melalui USB, mudah digunakan dan sangat boleh dipercayai bila diperlukan.",
+        "details": [
+          "Badan wisel elektronik dengan lampu LED terbina (sehingga 120 dB)",
+          "3 bunyi wisel dan 3 tahap kelantangan",
+          "Mod lampu: Terang / Rendah / Strob",
+          "Bateri Li-ion boleh dicas semula (≈300mAh), masa penuh 1.5–2 jam",
+          "Masa penggunaan: ≈2 jam siren / ≈3–4 jam lampu (bergantung mod)",
+          "Kabel pengecas USB",
+          "Tali pergelangan tangan & sarung klip pinggang",
+          "Reka bentuk tahan percikan IPX4",
+          "Berat ≈ 60g; saiz kompak 13 × 3 × 3 cm",
+          "Panduan pengguna ringkas"
+        ]
+      },
+
+      "r3": {
+        "title": "Pelitup Muka Boleh Guna Semula",
+        "desc": "Pelitup muka dewasa boleh basuh dengan penapis PM2.5 dan boleh laras.",
+        "longDesc": "Pelitup muka boleh guna semula yang selesa ini sesuai untuk kegunaan harian, musim jerebu, musim selesema atau semasa melancong. Fabriknya lembut pada kulit, dan dilengkapi dengan batang hidung boleh bentuk serta tali telinga boleh laras untuk mengurangkan kabus dan meningkatkan keselesaan. Penapis karbon aktif PM2.5 menambah perlindungan tambahan, sesuai untuk perjalanan berdebu atau kawasan sesak.",
+        "details": [
+          "1 × Pelitup muka dewasa boleh guna semula (3 lapisan kapas/poliester)",
+          "2 × Penapis karbon aktif PM2.5 (boleh diganti)",
+          "Tali telinga boleh laras untuk keselesaan maksimum",
+          "Batang hidung boleh bentuk untuk mengurangkan kabus cermin mata",
+          "Boleh dibasuh; disyorkan tanggalkan penapis sebelum basuh",
+          "Penggantian penapis: setiap 3–7 hari penggunaan (bergantung keadaan)",
+          "Beg simpanan boleh tutup semula, sesuai untuk dibawa",
+          "Saiz universal, sesuai untuk kebanyakan orang dewasa"
+        ]
+      },
+
+      "r4": {
+        "title": "Pek Air Kecemasan",
+        "desc": "Air minuman UHT steril dalam pek aluminium, tahan sehingga 5 tahun.",
+        "longDesc": "Air minuman bersih adalah keutamaan nombor satu selepas bencana. Pek aluminium berasingan ini mudah diagihkan, ringan dan dilindungi daripada cahaya serta pencemaran. Sesuai untuk disimpan di rumah, kereta atau pejabat bagi memastikan bekalan kecemasan asas sentiasa tersedia.",
+        "details": [
+          "62 × Pek aluminium 125ml (jumlah ≈7.75L)",
+          "Air steril melalui teknologi UHT (Ultra High Temperature)",
+          "Tahan sehingga 5 tahun (simpan di tempat sejuk dan kering)",
+          "Penutup kimpalan haba dengan bukaan mudah koyak; tiada pembuka botol diperlukan",
+          "Sesuai untuk beg kecemasan atau kit kereta; pembungkusan berkadar kurangkan pembaziran",
+          "Maklumat tarikh luput dicetak pada pembungkusan luar",
+          "Mematuhi piawaian pembungkusan bantuan kecemasan umum",
+          "Untuk kegunaan kecemasan dan hidrasi jangka pendek"
+        ]
+      },
+
+      "r5": {
+        "title": "Selimut Kecemasan",
+        "desc": "Selimut reflektif haba untuk mengekalkan suhu badan dalam cuaca sejuk, berangin atau hujan.",
+        "longDesc": "Selimut kecemasan Mylar ringan ini memantulkan sehingga 90% haba badan untuk membantu mencegah hipotermia. Boleh digunakan sebagai selimut, tempat perlindungan sementara, alas tanah, penutup hujan atau alat isyarat kecemasan. Saiz kecil dan mudah dibawa, sesuai untuk pendaki, kereta dan simpanan kecemasan di rumah.",
+        "details": [
+          "1 × Selimut kecemasan haba (±210 × 130 cm)",
+          "Permukaan reflektif Mylar—mengekalkan sehingga 90% haba badan",
+          "Kalis air dan angin; menghalang hujan dan percikan",
+          "Permukaan reflektif jelas untuk memberi isyarat kecemasan",
+          "Boleh digunakan semula jika dijaga dengan baik; bahan tahan koyak",
+          "Saiz lipat ≈12 × 8 × 2 cm; berat ≈55g",
+          "Pelbagai guna: selimut, bumbung tempat perlindungan, alas tanah, poncho atau bendera isyarat"
+        ]
+      },
+
+      "don-src-1": {
+        "title": "Sumbangan $1 kepada Palang Merah",
+        "desc": "Sokong usaha bantuan kecemasan.",
+        "longDesc": "Tukar mata ganjaran anda kepada sumbangan amal kecil. Sumbangan $1 ini membantu membiayai usaha bantuan bencana, latihan pertolongan cemas, perkhidmatan derma darah dan program komuniti. Ini hanyalah demonstrasi projek sekolah—tiada wang sebenar yang dipindahkan.",
+        "details": [
+          "Tiada item fizikal dihantar",
+          "Pengesahan sokongan dipaparkan dalam aplikasi (demo sahaja)",
+          "Tiada potongan cukai; untuk tujuan demonstrasi/pendidikan",
+          "Menunjukkan bagaimana mata ganjaran boleh memberi kesan dunia sebenar"
+        ]
+      },
+      "don-scdf-1": {
+        "title": "Sumbangan $1 kepada Program Komuniti SCDF",
+        "desc": "Sokong program kesedaran dan kesiapsiagaan kecemasan tempatan.",
+        "longDesc": "Gunakan mata ganjaran anda untuk menyokong kesiapsiagaan komuniti—termasuk latihan CPR/AED, program kesedaran CERT dan pendidikan awam tentang tindak balas kecemasan. Ini hanyalah demonstrasi, tiada dana sebenar dipindahkan.",
+        "details": [
+          "Tiada item fizikal dihantar",
+          "Pengesahan sokongan dipaparkan dalam aplikasi (demo sahaja)",
+          "Tiada potongan cukai; untuk tujuan demonstrasi/pendidikan",
+          "Menggalakkan budaya kesedaran dan sukarelawan kecemasan"
+        ]
+      },
+      "don-src-5": {
+        "title": "Sumbangan $5 kepada Palang Merah",
+        "desc": "Sokong usaha bantuan kecemasan.",
+        "longDesc": "Dengan menukar lebih banyak mata ganjaran, sumbangan $5 anda boleh memberikan impak yang lebih besar. Dalam penggunaan sebenar, ia membantu mengekalkan bekalan bantuan, melatih sukarelawan dan menyokong pemulihan pascabencana. Ini hanyalah demonstrasi projek sekolah—tiada wang sebenar dipindahkan.",
+        "details": [
+          "Tiada item fizikal dihantar",
+          "Pengesahan sokongan dipaparkan dalam aplikasi (demo sahaja)",
+          "Tiada potongan cukai; untuk tujuan demonstrasi/pendidikan",
+          "Menunjukkan bagaimana mata lebih tinggi memberi kesan lebih besar"
+        ]
+      },
+      "don-scdf-5": {
+        "title": "Sumbangan $5 kepada Program Komuniti SCDF",
+        "desc": "Sokong program kesedaran dan kesiapsiagaan kecemasan tempatan.",
+        "longDesc": "Tukar lebih banyak mata ganjaran anda kepada sumbangan simbolik yang lebih besar untuk menyokong kesiapsiagaan dan daya tahan komuniti. Ini hanyalah demonstrasi projek sekolah, tiada dana sebenar dipindahkan.",
+        "details": [
+          "Tiada item fizikal dihantar",
+          "Pengesahan sokongan dipaparkan dalam aplikasi (demo sahaja)",
+          "Tiada potongan cukai; untuk tujuan demonstrasi/pendidikan",
+          "Menunjukkan bagaimana mata ganjaran boleh memacu kesedaran kesiapsiagaan"
+        ]
+      }
+    }
   }
 }
