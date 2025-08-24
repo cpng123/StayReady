@@ -11,26 +11,31 @@ export const PREPAREDNESS_GUIDES = {
         id: "flood1",
         label: "Heavy Rainfall",
         icon: require("../assets/Reason/flood1.png"),
+        text: "Intense, short-duration downpours overwhelm drains and waterways, causing water levels to rise rapidly.",
       },
       {
         id: "flood2",
         label: "Blocked Drains",
         icon: require("../assets/Reason/flood2.png"),
+        text: "Leaves, litter, and silt clog drains and culverts, trapping runoff and backing water onto streets and homes.",
       },
       {
         id: "flood3",
         label: "Deforestation",
         icon: require("../assets/Reason/flood3.png"),
+        text: "Loss of trees and ground cover reduces infiltration and soil stability, speeding runoff and sending debris into waterways.",
       },
       {
         id: "flood4",
         label: "Urbanization",
         icon: require("../assets/Reason/flood4.png"),
+        text: "Concrete and asphalt limit absorption, channeling large volumes of rain into drainage systems that can overflow.",
       },
       {
         id: "flood5",
         label: "Low-Lying Terrain",
         icon: require("../assets/Reason/flood5.png"),
+        text: "Areas near rivers, canals, or below surrounding land collect runoff and are more prone to rapid inundation.",
       },
     ],
     sections: [
@@ -1141,7 +1146,6 @@ export const PREPAREDNESS_GUIDES = {
         url: "https://www.scdf.gov.sg/docs/default-source/comm.---volunteers-(docs)/civil-defence-resource-pack.pdf?sfvrsn=26a302c7_1",
         logo: require("../assets/External/EX-SCDF.jpg"),
       },
-
     ],
   },
 
