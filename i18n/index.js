@@ -23,16 +23,21 @@ export const SUPPORTED_LANGS = {
   ta: "தமிழ்",
 };
 
+import enPreparedness from "./resources/en/preparedness.json";
+import zhPreparedness from "./resources/zh/preparedness.json";
+import msPreparedness from "./resources/ms/preparedness.json";
+import taPreparedness from "./resources/ta/preparedness.json";
+
 const resources = {
-  en: { common: enCommon, checklist: enChecklist },
-  zh: { common: zhCommon, checklist: zhChecklist },
-  ms: { common: msCommon, checklist: msChecklist },
-  ta: { common: taCommon, checklist: taChecklist },
+  en: { common: enCommon, checklist: enChecklist, preparedness: enPreparedness },
+  zh: { common: zhCommon, checklist: zhChecklist, preparedness: zhPreparedness },
+  ms: { common: msCommon, checklist: msChecklist, preparedness: msPreparedness },
+  ta: { common: taCommon, checklist: taChecklist, preparedness: taPreparedness },
 };
 
 // Use ONE canonical key; still read legacy keys for older builds
-const CANON_LANG_KEY = "pref:language";          // <- preferred going forward
-const LEGACY_KEYS = ["pref:lang"];               // <- older key(s) you used
+const CANON_LANG_KEY = "pref:language"; // <- preferred going forward
+const LEGACY_KEYS = ["pref:lang"]; // <- older key(s) you used
 const ALL_LANG_KEYS = [CANON_LANG_KEY, ...LEGACY_KEYS];
 
 function pickDeviceLang() {
@@ -68,7 +73,7 @@ export async function initI18n() {
     resources,
     lng: initialLang,
     fallbackLng: "en",
-    ns: ["common", "checklist"],
+    ns: ["common", "checklist", "preparedness"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
     returnNull: false,

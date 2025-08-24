@@ -4,7 +4,9 @@
     "search": "Search",
     "cancel": "Cancel",
     "proceed": "Proceed",
-    "error": "Error"
+    "error": "Error",
+    "close": "Close",
+    "see_more": "See More"
   },
 
   "home": {
@@ -174,5 +176,16 @@
     },
     "quick_tips": "Quick Tips",
     "categories_quiz": "Categories Quiz"
+  },
+  "preparedness_screen": {
+    "preparedness_word": "Preparedness",
+    "title_suffix": "{{title}} Preparedness",
+    "why_title": "Why {{topic}} Happen",
+    "quick_facts": "Quick Facts (Stats)",
+    "interactive_learning": "Interactive Learning",
+    "interactive_title": "Test your knowledge",
+    "interactive_sub": "See how much you know about\nstaying safe.",
+    "interactive_cta": "Play & Learn",
+    "external_resources": "External Resources"
   }
 }

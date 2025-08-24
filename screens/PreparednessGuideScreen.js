@@ -11,13 +11,13 @@ import {
   Dimensions,
   Modal,
   Pressable,
-  Linking,
   ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getGuideById } from "../data/preparednessGuides";
 import { useThemeContext } from "../theme/ThemeProvider";
 import ExternalResourceCard from "../components/ExternalResourceCard";
+import { useTranslation } from "react-i18next";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 16;
@@ -25,7 +25,7 @@ const GAP = 12;
 const TILE_WIDTH = Math.floor((SCREEN_WIDTH - H_PADDING * 2 - GAP) / 2);
 const CARD_RADIUS = 16;
 
-// Small card in the horizontal reasons list
+/* ---------------- Small card in the horizontal reasons list ---------------- */
 function ReasonCard({ icon, label, onPress, theme }) {
   return (
     <TouchableOpacity
@@ -35,60 +35,43 @@ function ReasonCard({ icon, label, onPress, theme }) {
     >
       <Image
         source={icon}
-        style={{
-          width: 45,
-          height: 45,
-          marginBottom: 8,
-          resizeMode: "contain",
-        }}
+        style={{ width: 45, height: 45, marginBottom: 8, resizeMode: "contain" }}
       />
-      <Text
-        style={[styles.reasonText, { color: theme.colors.text }]}
-        numberOfLines={2}
-      >
+      <Text style={[styles.reasonText, { color: theme.colors.text }]} numberOfLines={2}>
         {label}
       </Text>
     </TouchableOpacity>
   );
 }
 
-// Simple info modal for a reason
-function ReasonModal({ visible, onClose, reason, theme }) {
+/* --------------------------- Reason info modal ----------------------------- */
+function ReasonModal({ visible, onClose, reason, theme, t }) {
   if (!visible) return null;
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalBackdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </View>
       <View style={styles.modalCenter} pointerEvents="box-none">
-        <View
-          style={[styles.modalCard, { backgroundColor: theme.colors.card }]}
-        >
+        <View style={[styles.modalCard, { backgroundColor: theme.colors.card }]}>
           <View style={{ alignItems: "center", marginBottom: 12 }}>
             {reason?.icon ? (
               <Image
                 source={reason.icon}
-                style={{
-                  width: 80,
-                  height: 80,
-                  resizeMode: "contain",
-                  marginBottom: 12,
-                }}
+                style={{ width: 80, height: 80, resizeMode: "contain", marginBottom: 12 }}
               />
             ) : null}
             <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-              {reason?.label ?? "Reason"}
+              {reason?.label ?? t("preparedness_screen.reason_fallback", { ns: "common", defaultValue: "Reason" })}
             </Text>
           </View>
           <Text style={[styles.modalBody, { color: theme.colors.subtext }]}>
             {reason?.text
               ? reason.text
-              : "More details about this reason will appear here..."}
+              : t("preparedness_screen.reason_more_details", {
+                  ns: "common",
+                  defaultValue: "More details about this reason will appear here...",
+                })}
           </Text>
           <View style={{ height: 12 }} />
           <TouchableOpacity
@@ -96,7 +79,7 @@ function ReasonModal({ visible, onClose, reason, theme }) {
             onPress={onClose}
             activeOpacity={0.9}
           >
-            <Text style={styles.modalBtnText}>Close</Text>
+            <Text style={styles.modalBtnText}>{t("common.close", { ns: "common" })}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -104,19 +87,22 @@ function ReasonModal({ visible, onClose, reason, theme }) {
   );
 }
 
-// Grid section (2 columns, image on top, caption below)
-function SectionGrid({ section, theme }) {
-  const data = section?.items ?? [];
-  if (!data.length) return null;
-  const lastRowStart = data.length - (data.length % 2 === 0 ? 2 : 1);
+/* -------- Grid section (2 columns, image on top, caption below) ------------ */
+function SectionGrid({ section, sectionKey, guideId, theme, t }) {
+  // Support both shapes: { id: 'prepareBefore', items: [...] } or { key: 'prepareBefore', items: [...] }
+  const effectiveKey = sectionKey || section?.id || section?.key;
+  const items = section?.items ?? [];
+  if (!items.length || !effectiveKey) return null;
+
+  const lastRowStart = items.length - (items.length % 2 === 0 ? 2 : 1);
 
   return (
     <View style={styles.bodyWrap}>
       <Text style={[styles.h2, { color: theme.colors.text }]}>
-        {section.title}
+        {t(`${guideId}.sections.${effectiveKey}.title`, { ns: "preparedness" })}
       </Text>
       <FlatList
-        data={data}
+        data={items}
         keyExtractor={(i) => i.id}
         numColumns={2}
         scrollEnabled={false}
@@ -137,7 +123,9 @@ function SectionGrid({ section, theme }) {
             >
               <Image source={item.img} style={styles.tileImg} />
               <Text style={[styles.tileCaption, { color: theme.colors.text }]}>
-                {item.text}
+                {t(`${guideId}.sections.${effectiveKey}.items.${item.id}`, {
+                  ns: "preparedness",
+                })}
               </Text>
             </View>
           );
@@ -147,12 +135,12 @@ function SectionGrid({ section, theme }) {
   );
 }
 
-// --- Big promo card -----------------------------------------
-function InteractiveLearning({ theme, onPress }) {
+/* --------------------------- Big promo card ------------------------------- */
+function InteractiveLearning({ theme, onPress, t }) {
   return (
     <View style={styles.bodyWrap}>
       <Text style={[styles.h2, { color: theme.colors.text }]}>
-        Interactive Learning
+        {t("preparedness_screen.interactive_learning", { ns: "common" })}
       </Text>
 
       <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
@@ -161,24 +149,18 @@ function InteractiveLearning({ theme, onPress }) {
           style={styles.interactiveCard}
           imageStyle={{ borderRadius: CARD_RADIUS }}
         >
-          {/* a subtle left-to-right overlay so white text always reads */}
           <View style={styles.interactiveTint} />
-
           <View style={styles.interactiveContent}>
-            <Text style={styles.interactiveTitle}>Test your knowledge</Text>
-            <Text style={styles.interactiveSub}>
-              See how much you know about{"\n"}staying safe.
+            <Text style={styles.interactiveTitle}>
+              {t("preparedness_screen.interactive_title", { ns: "common" })}
             </Text>
-
+            <Text style={styles.interactiveSub}>
+              {t("preparedness_screen.interactive_sub", { ns: "common" })}
+            </Text>
             <View style={styles.interactiveBtn}>
               <Ionicons name="play" size={16} color="#0A84FF" />
-              <Text
-                style={[
-                  styles.interactiveBtnText,
-                  { color: theme.colors.primary },
-                ]}
-              >
-                Play & Learn
+              <Text style={[styles.interactiveBtnText, { color: theme.colors.primary }]}>
+                {t("preparedness_screen.interactive_cta", { ns: "common" })}
               </Text>
             </View>
           </View>
@@ -188,27 +170,21 @@ function InteractiveLearning({ theme, onPress }) {
   );
 }
 
-// --- External section wrapper --------------------------------
-function ExternalResources({ resources = [], theme, navigation }) {
+/* ---------------------- External resources section ------------------------ */
+function ExternalResources({ resources = [], theme, navigation, guideId, t }) {
   if (!resources.length) return null;
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.extHeaderRow}>
-        <Text
-          style={[
-            styles.h2,
-            styles.extHeaderTitle,
-            { color: theme.colors.text },
-          ]}
-        >
-          External Resources
+        <Text style={[styles.h2, styles.extHeaderTitle, { color: theme.colors.text }]}>
+          {t("preparedness_screen.external_resources", { ns: "common" })}
         </Text>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => navigation.navigate("ExternalResources")}
         >
           <Text style={[styles.seeMore, { color: theme.colors.primary }]}>
-            See More
+            {t("common.see_more", { ns: "common" })}
           </Text>
         </TouchableOpacity>
       </View>
@@ -216,7 +192,11 @@ function ExternalResources({ resources = [], theme, navigation }) {
       {resources.map((r) => (
         <ExternalResourceCard
           key={r.id}
-          item={r}
+          item={{
+            ...r,
+            title: t(`${guideId}.externalResources.${r.id}.title`, { ns: "preparedness" }),
+            desc: t(`${guideId}.externalResources.${r.id}.desc`, { ns: "preparedness" }),
+          }}
           theme={theme}
           navigation={navigation}
         />
@@ -226,10 +206,19 @@ function ExternalResources({ resources = [], theme, navigation }) {
 }
 
 export default function PreparednessGuideScreen({ navigation, route }) {
-  const { theme } = useThemeContext(); // Get the current theme
+  const { theme } = useThemeContext();
+  const { t } = useTranslation();
+
   const guideId = route?.params?.id;
+  // Fallback to "flood" if no id passed
   const guide = getGuideById(guideId) || getGuideById("flood");
-  const { title, description, hero, reasons, sections = [] } = guide;
+
+  // Images/structure come from data; strings come from i18n
+  const { hero, reasons = [], sections = [] } = guide;
+
+  // Localized header strings
+  const translatedTitle = t(`${guideId}.title`, { ns: "preparedness" });
+  const translatedDescription = t(`${guideId}.description`, { ns: "preparedness" });
 
   // Map guide IDs to quiz category IDs if any differ
   const QUIZ_ID_MAP = {
@@ -237,12 +226,16 @@ export default function PreparednessGuideScreen({ navigation, route }) {
     firstaid: "aid",
     emergencykit: "kit",
   };
-  const quizCategoryId = QUIZ_ID_MAP[guideId] || guideId;
+  const quizCategoryId = QUIZ_ID_MAP[guideId] || guideId || "flood";
 
   const [reasonOpen, setReasonOpen] = useState(false);
   const [activeReason, setActiveReason] = useState(null);
+
   const openReason = (r) => {
-    setActiveReason(r);
+    // Fill modal with localized label/text for this reason
+    const label = t(`${guideId}.reasons.${r.id}.label`, { ns: "preparedness" });
+    const text = t(`${guideId}.reasons.${r.id}.text`, { ns: "preparedness" });
+    setActiveReason({ ...r, label, text });
     setReasonOpen(true);
   };
   const closeReason = () => setReasonOpen(false);
@@ -252,8 +245,8 @@ export default function PreparednessGuideScreen({ navigation, route }) {
     const head = [{ type: "reasons" }, { type: "stats" }];
     const grids = sections.map((s, idx) => ({
       type: "grid",
-      key: `grid-${idx}`,
       section: s,
+      key: s.id || s.key || `section-${idx}`,
     }));
     const tail = [{ type: "interactive" }];
     if (guide.externalResources?.length) tail.push({ type: "external" });
@@ -277,11 +270,13 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       {/* Title + description */}
       <View style={styles.bodyWrap}>
         <Text style={[styles.title, { color: theme.colors.text }]}>
-          {title} Preparedness
+          {t("preparedness_screen.title_suffix", {
+            ns: "common",
+            title: translatedTitle,
+          })}
         </Text>
-        <Text style={[styles.desc, { color: theme.colors.subtext }]}>
-          {description}
-        </Text>
+
+        <Text style={[styles.desc, { color: theme.colors.subtext }]}>{translatedDescription}</Text>
       </View>
     </>
   );
@@ -291,23 +286,21 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       return (
         <View style={styles.bodyWrap}>
           <Text style={[styles.h2, { color: theme.colors.text }]}>
-            Why {title} Happen
+            {t("preparedness_screen.why_title", { ns: "common", topic: translatedTitle })}
           </Text>
+
           <FlatList
             data={reasons}
             keyExtractor={(i) => i.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.edgeToEdge}
-            contentContainerStyle={{
-              paddingVertical: 6,
-              paddingHorizontal: H_PADDING - 1,
-            }}
+            contentContainerStyle={{ paddingVertical: 6, paddingHorizontal: H_PADDING - 1 }}
             ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
             renderItem={({ item: r }) => (
               <ReasonCard
                 icon={r.icon}
-                label={r.label}
+                label={t(`${guideId}.reasons.${r.id}.label`, { ns: "preparedness" })}
                 onPress={() => openReason(r)}
                 theme={theme}
               />
@@ -320,11 +313,9 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       return (
         <View style={styles.bodyWrap}>
           <Text style={[styles.h2, { color: theme.colors.text }]}>
-            Quick Facts (Stats)
+            {t("preparedness_screen.quick_facts", { ns: "common" })}
           </Text>
-          <View
-            style={[styles.statsCard, { backgroundColor: theme.colors.card }]}
-          >
+          <View style={[styles.statsCard, { backgroundColor: theme.colors.card }]}>
             {/* Placeholder image; replace later with a real chart */}
             <Image
               source={require("../assets/icon.png")}
@@ -336,16 +327,25 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       );
     }
     if (item.type === "grid") {
-      return <SectionGrid section={item.section} theme={theme} />;
+      return (
+        <SectionGrid
+          section={item.section}
+          sectionKey={item.section.id || item.section.key}
+          guideId={guideId || "flood"}
+          theme={theme}
+          t={t}
+        />
+      );
     }
     if (item.type === "interactive") {
       return (
         <InteractiveLearning
           theme={theme}
+          t={t}
           onPress={() =>
             navigation.navigate("QuizSets", {
               categoryId: quizCategoryId,
-              title: guide.title,
+              title: translatedTitle,
             })
           }
         />
@@ -355,19 +355,18 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       return (
         <ExternalResources
           resources={guide.externalResources}
+          guideId={guideId || "flood"}
           theme={theme}
           navigation={navigation}
+          t={t}
         />
       );
     }
-
     return null;
   };
 
   return (
-    <SafeAreaView
-      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
-    >
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
       <FlatList
         data={SECTIONS}
         keyExtractor={(s, i) => s.key ?? `${s.type}-${i}`}
@@ -382,12 +381,13 @@ export default function PreparednessGuideScreen({ navigation, route }) {
         onClose={closeReason}
         reason={activeReason}
         theme={theme}
+        t={t}
       />
     </SafeAreaView>
   );
 }
 
-// Update styles to use theme colors where needed
+/* --------------------------------- Styles --------------------------------- */
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   hero: { height: 170 },
@@ -407,6 +407,7 @@ const styles = StyleSheet.create({
   desc: { marginTop: 6, lineHeight: 20 },
   h2: { marginTop: 5, marginBottom: 8, fontSize: 18, fontWeight: "800" },
   edgeToEdge: { marginHorizontal: -H_PADDING },
+
   reasonCard: {
     width: 90,
     borderRadius: CARD_RADIUS,
@@ -419,12 +420,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
-  reasonText: {
-    textAlign: "center",
-    fontWeight: "500",
-    fontSize: 14,
-    lineHeight: 16,
-  },
+  reasonText: { textAlign: "center", fontWeight: "500", fontSize: 14, lineHeight: 16 },
+
   statsCard: {
     borderRadius: CARD_RADIUS,
     paddingVertical: 14,
@@ -435,6 +432,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
+
   tileCard: {
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
@@ -445,23 +443,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   tileImg: { width: "100%", height: 110, resizeMode: "cover" },
-  tileCaption: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    fontSize: 13,
-    lineHeight: 16,
-    textAlign: "center",
-  },
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)",
-  },
-  modalCenter: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
+  tileCaption: { paddingHorizontal: 10, paddingVertical: 10, fontSize: 13, lineHeight: 16, textAlign: "center" },
+
+  modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.35)" },
+  modalCenter: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
   modalCard: {
     width: "100%",
     maxWidth: 380,
@@ -477,16 +462,14 @@ const styles = StyleSheet.create({
   modalBody: { fontSize: 16, textAlign: "center", marginBottom: 10 },
   modalBtn: { borderRadius: 12, paddingVertical: 12, alignItems: "center" },
   modalBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
+
   interactiveCard: {
     height: 140,
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
     justifyContent: "center",
   },
-  interactiveTint: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.12)",
-  },
+  interactiveTint: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.12)" },
   interactiveContent: { paddingHorizontal: 16, paddingVertical: 12 },
   interactiveTitle: {
     color: "#fff",
@@ -517,6 +500,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   interactiveBtnText: { fontWeight: "800" },
+
   extHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -526,32 +510,4 @@ const styles = StyleSheet.create({
   },
   extHeaderTitle: { marginBottom: 0 },
   seeMore: { fontWeight: "700" },
-  extRow: {
-    flexDirection: "row",
-    height: 85,
-    borderRadius: CARD_RADIUS,
-    overflow: "hidden",
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
-  extLogoWrap: {
-    width: 105,
-    height: "100%",
-    borderTopLeftRadius: CARD_RADIUS,
-    borderBottomLeftRadius: CARD_RADIUS,
-    overflow: "hidden",
-  },
-  extLogo: { width: "100%", height: "100%", resizeMode: "cover" },
-  extTextWrap: {
-    flex: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    justifyContent: "center",
-  },
-  extTitle: { fontWeight: "800", fontSize: 14 },
-  extDesc: { fontSize: 11 },
 });

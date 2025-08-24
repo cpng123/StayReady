@@ -4,7 +4,9 @@
     "search": "Cari",
     "cancel": "Batal",
     "proceed": "Teruskan",
-    "error": "Ralat"
+    "error": "Ralat",
+    "close": "Tutup",
+    "see_more": "Lihat Lagi"
   },
 
   "home": {
@@ -35,10 +37,19 @@
       "title": "Nombor Kecemasan",
       "note": "Hubungi nombor ini hanya semasa bencana atau kecemasan.",
       "card": {
-        "sos":   { "title": "SOS",  "subtitle": "Aktifkan Amaran\nKecemasan yang Kuat" },
-        "995":   { "title": "995",  "subtitle": "Ambulans / Bomba\nKecemasan SCDF" },
-        "999":   { "title": "999",  "subtitle": "Tindak Balas Polis\nKecemasan SPF" },
-        "1777":  { "title": "1777", "subtitle": "Ambulans Bukan\nKecemasan" }
+        "sos": {
+          "title": "SOS",
+          "subtitle": "Aktifkan Amaran\nKecemasan yang Kuat"
+        },
+        "995": {
+          "title": "995",
+          "subtitle": "Ambulans / Bomba\nKecemasan SCDF"
+        },
+        "999": {
+          "title": "999",
+          "subtitle": "Tindak Balas Polis\nKecemasan SPF"
+        },
+        "1777": { "title": "1777", "subtitle": "Ambulans Bukan\nKecemasan" }
       }
     },
 
@@ -169,5 +180,18 @@
     },
     "quick_tips": "Tip Pantas",
     "categories_quiz": "Kuiz Mengikut Kategori"
+  },
+  "preparedness_screen": {
+    "preparedness_word": "Kesiapsiagaan",
+    "title_suffix": "Kesiapsiagaan {{title}}",
+    "why_title": "Mengapa {{topic}} Berlaku",
+    "quick_facts": "Fakta Pantas (Statistik)",
+
+    "interactive_learning": "Pembelajaran Interaktif",
+    "interactive_title": "Uji pengetahuan anda",
+    "interactive_sub": "Lihat sejauh mana anda tahu\nuntuk kekal selamat.",
+    "interactive_cta": "Main & Belajar",
+
+    "external_resources": "Sumber Luaran"
   }
 }

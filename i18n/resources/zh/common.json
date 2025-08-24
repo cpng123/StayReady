@@ -4,51 +4,44 @@
     "search": "搜索",
     "cancel": "取消",
     "proceed": "继续",
-    "error": "错误"
+    "error": "错误",
+    "close": "关闭",
+    "see_more": "查看更多"
   },
-
-   "home": {
+  "home": {
     "your_location": "你的位置",
     "region": "地区",
-
     "donate": {
       "title": "当每一秒\n都很重要时\n您的支持同样重要",
       "cta": "立即捐助",
       "error_try_later": "请稍后再试。",
       "error_open": "无法打开捐助页面。"
     },
-
     "section": {
       "emergencies_info": "紧急信息"
     },
-
     "map": {
       "placeholder": "新加坡地图（静态）"
     },
-
     "hazard": {
       "none": "未检测到危害",
       "slogan": "保持警惕，注意安全"
     },
-
     "contacts": {
       "title": "紧急联系",
       "note": "仅在灾难或紧急情况下拨打这些号码。",
       "card": {
-        "sos":   { "title": "SOS",  "subtitle": "触发响亮的\n紧急警报" },
-        "995":   { "title": "995",  "subtitle": "SCDF 紧急救护\n / 火警" },
-        "999":   { "title": "999",  "subtitle": "SPF\n紧急警务响应" },
-        "1777":  { "title": "1777", "subtitle": "非紧急救护车" }
+        "sos": { "title": "SOS", "subtitle": "触发响亮的\n紧急警报" },
+        "995": { "title": "995", "subtitle": "SCDF 紧急救护\n / 火警" },
+        "999": { "title": "999", "subtitle": "SPF\n紧急警务响应" },
+        "1777": { "title": "1777", "subtitle": "非紧急救护车" }
       }
     },
-
     "early": {
       "title": "预警",
       "subtitle": "监测常见风险"
     },
-
     "see_more": "查看更多",
-
     "prep": {
       "title": "灾害防备",
       "subtitle": "了解应对任何紧急情况的安全提示。",
@@ -65,7 +58,6 @@
         "earthquake": "地震"
       }
     },
-
     "routine": {
       "title": "日常准备",
       "subtitle": "通过日常准备保障您和家人的安全。",
@@ -75,7 +67,6 @@
         "quiz": "安全测验"
       }
     },
-
     "confirm_call_title": "拨打 {{title}}？",
     "confirm_call_body": "是否打开电话并预填 {{number}}？",
     "call_manual": "请手动拨打 {{num}}。",
@@ -122,19 +113,15 @@
     "tap_to": "点按以{{action}}",
     "alert": "发出警报",
     "stop_alarm": "停止警报",
-
     "subtitle_active_line1": "点按以停止警报。",
     "subtitle_active_line2": "{{delay}} 秒后，系统将把 SOS 信息发送给你的联系人。",
     "subtitle_idle_line1": "点按以发出警报。",
     "subtitle_idle_line2": "{{delay}} 秒后，系统会向你的联系人发送一条 SOS 信息。",
-
     "manage_contacts": "管理紧急联系人",
-
     "guard_title": "要添加紧急联系人吗？",
     "guard_message": "自动告警至少需要 1 位紧急联系人。你仍可现在启动警报，但不会发送任何消息。",
     "guard_add_contact": "添加联系人",
     "guard_not_now": "暂不添加",
-
     "button_sos": "SOS",
     "button_stop": "停止"
   },
@@ -173,5 +160,18 @@
     },
     "quick_tips": "快速提示",
     "categories_quiz": "分类测验"
+  },
+  "preparedness_screen": {
+    "preparedness_word": "防灾准备",
+    "title_suffix": "{{title}} 防灾准备",
+    "why_title": "为什么会发生 {{topic}}",
+    "quick_facts": "关键数据",
+
+    "interactive_learning": "互动学习",
+    "interactive_title": "测试你的知识",
+    "interactive_sub": "看看你对安全防护\n了解多少。",
+    "interactive_cta": "开始学习",
+
+    "external_resources": "外部资源"
   }
 }

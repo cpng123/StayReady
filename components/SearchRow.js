@@ -3,16 +3,20 @@ import React from "react";
 import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 export default function SearchRow({
   value,
   onChangeText,
-  placeholder = "Search",
+  placeholder,
   onSortToggle,
   showSort = true,
 }) {
   const { theme } = useThemeContext();
   const dark = theme.key === "dark";
+  const { t } = useTranslation();
+
+  const ph = placeholder ?? t("common.search", { ns: "common" });
 
   return (
     <View
@@ -26,7 +30,7 @@ export default function SearchRow({
     >
       <Ionicons name="search" size={18} color={dark ? "#9CA3AF" : "#6B7280"} />
       <TextInput
-        placeholder={placeholder}
+        placeholder={ph}
         placeholderTextColor={dark ? "#9CA3AF" : "#6B7280"}
         style={[styles.input, { color: theme.colors.text }]}
         value={value}

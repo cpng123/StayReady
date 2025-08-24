@@ -1,0 +1,563 @@
+{
+  "flood": {
+    "title": "Banjir Kilat",
+    "description": "Ketahui cara untuk kekal selamat semasa banjir kilat, melindungi harta benda anda daripada kerosakan, dan mengambil langkah yang betul untuk pulih dengan cepat selepas air surut.",
+    "reasons": {
+      "flood1": {
+        "label": "Hujan Lebat",
+        "text": "Hujan lebat berintensiti tinggi dalam tempoh singkat menyebabkan saliran dan sungai melimpah, mengakibatkan paras air meningkat dengan cepat."
+      },
+      "flood2": {
+        "label": "Saliran Tersumbat",
+        "text": "Daun, sampah, dan kelodak menyumbat longkang dan terowong, menyebabkan air melimpah ke jalan dan kawasan kediaman."
+      },
+      "flood3": {
+        "label": "Pemusnahan Hutan",
+        "text": "Kehilangan pokok dan penutup tanah mengurangkan penyerapan air, meningkatkan aliran air dan membawa serpihan ke dalam saliran."
+      },
+      "flood4": {
+        "label": "Perbandaran",
+        "text": "Konkrit dan asfalt menghalang penyerapan air, menyebabkan air hujan mengalir dengan banyak ke sistem saliran yang akhirnya melimpah."
+      },
+      "flood5": {
+        "label": "Kawasan Rendah",
+        "text": "Kawasan berhampiran sungai, terusan, atau tanah rendah lebih cenderung mengalami limpahan air dengan cepat."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Persediaan Sebelum",
+        "items": {
+          "floodPB1": "Sentiasa maklum dengan berita atau amaran di telefon anda.",
+          "floodPB2": "Sediakan beg kecemasan dengan barang keperluan dan alat pertolongan cemas.",
+          "floodPB3": "Kenali pelan pemindahan anda dan laluan alternatif yang selamat.",
+          "floodPB4": "Ikuti arahan pihak berkuasa dan keluar sebelum banjir bermula."
+        }
+      },
+      "surviveDuring": {
+        "title": "Keselamatan Semasa Banjir",
+        "items": {
+          "floodSD1": "JANGAN berjalan atau memandu di kawasan banjir.",
+          "floodSD2": "Segera bergerak ke kawasan tinggi.",
+          "floodSD3": "Ikuti semua arahan pemindahan dan amaran keselamatan.",
+          "floodSD4": "Tutup bekalan elektrik dan gas."
+        }
+      },
+      "recoverAfter": {
+        "title": "Pemulihan Selepas Banjir",
+        "items": {
+          "floodRA1": "Elakkan sentuhan dengan air banjir.",
+          "floodRA2": "Jauhkan diri daripada kabel elektrik yang terjatuh.",
+          "floodRA3": "JANGAN pulang ke rumah atau kawasan bencana sehingga diisytiharkan selamat.",
+          "floodRA4": "Apabila kembali ke rumah, bersihkan dan nyahkuman permukaan dan barang-barang."
+        }
+      }
+    },
+    "externalResources": {
+      "pub": {
+        "title": "Nasihat Banjir PUB",
+        "desc": "Dapatkan maklumat tentang cara PUB mengurangkan risiko banjir di Singapura dan ikuti tip keselamatan banjir yang penting."
+      },
+      "st": {
+        "title": "Keselamatan Jalan Raya Musim Monsun",
+        "desc": "Tip untuk pemandu memandu dengan selamat semasa hujan lebat dan lonjakan monsun, mengurangkan risiko kemalangan."
+      },
+      "hch": {
+        "title": "Tip Pembersihan Selepas Banjir",
+        "desc": "Panduan praktikal tentang cara membersihkan dan memulihkan rumah selepas banjir kilat."
+      },
+      "laminar": {
+        "title": "Penyelesaian Penghadang Banjir",
+        "desc": "Terokai produk dan penyelesaian perlindungan banjir yang direka khusus untuk persekitaran Singapura."
+      }
+    }
+  },
+  "haze": {
+    "title": "Jerebu (PM2.5)",
+    "description": "Ketahui cara melindungi diri dan keluarga anda semasa musim jerebu. Fahami risiko kesihatan PM2.5, ambil langkah pencegahan, dan ketahui cara menghadapinya dengan selamat.",
+    "reasons": {
+      "haze1": {
+        "label": "Kebakaran Hutan",
+        "text": "Pembakaran hutan menghasilkan asap dan zarah halus yang boleh bergerak jauh."
+      },
+      "haze2": {
+        "label": "Pencemaran Rentas Sempadan",
+        "text": "Angin membawa bahan pencemar dari negara jiran ke ruang udara tempatan."
+      },
+      "haze3": {
+        "label": "Cuaca Kering",
+        "text": "Cuaca kering menyebabkan asap bertahan lebih lama dan mengurangkan pencucian zarah oleh hujan."
+      },
+      "haze4": {
+        "label": "Perbandaran",
+        "text": "Emisi kenderaan dan industri menambah pencemaran PM2.5 semasa musim jerebu."
+      },
+      "haze5": {
+        "label": "Udara Bertakung",
+        "text": "Angin lemah dan suhu tidak seimbang memerangkap bahan pencemar berhampiran tanah."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Persediaan Sebelum",
+        "items": {
+          "haze-01": "Pantau ramalan jerebu dan bacaan PSI/PM2.5 setiap hari.",
+          "haze-02": "Simpan stok topeng N95 dan letakkan di tempat yang kering dan bersih.",
+          "haze-03": "Beli dan selenggara penapis udara dengan penapis HEPA.",
+          "haze-04": "Tutup celah pada pintu dan tingkap untuk mengurangkan kemasukan asap."
+        }
+      },
+      "protectDuring": {
+        "title": "Perlindungan Semasa Jerebu",
+        "items": {
+          "haze-05": "Kurangkan aktiviti luar, terutama bagi individu yang berisiko.",
+          "haze-06": "Pakai topeng N95 dengan betul apabila berada di luar.",
+          "haze-07": "Pastikan badan terhidrasi dan elakkan senaman berat di luar.",
+          "haze-08": "Gunakan titisan mata dan semburan hidung untuk melegakan iritasi."
+        }
+      },
+      "recoverAfter": {
+        "title": "Pemulihan Selepas Jerebu",
+        "items": {
+          "haze-09": "Buka tingkap dan pintu untuk mengudarakan rumah apabila kualiti udara bertambah baik.",
+          "haze-10": "Bersihkan lantai dan permukaan untuk menyingkirkan habuk yang mendap.",
+          "haze-11": "Gantikan atau bersihkan penapis udara selepas musim jerebu.",
+          "haze-12": "Dapatkan rawatan doktor jika simptom berterusan."
+        }
+      }
+    },
+    "externalResources": {
+      "nea": {
+        "title": "Pengurusan Jerebu di Singapura",
+        "desc": "Ketahui bagaimana Singapura memantau kualiti udara, mengurus jerebu rentas sempadan, dan melaksanakan langkah perlindungan."
+      },
+      "healthhub": {
+        "title": "Lindungi Diri Daripada Jerebu",
+        "desc": "Langkah praktikal untuk menjaga kesihatan semasa jerebu, termasuk penggunaan topeng dan tip mengekalkan kualiti udara di rumah."
+      },
+      "mom": {
+        "title": "Keselamatan Tempat Kerja Semasa Jerebu",
+        "desc": "Garis panduan keselamatan bagi majikan dan pekerja semasa jerebu, termasuk pelarasan kerja luar dan peralatan perlindungan."
+      },
+      "st": {
+        "title": "5 Cara Melindungi Diri Anda",
+        "desc": "Tip gaya hidup ringkas untuk mengurangkan risiko kesihatan akibat jerebu, daripada tinggal di dalam rumah hingga meningkatkan kualiti udara dalaman."
+      },
+      "mounte": {
+        "title": "Fakta Mengenai Jerebu",
+        "desc": "Fahami punca, kesan, dan langkah pencegahan jerebu serta cara menguruskan risiko kesihatan berkaitannya."
+      }
+    }
+  },
+  "dengue": {
+    "title": "Pencegahan Denggi",
+    "description": "Ketahui cara melindungi diri dan komuniti anda daripada demam denggi, penyakit bawaan nyamuk. Fahami puncanya, kenal pasti simptom awal, dan ambil langkah proaktif untuk mencegah penularan.",
+    "reasons": {
+      "dengue1": {
+        "label": "Air Bertakung",
+        "text": "Nyamuk Aedes membiak dalam takungan air kecil—pasu bunga, baldi, talang bumbung, dan dulang air."
+      },
+      "dengue2": {
+        "label": "Iklim Lembap",
+        "text": "Keadaan panas dan lembap mempercepatkan kitaran hidup nyamuk dan replikasi virus."
+      },
+      "dengue3": {
+        "label": "Pengurusan Sisa Lemah",
+        "text": "Bekas terbuang dan sampah yang menakung air menjadi tempat pembiakan nyamuk."
+      },
+      "dengue4": {
+        "label": "Kepadatan Bandar",
+        "text": "Kawasan berpenduduk padat meningkatkan risiko gigitan dan penularan kluster denggi."
+      },
+      "dengue5": {
+        "label": "Pelancong Dijangkiti",
+        "text": "Kes bawaan dari luar negara boleh mencetuskan penularan tempatan apabila digigit nyamuk Aedes."
+      }
+    },
+    "sections": {
+      "Prevention": {
+        "dengue-01": "Buang air bertakung di pasu bunga, baldi, dan dulang air.",
+        "dengue-02": "Pastikan talang bumbung bersih dan tidak tersumbat.",
+        "dengue-03": "Tukar air dalam pasu, mangkuk, dan kolam burung setiap 2 hari.",
+        "dengue-04": "Pasang jaring pada pintu dan tingkap untuk menghalang nyamuk."
+      },
+      "Recognising Symptoms": {
+        "dengue-05": "Demam panas mendadak selama 2 hingga 7 hari.",
+        "dengue-06": "Sakit kepala teruk, terutama di belakang mata.",
+        "dengue-07": "Sakit otot dan sendi di seluruh badan.",
+        "dengue-08": "Loya, muntah, atau hilang selera makan.",
+        "dengue-09": "Ruam kulit muncul beberapa hari selepas demam bermula.",
+        "dengue-10": "Gusi berdarah, muntah berterusan, sakit perut."
+      },
+      "Treatment & Care": {
+        "dengue-11": "Dapatkan rawatan perubatan segera jika disyaki denggi.",
+        "dengue-12": "Minum banyak air untuk mengelakkan dehidrasi.",
+        "dengue-13": "Rehat secukupnya dan elakkan aktiviti fizikal sehingga pulih sepenuhnya.",
+        "dengue-14": "Ambil ubat yang disyorkan doktor (elakkan aspirin/ibuprofen).",
+        "dengue-15": "Gunakan kelambu atau ubat penghalau nyamuk untuk mencegah jangkitan kepada orang lain.",
+        "dengue-16": "Lakukan pemeriksaan susulan dengan penyedia penjagaan kesihatan."
+      }
+    },
+    "externalResources": {
+      "cgs": {
+        "title": "Kempen Hapus Denggi",
+        "desc": "Dapatkan tip mingguan daripada kempen Hapus Denggi tentang cara menjaga rumah dan kejiranan bebas nyamuk."
+      },
+      "singhealth": {
+        "title": "Simptom & Rawatan Denggi",
+        "desc": "Fahami tanda-tanda biasa denggi dan ketahui bila rawatan perubatan diperlukan untuk pemulihan yang selamat."
+      },
+      "raffles": {
+        "title": "Maklumat Demam Denggi",
+        "desc": "Ketahui cara denggi merebak melalui nyamuk Aedes, kenali simptomnya dan dapatkan maklumat awal untuk tindakan segera."
+      }
+    }
+  },
+  "fire": {
+    "title": "Keselamatan Kebakaran",
+    "description": "Ketahui cara mencegah kebakaran, bertindak balas dengan berkesan semasa kecemasan, dan melindungi nyawa serta harta benda. Kebakaran boleh berlaku tanpa diduga, tetapi persediaan awal dapat mengurangkan risiko dan menyelamatkan nyawa.",
+    "reasons": {
+      "fire1": {
+        "label": "Memasak Tanpa Pengawasan",
+        "text": "Minyak dan lemak mudah terbakar apabila dipanaskan tanpa dipantau."
+      },
+      "fire2": {
+        "label": "Soket Berlebihan",
+        "text": "Terlalu banyak peranti disambungkan pada satu soket boleh menyebabkan wayar dan soket menjadi panas melampau."
+      },
+      "fire3": {
+        "label": "Pendawaian Rosak",
+        "text": "Kabel yang rosak atau sambungan longgar boleh menyebabkan percikan api dan memulakan kebakaran."
+      },
+      "fire4": {
+        "label": "Api Terbuka",
+        "text": "Lilin, colok, atau pemetik api berdekatan bahan mudah terbakar boleh menyebabkan kebakaran."
+      },
+      "fire5": {
+        "label": "Simpanan Bahan Mudah Terbakar",
+        "text": "Penyimpanan pelarut atau aerosol yang tidak betul meningkatkan risiko kebakaran menjadi lebih teruk."
+      }
+    },
+    "sections": {
+      "fire-prevent": {
+        "title": "Tip Pencegahan Kebakaran",
+        "items": {
+          "fire1": "Pasang dan selenggara pengesan asap di kawasan utama rumah anda.",
+          "fire2": "Letakkan alat pemadam api di tempat yang mudah dicapai dan ketahui cara menggunakannya.",
+          "fire3": "Elakkan menggunakan soket elektrik secara berlebihan dan gunakan produk elektrik yang disahkan.",
+          "fire4": "Simpan bahan mudah terbakar di tempat sejuk dan berventilasi jauh daripada haba."
+        }
+      },
+      "fire-during": {
+        "title": "Semasa Kebakaran",
+        "items": {
+          "fire5": "Kekal tenang – Maklumkan orang lain dan hubungi 995 segera.",
+          "fire6": "Jika ada asap, merangkak rendah untuk mengelakkan sedutan asap berbahaya.",
+          "fire7": "Gunakan kain basah untuk menutup hidung dan mulut anda.",
+          "fire8": "Keluar melalui tangga, jangan gunakan lif."
+        }
+      },
+      "fire-after": {
+        "title": "Selepas Kebakaran",
+        "items": {
+          "fire9": "Tunggu kebenaran SCDF sebelum memasuki semula premis.",
+          "fire10": "Aturkan pemeriksaan profesional pada pendawaian dan sistem gas."
+        }
+      }
+    },
+    "externalResources": {
+      "scdf": {
+        "title": "Direktori Perkhidmatan & Keselamatan Kebakaran",
+        "desc": "Akses perkhidmatan rasmi SCDF termasuk panduan keselamatan kebakaran, bahan rujukan, dan sumber muat turun kecemasan."
+      },
+      "fss": {
+        "title": "Konsultasi Perlindungan Kebakaran",
+        "desc": "Terokai penyedia tempatan yang menawarkan pemasangan alat pengesan kebakaran, sistem pemadaman api, pemeriksaan keselamatan, dan perkhidmatan konsultasi."
+      }
+    }
+  },
+  "aid": {
+    "title": "CPR & Pertolongan Cemas",
+    "description": "Panduan ini mengajar anda cara bertindak balas dalam minit kritikal pertama semasa kecemasan. Kenali kecemasan, bila perlu hubungi 995, CPR tanpa bantuan pernafasan, cara menggunakan AED, dan asas pertolongan cemas.",
+    "reasons": {
+      "aid1": {
+        "label": "Kemahiran Menyelamatkan Nyawa",
+        "text": "Tindakan CPR segera boleh menggandakan atau menggandakan kadar kelangsungan hidup mangsa henti jantung."
+      },
+      "aid2": {
+        "label": "Menstabilkan Keadaan",
+        "text": "Rawatan asas dapat mengurangkan pendarahan, kejutan, dan keadaan menjadi lebih teruk sebelum bantuan tiba."
+      },
+      "aid3": {
+        "label": "Tindak Balas Pantas",
+        "text": "Mengetahui apa yang perlu dilakukan mengurangkan keraguan semasa saat genting."
+      },
+      "aid4": {
+        "label": "Keselamatan Awam",
+        "text": "Lebih ramai orang yang terlatih bermakna bantuan boleh diberikan lebih cepat di kawasan sesak."
+      },
+      "aid5": {
+        "label": "Keyakinan Semasa Kecemasan",
+        "text": "Latihan membina keyakinan dan membantu membuat keputusan yang tenang ketika tekanan."
+      }
+    },
+    "sections": {
+      "before": {
+        "title": "Sebelum Kecemasan",
+        "items": {
+          "aid1": "Daftar kursus CPR dan pertolongan cemas daripada penyedia bertauliah.",
+          "aid2": "Lengkapkan kit anda dengan pembalut, tisu antiseptik, sarung tangan, dan topeng CPR.",
+          "aid3": "Simpan nombor SCDF (995) dan ambulans di telefon anda.",
+          "aid4": "Ketahui lokasi Defibrilator Luaran Automatik (AED) di kawasan anda."
+        }
+      },
+      "during": {
+        "title": "Semasa Kecemasan",
+        "items": {
+          "aid5": "Periksa bahaya sebelum mendekati mangsa.",
+          "aid6": "Hubungi talian kecemasan dengan segera.",
+          "aid7": "30 tekanan dada + 2 nafas bantuan, atau CPR tanpa nafas jika tidak terlatih.",
+          "aid8": "Ikuti arahan suara AED sehingga bantuan tiba."
+        }
+      },
+      "after": {
+        "title": "Selepas Kecemasan",
+        "items": {
+          "aid9": "Teruskan rawatan sehingga bantuan profesional tiba.",
+          "aid10": "Maklumkan responden tentang apa yang anda lakukan dan sebarang pemerhatian.",
+          "aid11": "Segera isi semula kit pertolongan cemas anda.",
+          "aid12": "Nilai apa yang berjaya dan apa yang perlu diperbaiki."
+        }
+      }
+    },
+    "externalResources": {
+      "vwh": {
+        "title": "Tip Pertolongan Cemas",
+        "desc": "Terokai panduan langkah demi langkah yang dipercayai untuk prosedur pertolongan cemas bagi kecederaan umum—pendarahan, tercekik, melecur, dan patah tulang."
+      },
+      "src1": {
+        "title": "Pendidikan Keselamatan Bencana",
+        "desc": "Akses panduan rasmi Palang Merah Singapura tentang prinsip pertolongan cemas, langkah berjaga-jaga sejagat, dan peranan penyelamat."
+      },
+      "src2": {
+        "title": "Garis Panduan Singapura",
+        "desc": "Ketahui protokol pertolongan cemas terkini, termasuk sokongan hayat asas dan cadangan tempatan."
+      },
+      "sfatc": {
+        "title": "Langkah Kecemasan",
+        "desc": "Pelajari pelan tindakan mudah DRSABCD—Periksa, Panggil, Rawat—yang menjadi asas tindak balas kecemasan berkesan."
+      }
+    }
+  },
+  "kit": {
+    "title": "Kit Kecemasan",
+    "description": "Koleksi bekalan dan peralatan penting yang disediakan lebih awal untuk menyokong individu dan keluarga semasa krisis yang tidak dijangka seperti bencana alam, kemalangan, atau gangguan bekalan elektrik.",
+    "reasons": {
+      "kit1": {
+        "label": "Bekalan Penyelamat Nyawa",
+        "text": "Air, makanan, dan kit pertolongan cemas memastikan keselamatan sehingga bantuan tiba."
+      },
+      "kit2": {
+        "label": "Keperluan Asas",
+        "text": "Lampu, peralatan, dan barangan kebersihan mengekalkan fungsi harian."
+      },
+      "kit3": {
+        "label": "Mengurangkan Panik",
+        "text": "Persediaan awal memberikan keyakinan dan mengurangkan kekeliruan semasa krisis."
+      },
+      "kit4": {
+        "label": "Menyokong Pemindahan",
+        "text": "Beg ‘grab-and-go’ mempercepatkan pemindahan selamat jika perlu keluar segera."
+      },
+      "kit5": {
+        "label": "Kebolehan Berdikari",
+        "text": "Bekalan membantu anda menguruskan keadaan apabila perkhidmatan terganggu."
+      }
+    },
+    "sections": {
+      "kit-basics": {
+        "title": "Keperluan Asas Untuk Hidup",
+        "items": {
+          "kit1": "Minimum 4 liter air setiap orang sehari (untuk minuman & kebersihan).",
+          "kit2": "Makanan dalam tin, bar tenaga, buah kering, dan makanan sedia dimakan.",
+          "kit3": "Pastikan kit pertolongan cemas lengkap dan tidak luput.",
+          "kit4": "Bekalan minimum 7 hari, termasuk salinan preskripsi ubat."
+        }
+      },
+      "kit-tools": {
+        "title": "Alat Komunikasi & Keselamatan",
+        "items": {
+          "kit5": "Radio berkuasa bateri atau boleh dicas tangan (untuk makluman kecemasan tempatan).",
+          "kit6": "Lampu suluh & bateri tambahan (sebaiknya LED).",
+          "kit7": "Wisil - penting untuk memanggil bantuan.",
+          "kit8": "Bank kuasa penuh untuk mengecas peranti mudah alih.",
+          "kit9": "Pisau serbaguna atau Swiss Army knife - untuk memotong, membaiki, atau membuka tin.",
+          "kit10": "Alat pemadam api kecil dengan gred ABC."
+        }
+      },
+      "kit-comfort": {
+        "title": "Keselesaan, Perlindungan & Dokumen Penting",
+        "items": {
+          "kit11": "Pakaian hangat & selimut - pakaian berlapis, ponco, dan stoking.",
+          "kit12": "Topeng habuk / respirator N95 - untuk kualiti udara yang buruk atau asap.",
+          "kit13": "Plastik dan pita pelekat - untuk tempat perlindungan sementara atau menutup ruang terbuka.",
+          "kit14": "Barangan kebersihan diri - berus gigi, ubat gigi, sabun, pembersih tangan, dll."
+        }
+      }
+    },
+    "externalResources": {
+      "singhealth": {
+        "title": "Kit Kecemasan Rumah",
+        "desc": "Ketahui barangan disyorkan yang perlu disediakan setiap isi rumah—daripada air dan makanan hingga kit pertolongan cemas."
+      },
+      "health": {
+        "title": "Keselamatan Setiap Rumah",
+        "desc": "Senarai lengkap barangan pertolongan cemas yang disahkan pakar dan kegunaannya, termasuk rawatan luka, melecur, dan ubat asas."
+      },
+      "scdf": {
+        "title": "Pek Sumber Pertahanan Awam",
+        "desc": "Pek rujukan kecemasan rasmi SCDF termasuk panduan persediaan rumah dan keperluan pemindahan."
+      }
+    }
+  },
+  "disease": {
+    "title": "Wabak Penyakit",
+    "description": "Ketahui cara mencegah jangkitan, bertindak balas dengan berkesan semasa wabak penyakit, dan menyokong usaha pemulihan. Sentiasa peka dan bersedia dapat mengurangkan risiko serta membantu mengawal penularan.",
+    "reasons": {
+      "disease1": {
+        "label": "Ruang Sesak",
+        "text": "Kontak rapat meningkatkan risiko penularan melalui titisan dan aerosol."
+      },
+      "disease2": {
+        "label": "Kebersihan Lemah",
+        "text": "Jarang mencuci tangan dan membersihkan permukaan membolehkan patogen kekal lebih lama."
+      },
+      "disease3": {
+        "label": "Perjalanan Global",
+        "text": "Pergerakan pantas manusia membawa masuk varian baharu dan menyebarkan penularan tempatan."
+      },
+      "disease4": {
+        "label": "Sumber Tercemar",
+        "text": "Air atau makanan yang tidak selamat boleh menyebabkan jangkitan pada sistem pencernaan."
+      },
+      "disease5": {
+        "label": "Mutasi Patogen",
+        "text": "Varian baharu boleh menjadi lebih mudah berjangkit atau lebih kebal terhadap imuniti."
+      }
+    },
+    "sections": {
+      "preventBefore": {
+        "title": "Pencegahan Sebelum Wabak",
+        "items": {
+          "disease1": "Pastikan vaksinasi sentiasa dikemas kini (contoh: Influenza, COVID-19, Hepatitis).",
+          "disease2": "Amalkan kebersihan diri—cuci tangan dengan kerap menggunakan sabun.",
+          "disease3": "Kuatkan imuniti badan melalui pemakanan sihat, senaman, dan rehat yang mencukupi.",
+          "disease4": "Sediakan bekalan kesihatan asas—topeng, termometer, dan pembersih tangan."
+        }
+      },
+      "protectDuring": {
+        "title": "Perlindungan Semasa Wabak",
+        "items": {
+          "disease5": "Pakai topeng di kawasan sesak atau berisiko tinggi.",
+          "disease6": "Amalkan penjarakan fizikal jika boleh.",
+          "disease7": "Bersihkan permukaan yang kerap disentuh di rumah dan tempat kerja.",
+          "disease8": "Elakkan berkongsi barang peribadi seperti sudu, garpu, atau tuala."
+        }
+      },
+      "recoverAfter": {
+        "title": "Pemulihan Selepas Wabak",
+        "items": {
+          "disease9": "Terus amalkan kebersihan yang baik untuk mencegah jangkitan semula.",
+          "disease10": "Hadiri pemeriksaan kesihatan susulan jika disarankan.",
+          "disease11": "Sokong program vaksinasi dan kesedaran masyarakat.",
+          "disease12": "Kekal peka dengan garis panduan kesihatan awam selepas wabak."
+        }
+      }
+    },
+    "externalResources": {
+      "ncis": {
+        "title": "Maklumat Terkini Wabak",
+        "desc": "Ketahui maklumat semasa tentang penularan penyakit berjangkit di Singapura. Termasuk kemas kini kes aktif dan amaran terkini."
+      },
+      "cdas": {
+        "title": "Buletin Penyakit Berjangkit",
+        "desc": "Akses data rasmi pemantauan penyakit melalui buletin mingguan yang dikeluarkan oleh CDA."
+      },
+      "ncis2": {
+        "title": "Rangka Kerja Pandemik",
+        "desc": "Ketahui tentang rangka kerja kesiapsiagaan pandemik Singapura—bagaimana sistem mengesan, bertindak balas, dan pulih daripada ancaman penyakit berskala besar."
+      },
+      "cdas2": {
+        "title": "Tindak Balas Wabak di Hospital",
+        "desc": "Fahami bagaimana hospital awam mengaktifkan mod tindak balas wabak—termasuk kawalan jangkitan dan pengurusan kapasiti semasa lonjakan penyakit."
+      }
+    }
+  },
+  "earthquake": {
+    "title": "Gempa Bumi",
+    "description": "Walaupun Singapura tidak terletak di atas garisan sesar utama, gegaran dari gempa bumi serantau masih boleh dirasai. Persediaan awal membantu anda kekal tenang dan bertindak pantas semasa gegaran berlaku.",
+    "reasons": {
+      "earthquake1": {
+        "label": "Plat Tektonik",
+        "text": "Tekanan terkumpul di sempadan plat sehingga ia dilepaskan secara tiba-tiba."
+      },
+      "earthquake2": {
+        "label": "Zon Subduksi",
+        "text": "Satu plat menolak ke bawah plat lain, menghasilkan gegaran gempa yang kuat."
+      },
+      "earthquake3": {
+        "label": "Aktiviti Gunung Berapi",
+        "text": "Pergerakan magma dan letusan gunung berapi boleh mencetuskan gegaran seismik."
+      },
+      "earthquake4": {
+        "label": "Pergerakan Sesar",
+        "text": "Pergerakan secara tiba-tiba di sepanjang garisan sesar melepaskan tenaga sebagai gelombang seismik."
+      },
+      "earthquake5": {
+        "label": "Gegaran Susulan",
+        "text": "Gegaran kecil berlaku selepas gempa utama ketika kerak bumi menyesuaikan semula tekanan."
+      }
+    },
+    "sections": {
+      "eq-indoors": {
+        "title": "Jika Merasa Gegaran di Dalam Bangunan",
+        "items": {
+          "earthquake1": "Jatuh, Berlindung, Pegang - Berlindung di bawah perabot kukuh dan lindungi kepala anda.",
+          "earthquake2": "Jauhi Kaca - Elakkan dari tingkap dan cermin.",
+          "earthquake3": "Jangan Guna Lif - Gunakan tangga hanya selepas gegaran berhenti.",
+          "earthquake4": "Kekal di Dalam - Elakkan berlari keluar ketika gegaran.",
+          "earthquake5": "Tutup Utiliti - Jika boleh, matikan gas dan elektrik.",
+          "earthquake6": "Bertenang - Tenangkan orang di sekeliling anda, terutama kanak-kanak."
+        }
+      },
+      "eq-outdoors": {
+        "title": "Jika Merasa Gegaran di Luar Bangunan",
+        "items": {
+          "earthquake7": "Pergi ke Kawasan Terbuka - Jauhkan diri daripada bangunan, pokok, dan kabel elektrik.",
+          "earthquake8": "Elakkan Jambatan & Laluan Bertingkat - Ia mungkin tidak stabil.",
+          "earthquake9": "Rendahkan Diri - Jatuh ke tanah untuk mengelakkan terjatuh.",
+          "earthquake10": "Ikut Arahan Rasmi - Dengar siaran kecemasan untuk panduan keselamatan."
+        }
+      },
+      "eq-after": {
+        "title": "Selepas Gegaran",
+        "items": {
+          "earthquake11": "Periksa kecederaan - Beri pertolongan cemas jika perlu.",
+          "earthquake12": "Periksa bahaya - Waspada terhadap kebocoran gas atau kerosakan elektrik.",
+          "earthquake13": "Berwaspada dengan Gegaran Susulan - Ia boleh sama berbahaya.",
+          "earthquake14": "Laporkan kerosakan struktur - Maklumkan pihak berkuasa berkaitan."
+        }
+      }
+    },
+    "externalResources": {
+      "nlb": {
+        "title": "Sumber Kesedaran Gempa Bumi",
+        "desc": "Terokai buku dan bahan berkaitan gempa bumi untuk meningkatkan kefahaman anda tentang keselamatan dan kesiapsiagaan."
+      },
+      "aa": {
+        "title": "Panduan Tindakan Semasa Gempa",
+        "desc": "Pelajari panduan asas tentang langkah yang perlu diambil jika anda terperangkap dalam gempa bumi walaupun berada di kawasan 'selamat'."
+      }
+    }
+  }
+}

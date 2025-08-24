@@ -101,7 +101,7 @@ export default function ChecklistScreen({ navigation }) {
       <SearchRow
         value={query}
         onChangeText={setQuery}
-        placeholder={t("common:search", "Search")}
+        placeholder={t("common.search", { ns: "common" })}
         showSort={false}
       />
 

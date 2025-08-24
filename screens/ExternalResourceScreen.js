@@ -9,40 +9,51 @@ import ExternalResourceCard from "../components/ExternalResourceCard";
 import TopBar from "../components/TopBar";
 import SearchRow from "../components/SearchRow";
 import FilterChips from "../components/FilterChips";
+import { useTranslation } from "react-i18next";
 
-// IDs must match your guide IDs
-const FILTERS = [
-  { id: "all", label: "All" },
-  { id: "flood", label: "Flood" },
-  { id: "haze", label: "Haze" },
-  { id: "storm", label: "Thunderstorm" },
-  { id: "dengue", label: "Dengue" },
-  { id: "wind", label: "Wind" },
-  { id: "aid", label: "First Aid" },
-  { id: "fire", label: "Fire" },
-  { id: "kit", label: "Emergency Kit" },
-  { id: "disease", label: "Disease" },
-  { id: "earthquake", label: "Earthquake" },
-];
+// filter ids must match your guide IDs
+function useFilters() {
+  const { t } = useTranslation();
+  return [
+    { id: "all", label: t("filters.all", { ns: "common", defaultValue: "All" }) },
+    { id: "flood", label: t("home.prep.topic.flood", { ns: "common" }) },
+    { id: "haze", label: t("home.prep.topic.haze", { ns: "common" }) },
+    { id: "storm", label: t("home.prep.topic.storm", { ns: "common" }) },
+    { id: "dengue", label: t("home.prep.topic.dengue", { ns: "common" }) },
+    { id: "wind", label: t("home.prep.topic.wind", { ns: "common" }) },
+    { id: "aid", label: t("home.prep.topic.aid", { ns: "common" }) },
+    { id: "fire", label: t("home.prep.topic.fire", { ns: "common" }) },
+    { id: "kit", label: t("home.prep.topic.kit", { ns: "common" }) },
+    { id: "disease", label: t("home.prep.topic.disease", { ns: "common" }) },
+    { id: "earthquake", label: t("home.prep.topic.earthquake", { ns: "common" }) },
+  ];
+}
 
 export default function ExternalResourceScreen({ navigation }) {
   const { theme } = useThemeContext();
+  const { t, i18n } = useTranslation();
+  const FILTERS = useFilters();
 
-  // Flatten all external resources across guides
+  // Flatten all external resources across guides, localizing title/desc here
   const allResources = useMemo(() => {
     const out = [];
     Object.values(PREPAREDNESS_GUIDES).forEach((guide) => {
+      const guideId = guide.id;
       (guide.externalResources ?? []).forEach((r) => {
         out.push({
           ...r,
-          key: `${guide.id}-${r.id}`,
-          categoryId: guide.id,
+          key: `${guideId}-${r.id}`,
+          categoryId: guideId,
           updated: r.updated ?? "",
+          // localize strings for current language
+          title: t(`${guideId}.externalResources.${r.id}.title`, { ns: "preparedness" }),
+          desc: t(`${guideId}.externalResources.${r.id}.desc`, { ns: "preparedness" }),
         });
       });
     });
     return out;
-  }, []);
+    // re-run when language changes
+  }, [t, i18n.language]);
 
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -75,24 +86,22 @@ export default function ExternalResourceScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
-      {/* Shared header block */}
-      <TopBar title="External Resource" onBack={() => navigation.goBack()} />
+      <TopBar
+        title={t("preparedness_screen.external_resources", { ns: "common" })}
+        onBack={() => navigation.goBack()}
+      />
 
       <SearchRow
         value={query}
         onChangeText={setQuery}
         onSortToggle={() => setSortDesc((v) => !v)}
-        placeholder="Search"
+        // use i18n placeholder
+        placeholder={t("common.search", { ns: "common" })}
         showSort
       />
 
-      <FilterChips
-        options={FILTERS}
-        activeId={activeFilter}
-        onChange={setActiveFilter}
-      />
+      <FilterChips options={FILTERS} activeId={activeFilter} onChange={setActiveFilter} />
 
-      {/* List */}
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         data={data}

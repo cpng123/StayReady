@@ -1,0 +1,696 @@
+{
+  "flood": {
+    "title": "Flash Flood",
+    "description": "Learn how to stay safe during a flash flood, protect your property from damage, and take the right steps to recover quickly once the water recedes.",
+    "reasons": {
+      "flood1": {
+        "label": "Heavy Rainfall",
+        "text": "Intense, short-duration downpours overwhelm drains and waterways, causing water levels to rise rapidly."
+      },
+      "flood2": {
+        "label": "Blocked Drains",
+        "text": "Leaves, litter, and silt clog drains and culverts, trapping runoff and backing water onto streets and homes."
+      },
+      "flood3": {
+        "label": "Deforestation",
+        "text": "Loss of trees and ground cover reduces infiltration and soil stability, speeding runoff and sending debris into waterways."
+      },
+      "flood4": {
+        "label": "Urbanization",
+        "text": "Concrete and asphalt limit absorption, channeling large volumes of rain into drainage systems that can overflow."
+      },
+      "flood5": {
+        "label": "Low-Lying Terrain",
+        "text": "Areas near rivers, canals, or below surrounding land collect runoff and are more prone to rapid inundation."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Prepare Before",
+        "items": {
+          "floodPB1": "Always stay informed by news or alerts on your phone.",
+          "floodPB2": "Organize an emergency bag with essentials & first-aid.",
+          "floodPB3": "Know your evacuation plan & safe alternate routes.",
+          "floodPB4": "Follow instructions & leave before flooding starts."
+        }
+      },
+      "surviveDuring": {
+        "title": "Survive During",
+        "items": {
+          "floodSD1": "Do NOT walk or drive in flood water.",
+          "floodSD2": "Get to higher ground as soon as possible.",
+          "floodSD3": "Follow all evacuation instructions and orders.",
+          "floodSD4": "Disconnect electricity and gas."
+        }
+      },
+      "recoverAfter": {
+        "title": "Recover After",
+        "items": {
+          "floodRA1": "Avoid contact with flood water.",
+          "floodRA2": "Stay away from fallen power lines.",
+          "floodRA3": "Do NOT return home or to disaster areas until they are declared safe.",
+          "floodRA4": "When back home, clean and disinfect surfaces and items."
+        }
+      }
+    },
+    "externalResources": {
+      "pub": {
+        "title": "PUB Flood Advisory",
+        "desc": "Stay informed on how PUB mitigates flood risks in Singapore and follow their essential flood safety tips."
+      },
+      "st": {
+        "title": "Monsoon Road Safety",
+        "desc": "Tips for motorists to navigate safely during heavy rain and monsoon surges, reducing accident risks."
+      },
+      "hch": {
+        "title": "Post-Flood Cleanup Tips",
+        "desc": "Get practical guidance on cleaning and restoring your home after a flash flood."
+      },
+      "laminar": {
+        "title": "Flood Barrier Solutions",
+        "desc": "Explore practical flood protection products and solutions designed for Singapore’s environment."
+      }
+    }
+  },
+  "haze": {
+    "title": "Haze (PM2.5)",
+    "description": "Learn how to protect yourself and your family during haze episodes. Understand the health risks of PM2.5, take preventive measures, and know how to deal with haze events.",
+    "reasons": {
+      "haze1": {
+        "label": "Forest Fires",
+        "text": "Regional biomass burning emits smoke and fine particles that travel long distances."
+      },
+      "haze2": {
+        "label": "Transboundary Pollution",
+        "text": "Winds transport pollutants from neighboring regions into local airspace."
+      },
+      "haze3": {
+        "label": "Dry Weather",
+        "text": "Dry spells allow smoke to persist and reduce natural particulate wash-out by rain."
+      },
+      "haze4": {
+        "label": "Urbanization",
+        "text": "Vehicle and industrial emissions add to background PM2.5 during haze periods."
+      },
+      "haze5": {
+        "label": "Stagnant Air",
+        "text": "Weak winds and temperature inversions trap pollutants near the ground."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Prepare Before",
+        "items": {
+          "haze-01": "Monitor haze forecasts and PSI/PM2.5 readings daily.",
+          "haze-02": "Stock up on N95 masks and store them in a clean, dry place.",
+          "haze-03": "Purchase and maintain air purifiers with HEPA filters.",
+          "haze-04": "Seal gaps in doors and windows to reduce indoor smoke entry."
+        }
+      },
+      "protectDuring": {
+        "title": "Protect Yourself During",
+        "items": {
+          "haze-05": "Limit outdoor activities, especially for those with health issues.",
+          "haze-06": "Wear a properly fitted N95 mask when outdoors.",
+          "haze-07": "Stay hydrated and avoid strenuous outdoor exercise.",
+          "haze-08": "Use eye drops and nasal saline spray to ease irritation."
+        }
+      },
+      "recoverAfter": {
+        "title": "Recover After",
+        "items": {
+          "haze-09": "Open windows and doors to air out your home when air quality improves.",
+          "haze-10": "Clean floors and surfaces to remove deposited dust particles.",
+          "haze-11": "Replace or clean air purifier filters after the haze episode.",
+          "haze-12": "Follow up with a doctor if symptoms persist."
+        }
+      }
+    },
+    "externalResources": {
+      "nea": {
+        "title": "Managing Haze in Singapore",
+        "desc": "Learn how Singapore monitors air quality, manages transboundary haze, and implements measures to reduce exposure."
+      },
+      "healthhub": {
+        "title": "Protect Yourself Against Haze",
+        "desc": "Practical steps to safeguard your health during haze periods, including mask usage and home air quality tips."
+      },
+      "mom": {
+        "title": "Workplace Safety During Haze",
+        "desc": "Guidelines for employers and workers to stay safe, from adjusting outdoor work to providing protective equipment."
+      },
+      "st": {
+        "title": "5 Ways to Protect Yourself",
+        "desc": "Quick lifestyle tips to reduce haze health risks, from staying indoors to boosting indoor air quality."
+      },
+      "mounte": {
+        "title": "Facts About Haze",
+        "desc": "Understand the causes, effects, and prevention of haze, and learn how to manage related health issues."
+      }
+    }
+  },
+  "dengue": {
+    "title": "Dengue Prevention",
+    "description": "Learn how to protect yourself and your community from dengue fever, a mosquito-borne disease. Understand its causes, recognise symptoms early, and take proactive measures to prevent outbreaks.",
+
+    "reasons": {
+      "dengue1": {
+        "label": "Stagnant Water",
+        "text": "Aedes mosquitoes breed in small pools—flower pots, pails, roof gutters, tray dishes."
+      },
+      "dengue2": {
+        "label": "Humid Climate",
+        "text": "Warm, humid conditions speed up mosquito life cycles and virus replication."
+      },
+      "dengue3": {
+        "label": "Poor Waste Mgmt.",
+        "text": "Discarded containers and clutter collect rainwater, creating breeding sites."
+      },
+      "dengue4": {
+        "label": "Urban Density",
+        "text": "Close living quarters increase bite exposure and speed cluster spread."
+      },
+      "dengue5": {
+        "label": "Infected Travellers",
+        "text": "Imported cases can seed local transmission when bitten by Aedes mosquitoes."
+      }
+    },
+
+    "sections": {
+      "Prevention": {
+        "dengue-01": "Remove stagnant water from flower pots, buckets, and trays.",
+        "dengue-02": "Clear roof gutters and always ensure proper drainage.",
+        "dengue-03": "Change water in vases, bowls, and birdbaths every 2 days.",
+        "dengue-04": "Install window and door screens to block mosquitoes."
+      },
+      "Recognising Symptoms": {
+        "dengue-05": "Sudden high fever lasting 2 to 7 days.",
+        "dengue-06": "Severe headache, especially behind eyes.",
+        "dengue-07": "Body muscle and joint pains.",
+        "dengue-08": "Nausea, vomiting, or loss of appetite.",
+        "dengue-09": "Skin rash appearing a few days after fever starts.",
+        "dengue-10": "Bleeding gums, persistent vomiting, abdominal pain."
+      },
+      "Treatment & Care": {
+        "dengue-11": "Seek medical attention immediately if dengue is suspected.",
+        "dengue-12": "Remember to drink plenty of fluids to prevent dehydration.",
+        "dengue-13": "Rest well and avoid physical exertion until full recovery.",
+        "dengue-14": "Take doctor approved medicines (avoid aspirin/ibuprofen).",
+        "dengue-15": "Use mosquito nets or repellents to avoid infecting others.",
+        "dengue-16": "Follow up with healthcare providers for monitoring."
+      }
+    },
+
+    "externalResources": {
+      "cgs": {
+        "title": "Block Dengue Campaign",
+        "desc": "Get weekly tips from the Block Dengue campaign on how to keep your home and neighbourhood mosquito-free."
+      },
+      "singhealth": {
+        "title": "Dengue Symptoms & Treatment",
+        "desc": "Understand the common signs of dengue and learn when and how medical care is required for safe recovery."
+      },
+      "raffles": {
+        "title": "Dengue Fever Insights",
+        "desc": "Learn how dengue spreads through Aedes mosquitoes, recognize its symptoms and stay informed to take early action."
+      }
+    }
+  },
+  "storm": {
+    "title": "Thunderstorm",
+    "description": "Thunderstorms in Singapore can bring heavy rain, strong winds, lightning strikes, and flash floods. Learn how to protect yourself and reduce risks from lightning and wind damage.",
+    "reasons": {
+      "storm1": {
+        "label": "Rising Warm Air",
+        "text": "Heated surface air rises rapidly, forming towering cumulonimbus clouds."
+      },
+      "storm2": {
+        "label": "High Moisture",
+        "text": "Abundant humidity fuels cloud growth and intense rainfall."
+      },
+      "storm3": {
+        "label": "Converging Winds",
+        "text": "Sea breeze and monsoon flows collide, triggering strong updrafts."
+      },
+      "storm4": {
+        "label": "Monsoon Seasons",
+        "text": "Seasonal wind patterns enhance storm frequency and severity."
+      },
+      "storm5": {
+        "label": "Temperature Differences",
+        "text": "Sharp contrasts between air masses destabilize the atmosphere."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Prepare Before",
+        "items": {
+          "storm-01": "Monitor weather forecasts and NEA lightning alerts.",
+          "storm-02": "Secure loose items outdoors (plants, furniture, tools).",
+          "storm-03": "Check drainage around your home to reduce flood risk.",
+          "storm-04": "Avoid scheduling outdoor events during storm warnings."
+        }
+      },
+      "protectDuring": {
+        "title": "Protect Yourself During",
+        "items": {
+          "storm-05": "Seek shelter indoors immediately.",
+          "storm-06": "Stay away from open fields, tall trees, and metal poles.",
+          "storm-07": "Avoid swimming pools, beaches, or any open water.",
+          "storm-08": "Unplug electronics to prevent lightning damage."
+        }
+      },
+      "recoverAfter": {
+        "title": "Recover After",
+        "items": {
+          "storm-09": "Check for and report fallen trees, damaged power lines, or flooding.",
+          "storm-10": "Avoid touching electrical equipment until safe."
+        }
+      }
+    },
+    "externalResources": {
+      "cdc": {
+        "title": "Lightning Safety Guidelines",
+        "desc": "Learn essential lightning safety measures, including first-aid steps to help someone struck by lightning."
+      },
+      "mom": {
+        "title": "Adverse Weather Response",
+        "desc": "Singapore's official WSH guidelines for managing risks during adverse weather; designed for safe workplace practices."
+      },
+      "hyme": {
+        "title": "Lightning Risk Assessment",
+        "desc": "Insight into how Singapore's built environments can be safeguarded from lightning."
+      }
+    }
+  },
+  "wind": {
+    "title": "Strong Wind",
+    "description": "Learn how to stay safe, protect your surroundings, and reduce risks during periods of strong winds and gusty weather in Singapore.",
+    "reasons": {
+      "wind1": {
+        "label": "Sumatra Squalls",
+        "text": "Fast-moving storm lines from Sumatra can produce sudden, powerful gusts."
+      },
+      "wind2": {
+        "label": "Monsoon Surges",
+        "text": "Cool surges in the Northeast Monsoon bring sustained strong winds."
+      },
+      "wind3": {
+        "label": "Tropical Storms",
+        "text": "Regional cyclones influence pressure gradients and wind strength."
+      },
+      "wind4": {
+        "label": "Downdraft Bursts",
+        "text": "Thunderstorm downdrafts can create brief but damaging outflow winds."
+      },
+      "wind5": {
+        "label": "Building Channeling",
+        "text": "Urban canyons funnel airflow, locally amplifying wind speeds."
+      }
+    },
+    "sections": {
+      "prepareBefore": {
+        "title": "Prepare Before",
+        "items": {
+          "wind1": "Park vehicles away from trees, lamp posts, and unstable structures.",
+          "wind2": "Secure loose outdoor items like plant pots, laundry poles, and signage.",
+          "wind3": "Close and lock windows and balcony doors.",
+          "wind4": "Avoid scheduling outdoor activities in exposed areas."
+        }
+      },
+      "protectDuring": {
+        "title": "Protect Yourself During",
+        "items": {
+          "wind5": "Stay indoors and away from windows.",
+          "wind6": "If outside, seek shelter in a sturdy building.",
+          "wind7": "Avoid walking under large trees, power lines, or temp. structures.",
+          "wind8": "Be alert for flying debris and the falling branches."
+        }
+      },
+      "recoverAfter": {
+        "title": "Recover After",
+        "items": {
+          "wind9": "Clear debris safely—wear gloves and avoid sharp objects.",
+          "wind10": "Inspect your property for damage & hazards like loose roof tiles."
+        }
+      }
+    },
+    "externalResources": {
+      "met": {
+        "title": "Staying Safe in Strong Wind",
+        "desc": "Practical guidance from the Met Office on protecting your home, safe travel, and staying secure during high wind events."
+      },
+      "mss": {
+        "title": "Learn Weather Phenomena",
+        "desc": "Explore Singapore’s common weather hazards and understand how they form and affect daily life."
+      }
+    }
+  },
+  "fire": {
+    "title": "Fire Safety",
+    "description": "Learn how to prevent fires, respond effectively in an emergency, and protect lives and property. Fires can start unexpectedly, but being prepared greatly reduces risks and saves lives.",
+    "reasons": {
+      "fire1": {
+        "label": "Unattended Cooking",
+        "text": "Grease and oil ignite quickly when left heating without supervision."
+      },
+      "fire2": {
+        "label": "Overloaded Sockets",
+        "text": "Too many devices on a power strip can overheat wiring and outlets."
+      },
+      "fire3": {
+        "label": "Faulty Wiring",
+        "text": "Damaged cables or loose connections can arc and start a blaze."
+      },
+      "fire4": {
+        "label": "Open Flames",
+        "text": "Candles, incense, or lighters near flammables cause accidental ignition."
+      },
+      "fire5": {
+        "label": "Flammable Storage",
+        "text": "Improperly stored solvents or aerosols increase fire intensity."
+      }
+    },
+    "sections": {
+      "fire-prevent": {
+        "title": "Fire Prevention Tips",
+        "items": {
+          "fire1": "Install and maintain smoke detectors in key areas of your home.",
+          "fire2": "Keep fire extinguishers accessible and know how to use them.",
+          "fire3": "Avoid overloading power points and use certified electrical products.",
+          "fire4": "Store flammable items in cool, ventilated spaces away from heat."
+        }
+      },
+      "fire-during": {
+        "title": "During a Fire",
+        "items": {
+          "fire5": "Stay Calm – Alert others and call 995 immediately.",
+          "fire6": "If smoke is present, stay low to avoid inhaling toxic fumes.",
+          "fire7": "Use a wet cloth to cover your nose and mouth.",
+          "fire8": "Evacuate using stairs, never lifts."
+        }
+      },
+      "fire-after": {
+        "title": "After a Fire",
+        "items": {
+          "fire9": "Wait for SCDF clearance before re-entering premises.",
+          "fire10": "Arrange professional inspection of wiring and gas systems."
+        }
+      }
+    },
+    "externalResources": {
+      "scdf": {
+        "title": "Fire Safety & Service Directory",
+        "desc": "Access Singapore's official Fire Safety services, including guides, and downloadable emergency resources etc."
+      },
+      "fss": {
+        "title": "Fire Protection Consultation",
+        "desc": "Explore local providers offering fire alarms, suppression systems, safety inspections, and consultancy services."
+      }
+    }
+  },
+  "aid": {
+    "title": "CPR & First Aid",
+    "description": "This guide teaches you how to respond in the first critical minutes of an emergency. Recognize emergencies, when to call 995, hands-only CPR, how to use an AED, and basics.",
+    "reasons": {
+      "aid1": {
+        "label": "Life-Saving Skill",
+        "text": "Immediate CPR can double or triple survival in cardiac arrest."
+      },
+      "aid2": {
+        "label": "Stabilize Condition",
+        "text": "Basic care limits bleeding, shock, and deterioration before help arrives."
+      },
+      "aid3": {
+        "label": "Quick Response",
+        "text": "Knowing what to do reduces hesitation during critical minutes."
+      },
+      "aid4": {
+        "label": "Public Safety",
+        "text": "More trained bystanders means faster help in crowded places."
+      },
+      "aid5": {
+        "label": "Emergency Confidence",
+        "text": "Practice builds calm decision-making under pressure."
+      }
+    },
+    "sections": {
+      "before": {
+        "title": "Before an Emergency",
+        "items": {
+          "aid1": "Enrol in CPR and First Aid courses from recognised providers.",
+          "aid2": "Stock with bandages, antiseptic wipes, gloves, and CPR mask.",
+          "aid3": "Save SCDF (995) and ambulance contacts in your phone.",
+          "aid4": "Learn where Automated External Defibrillators are in your area."
+        }
+      },
+      "during": {
+        "title": "During an Emergency",
+        "items": {
+          "aid5": "Check for dangers before approaching.",
+          "aid6": "Dial emergency services without delay.",
+          "aid7": "30 chest compressions + 2 rescue breaths, or hands-only CPR if untrained.",
+          "aid8": "Follow AED voice prompts until help arrives."
+        }
+      },
+      "after": {
+        "title": "After the Emergency",
+        "items": {
+          "aid9": "Continue care until professionals take over.",
+          "aid10": "Tell responders what you did and any observations.",
+          "aid11": "Restock your first aid kit immediately.",
+          "aid12": "Reflect on what went well and what to improve."
+        }
+      }
+    },
+    "externalResources": {
+      "vwh": {
+        "title": "First Aid Tips",
+        "desc": "Explore trusted, step-by-step first-aid procedures for common emergencies—bleeding, choking, burns, fractures."
+      },
+      "src1": {
+        "title": "Disaster Safety Education",
+        "desc": "Access the Singapore Red Cross's official guide to first-aid principles, universal precautions, and the role of a responder."
+      },
+      "src2": {
+        "title": "Singapore Guidelines",
+        "desc": "Delve into the updated local first-aid protocols, including basic cardiac life support and recommendations"
+      },
+      "sfatc": {
+        "title": "Emergency Steps",
+        "desc": "Learn the simple DRSABCD action plan—Check, Call, Care—forming the foundation of effective emergency response."
+      }
+    }
+  },
+  "kit": {
+    "title": "Emergency Kits",
+    "description": "A collection of essential supplies and equipment prepared in advance to support individuals and families during unexpected crises such as natural disasters, accidents, or power outages.",
+    "reasons": {
+      "kit1": {
+        "label": "Life-Saving Supplies",
+        "text": "Water, food, and first aid keep you safe until help is available."
+      },
+      "kit2": {
+        "label": "Basic Needs",
+        "text": "Lighting, tools, and hygiene items maintain daily function."
+      },
+      "kit3": {
+        "label": "Reduces Panic",
+        "text": "Prepared items provide reassurance and structure during crises."
+      },
+      "kit4": {
+        "label": "Supports Evacuation",
+        "text": "Grab-and-go bags speed safe movement if you must leave quickly."
+      },
+      "kit5": {
+        "label": "Self-Reliance",
+        "text": "Supplies help you manage when services are disrupted."
+      }
+    },
+    "sections": {
+      "kit-basics": {
+        "title": "Basic Survival Essentials",
+        "items": {
+          "kit1": "Minimum 4 litres of water per person per day (for drinking & hygiene).",
+          "kit2": "Canned goods, energy bars, dried fruits, ready-to-eat meals.",
+          "kit3": "Ensure first aid kit is well prepared and not expired.",
+          "kit4": "At least 7 days' supply, plus copies of prescriptions."
+        }
+      },
+      "kit-tools": {
+        "title": "Communication & Safety Tools",
+        "items": {
+          "kit5": "Battery-powered or hand-crank radio (for local emergency alerts).",
+          "kit6": "Flashlights & extra batteries (preferably LED).",
+          "kit7": "Whistle - essential for signalling help.",
+          "kit8": "Fully charged power banks (for mobile devices).",
+          "kit9": "Multi-tool or Swiss Army knife - for cutting, repairs, or opening cans.",
+          "kit10": "Fire extinguisher - small ABC-rated."
+        }
+      },
+      "kit-comfort": {
+        "title": "Comfort, Protection & Important Documents",
+        "items": {
+          "kit11": "Warm clothing & blankets - thermal layers, poncho, socks.",
+          "kit12": "Dust masks / N95 respirators - for poor air quality or smoke.",
+          "kit13": "Plastic sheeting & duct tape - temporary shelter or sealing openings.",
+          "kit14": "Personal hygiene items - toothbrush, toothpaste, soap, hand sanitiser, etc."
+        }
+      }
+    },
+    "externalResources": {
+      "singhealth": {
+        "title": "Home Emergency Kit",
+        "desc": "Find recommended items every household should pack—from water and food to first-aid supplies."
+      },
+      "health": {
+        "title": "Every Home Safety",
+        "desc": "An expert-backed list of essential first-aid supplies and their purposes, including wound care, burns, and basic medications."
+      },
+      "scdf": {
+        "title": "Civil Defence Resource Pack",
+        "desc": "SCDF's official emergency kit resource including guidance on home preparedness and evacuation essentials."
+      }
+    }
+  },
+  "disease": {
+    "title": "Disease Outbreak",
+    "description": "Learn how to prevent infection, respond effectively during a disease outbreak, and support recovery efforts. Staying informed and prepared can greatly reduce your risk and help control the spread.",
+    "reasons": {
+      "disease1": {
+        "label": "Crowded Spaces",
+        "text": "Close contact increases transmission through droplets and aerosols."
+      },
+      "disease2": {
+        "label": "Poor Hygiene",
+        "text": "Infrequent handwashing and surface cleaning allow pathogens to linger."
+      },
+      "disease3": {
+        "label": "Global Travel",
+        "text": "Rapid movement introduces new variants and seeds local chains."
+      },
+      "disease4": {
+        "label": "Contaminated Sources",
+        "text": "Unsafe water or food can spread gastrointestinal infections."
+      },
+      "disease5": {
+        "label": "Pathogen Mutation",
+        "text": "Variants can become more transmissible or immune-evasive."
+      }
+    },
+    "sections": {
+      "preventBefore": {
+        "title": "Prevent Before an Outbreak",
+        "items": {
+          "disease1": "Keep vaccinations up to date (e.g., influenza, COVID-19, Hepatitis).",
+          "disease2": "Maintain good personal hygiene—wash hands frequently with soap.",
+          "disease3": "Strengthen immunity through healthy diet, exercise, and rest.",
+          "disease4": "Stock basic health supplies—masks, thermometer, hand sanitiser."
+        }
+      },
+      "protectDuring": {
+        "title": "Protect During an Outbreak",
+        "items": {
+          "disease5": "Wear masks in crowded or high-risk settings.",
+          "disease6": "Practise safe distancing where possible.",
+          "disease7": "Disinfect frequently touched surfaces at home and work.",
+          "disease8": "Avoid sharing personal items like utensils or towels."
+        }
+      },
+      "recoverAfter": {
+        "title": "Recover & Support After an Outbreak",
+        "items": {
+          "disease9": "Continue practising good hygiene to prevent resurgence.",
+          "disease10": "Attend follow-up health checks if recommended.",
+          "disease11": "Support community vaccination and awareness programmes.",
+          "disease12": "Stay updated on post-outbreak public health guidance."
+        }
+      }
+    },
+    "externalResources": {
+      "ncis": {
+        "title": "Ongoing Outbreaks",
+        "desc": "Stay informed with current infectious disease outbreaks in Singapore. Includes updates on active cases, and alerts etc."
+      },
+      "cdas": {
+        "title": "Infectious Disease Bulletin",
+        "desc": "Access the latest official disease surveillance data from weekly bulletins released by the CDA."
+      },
+      "ncis2": {
+        "title": "Pandemic Framework",
+        "desc": "Learn about Singapore's strategic pandemic preparedness framework—how our systems detect, respond to, and recover from large-scale disease threats."
+      },
+      "cdas2": {
+        "title": "Hospital Outbreak Response",
+        "desc": "Understand how public hospitals activate outbreak response mode—including infection control and scaling operations to manage disease surges."
+      }
+    }
+  },
+  "earthquake": {
+    "title": "Earthquake",
+    "description": "Even though Singapore is not located on a major fault line, tremors from regional earthquakes can still be felt. Being prepared helps you stay calm and act quickly when the ground shakes.",
+    "reasons": {
+      "earthquake1": {
+        "label": "Tectonic Plate",
+        "text": "Stress accumulates along plate boundaries until it releases suddenly."
+      },
+      "earthquake2": {
+        "label": "Subduction Zones",
+        "text": "One plate dives beneath another, generating powerful quakes."
+      },
+      "earthquake3": {
+        "label": "Volcanic Activity",
+        "text": "Magma movement and eruptions can trigger seismic shaking."
+      },
+      "earthquake4": {
+        "label": "Fault Slippage",
+        "text": "Sudden movement along faults releases energy as seismic waves."
+      },
+      "earthquake5": {
+        "label": "Aftershocks",
+        "text": "Smaller quakes follow as the crust readjusts after a main event."
+      }
+    },
+    "sections": {
+      "eq-indoors": {
+        "title": "If Tremors are Felt Indoors",
+        "items": {
+          "earthquake1": "Drop, Cover, Hold On - Get under sturdy furniture and protect your head.",
+          "earthquake2": "Stay Away from Glass - Keep clear of windows and mirrors.",
+          "earthquake3": "Do Not Use Lifts - Use stairs only after shaking stops.",
+          "earthquake4": "Stay Indoors Until Safe - Avoid rushing outside during shaking.",
+          "earthquake5": "Turn Off Utilities - If possible, shut off gas and electricity.",
+          "earthquake6": "Remain Calm - Reassure those around you, especially children."
+        }
+      },
+      "eq-outdoors": {
+        "title": "If Tremors are Felt Outdoors",
+        "items": {
+          "earthquake7": "Move to Open Space - Away from buildings, trees, and power lines.",
+          "earthquake8": "Avoid Bridges & Overpasses - They may be unstable.",
+          "earthquake9": "Stay Low - Drop to the ground to avoid being knocked over.",
+          "earthquake10": "Follow Official Guidance - Listen to emergency broadcasts."
+        }
+      },
+      "eq-after": {
+        "title": "After the Tremor",
+        "items": {
+          "earthquake11": "Check for injuries - Provide first aid if needed.",
+          "earthquake12": "Inspect for hazards - Watch for gas leaks or electrical damage.",
+          "earthquake13": "Be alert for aftershocks - They can be as dangerous.",
+          "earthquake14": "Report structural damage - Notify relevant authorities."
+        }
+      }
+    },
+    "externalResources": {
+      "nlb": {
+        "title": "Earthquake Awareness Feature",
+        "desc": "Explore Earthquake-focused books and resources to deepen your understanding of seismic safety and preparedness."
+      },
+      "aa": {
+        "title": "Infectious Disease Bulletin",
+        "desc": "Practice and learn about the basic guide on steps to take if you are caught in one even you are in a “safe” place for now."
+      }
+    }
+  }
+}
