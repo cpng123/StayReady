@@ -149,5 +149,25 @@
       "disease": "Wabak Penyakit",
       "earthquake": "Gempa Bumi"
     }
+  },
+  "games": {
+    "title": "Kuiz Keselamatan",
+    "subtitle": "Uji kemahiran kesiapsiagaan anda.",
+    "stats": {
+      "taken": "Kuiz Diambil",
+      "accuracy": "Ketepatan Terkini",
+      "streak": "Rentetan Hari"
+    },
+    "daily": {
+      "title": "Cabaran Harian",
+      "review_title": "Cabaran Harian — Ulas",
+      "category_label": "Harian",
+      "loading": "Memuatkan...",
+      "review_answer": "Semak Jawapan",
+      "start": "Mula Cabaran",
+      "questions_count": "{{count}} Soalan"
+    },
+    "quick_tips": "Tip Pantas",
+    "categories_quiz": "Kuiz Mengikut Kategori"
   }
 }

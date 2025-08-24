@@ -154,5 +154,25 @@
       "disease": "Disease Outbreak",
       "earthquake": "Earthquake"
     }
+  },
+  "games": {
+    "title": "Safety Quiz",
+    "subtitle": "Quiz your preparedness skills.",
+    "stats": {
+      "taken": "Quiz Taken",
+      "accuracy": "Recent Accuracy",
+      "streak": "Day Streak"
+    },
+    "daily": {
+      "title": "Daily Challenge",
+      "review_title": "Daily Challenge — Review",
+      "category_label": "Daily",
+      "loading": "Loading...",
+      "review_answer": "Review Answer",
+      "start": "Start Challenge",
+      "questions_count": "{{count}} Questions"
+    },
+    "quick_tips": "Quick Tips",
+    "categories_quiz": "Categories Quiz"
   }
 }

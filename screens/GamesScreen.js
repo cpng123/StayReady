@@ -18,6 +18,7 @@ import { pickRandomTips } from "../utils/tips";
 import { getDailyToday } from "../utils/dailyChallenge";
 import { getStatsSummary } from "../utils/progressStats";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 
 const SCREEN_PADDING = 16;
 const GAP = 12;
@@ -41,16 +42,18 @@ export default function GamesScreen({ navigation }) {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const categories = useMemo(
     () =>
       (QUIZ?.categories ?? []).map((c) => ({
         id: c.id,
-        title: c.title,
+        // If you later add keys, this will pick them up. Falls back to data title.
+        title: t(`games.categories.${c.id}`, c.title),
         image: QUIZ_IMAGES[c.id],
         setCount: (c.sets ?? []).length,
       })),
-    []
+    [t]
   );
 
   const [stats, setStats] = useState({ taken: 0, accuracy: 0, streak: 0 });
@@ -70,7 +73,7 @@ export default function GamesScreen({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       refreshDaily();
-      refreshStats(); // <- important
+      refreshStats();
     }, [])
   );
 
@@ -80,25 +83,26 @@ export default function GamesScreen({ navigation }) {
 
     if (completed) {
       nav.navigate("ReviewAnswer", {
-        title: "Daily Challenge — Review",
+        title: t("games.daily.review_title", "Daily Challenge — Review"),
         review: Array.isArray(review) ? review : [],
-        meta: meta || {
-          setId: key,
-          setTitle: "Daily Challenge",
-          categoryId: "daily",
-          categoryLabel: "Daily",
-        },
+        meta:
+          meta || {
+            setId: key,
+            setTitle: t("games.daily.title", "Daily Challenge"),
+            categoryId: "daily",
+            categoryLabel: t("games.daily.category_label", "Daily"),
+          },
       });
     } else {
       nav.navigate("QuizPlay", {
         mode: "daily",
-        title: "Daily Challenge",
+        title: t("games.daily.title", "Daily Challenge"),
         customQuestions: questions,
         meta: {
           setId: key,
-          setTitle: "Daily Challenge",
+          setTitle: t("games.daily.title", "Daily Challenge"),
           categoryId: "daily",
-          categoryLabel: "Daily",
+          categoryLabel: t("games.daily.category_label", "Daily"),
         },
       });
     }
@@ -113,19 +117,25 @@ export default function GamesScreen({ navigation }) {
   };
 
   const dailyBtnText = daily.loading
-    ? "Loading..."
+    ? t("games.daily.loading", "Loading...")
     : daily.data?.completed
-    ? "Review Answer"
-    : "Start Challenge";
+    ? t("games.daily.review_answer", "Review Answer")
+    : t("games.daily.start", "Start Challenge");
 
   const Header = (
     <View style={styles.headerWrap}>
-      <Text style={styles.h1}>Safety Quiz</Text>
-      <Text style={styles.hSub}>Quiz your preparedness skills.</Text>
+      <Text style={styles.h1}>{t("games.title", "Safety Quiz")}</Text>
+      <Text style={styles.hSub}>
+        {t("games.subtitle", "Quiz your preparedness skills.")}
+      </Text>
 
-      {/* Stats - single container with shadow */}
+      {/* Stats */}
       <View style={[styles.statsCard, { backgroundColor: theme.colors.card }]}>
-        <StatCol label="Quiz Taken" value={`${stats.taken}`} theme={theme} />
+        <StatCol
+          label={t("games.stats.taken", "Quiz Taken")}
+          value={`${stats.taken}`}
+          theme={theme}
+        />
         <View
           style={{
             backgroundColor: theme.key === "dark" ? "#2A2F3A" : "#E5E7EB",
@@ -134,7 +144,7 @@ export default function GamesScreen({ navigation }) {
           }}
         />
         <StatCol
-          label="Recent Accuracy"
+          label={t("games.stats.accuracy", "Recent Accuracy")}
           value={`${Math.round(stats.accuracy)}%`}
           theme={theme}
         />
@@ -145,10 +155,14 @@ export default function GamesScreen({ navigation }) {
             marginVertical: 6,
           }}
         />
-        <StatCol label="Day Streak" value={`${stats.streak}`} theme={theme} />
+        <StatCol
+          label={t("games.stats.streak", "Day Streak")}
+          value={`${stats.streak}`}
+          theme={theme}
+        />
       </View>
 
-      {/* Daily challenge with image background */}
+      {/* Daily challenge */}
       <TouchableOpacity activeOpacity={0.85} onPress={onDailyPress}>
         <ImageBackground
           source={require("../assets/General/quiz-background.jpg")}
@@ -158,9 +172,14 @@ export default function GamesScreen({ navigation }) {
           <View style={styles.dailyOverlay} />
           <View style={styles.dailyRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.dailyTitle}>Daily Challenge</Text>
+              <Text style={styles.dailyTitle}>
+                {t("games.daily.title", "Daily Challenge")}
+              </Text>
               <Text style={styles.dailySub}>
-                {daily.data?.questions?.length ?? 10} Questions
+                {t("games.daily.questions_count", {
+                  count: daily.data?.questions?.length ?? 10,
+                  defaultValue: "{{count}} Questions",
+                })}
               </Text>
               <View style={styles.dailyBtn}>
                 <Text style={styles.dailyBtnText}>{dailyBtnText}</Text>
@@ -170,7 +189,9 @@ export default function GamesScreen({ navigation }) {
         </ImageBackground>
       </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>Quick Tips</Text>
+      <Text style={styles.sectionTitle}>
+        {t("games.quick_tips", "Quick Tips")}
+      </Text>
       <QuickTipsCarousel
         tips={tips}
         theme={theme}
@@ -179,7 +200,7 @@ export default function GamesScreen({ navigation }) {
       />
 
       <Text style={[styles.sectionTitle, { marginTop: 10 }]}>
-        Categories Quiz
+        {t("games.categories_quiz", "Categories Quiz")}
       </Text>
     </View>
   );
@@ -217,9 +238,7 @@ export default function GamesScreen({ navigation }) {
 function StatCol({ label, value, theme }) {
   return (
     <View style={pillStyles.col}>
-      <Text style={[pillStyles.value, { color: theme.colors.text }]}>
-        {value}
-      </Text>
+      <Text style={[pillStyles.value, { color: theme.colors.text }]}>{value}</Text>
       <Text style={[pillStyles.label, { color: theme.colors.subtext }]}>
         {label}
       </Text>
@@ -236,7 +255,6 @@ const pillStyles = StyleSheet.create({
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
-
     headerWrap: { paddingTop: 10, paddingBottom: 8 },
     h1: { fontSize: 22, fontWeight: "800", color: theme.colors.text },
     hSub: {
@@ -245,8 +263,6 @@ const makeStyles = (theme) =>
       marginTop: 2,
       marginBottom: 14,
     },
-
-    // stats container
     statsCard: {
       flexDirection: "row",
       alignItems: "stretch",
@@ -260,8 +276,6 @@ const makeStyles = (theme) =>
       shadowOffset: { width: 0, height: 4 },
       elevation: 3,
     },
-
-    // daily challenge
     dailyCard: {
       borderRadius: 16,
       overflow: "hidden",
@@ -293,7 +307,6 @@ const makeStyles = (theme) =>
       borderRadius: 12,
     },
     dailyBtnText: { color: "#1D4ED8", fontWeight: "800" },
-
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
@@ -301,8 +314,6 @@ const makeStyles = (theme) =>
       marginTop: 6,
       marginBottom: 4,
     },
-
-    // quick tips
     tipCard: {
       flexDirection: "row",
       alignItems: "center",

@@ -153,5 +153,25 @@
       "disease": "疾病暴发",
       "earthquake": "地震"
     }
+  },
+  "games": {
+    "title": "安全测验",
+    "subtitle": "测一测你的应急能力。",
+    "stats": {
+      "taken": "已完成测验",
+      "accuracy": "近期正确率",
+      "streak": "连续天数"
+    },
+    "daily": {
+      "title": "每日挑战",
+      "review_title": "每日挑战 — 回顾",
+      "category_label": "每日",
+      "loading": "载入中…",
+      "review_answer": "查看解答",
+      "start": "开始挑战",
+      "questions_count": "{{count}} 题"
+    },
+    "quick_tips": "快速提示",
+    "categories_quiz": "分类测验"
   }
 }
