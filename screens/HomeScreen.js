@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { PREPAREDNESS, getHomePreparedness, ROUTINE } from "../data/homeData";
 import ConfirmModal from "../components/ConfirmModal";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
+import { resolveLocationLabel } from "../utils/locationService";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 const HOME_WARNINGS = getHomeWarnings(4);
@@ -28,8 +29,27 @@ const UNICEF_URL =
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { theme } = useThemeContext(); // 👈 theme here
-  const styles = useMemo(() => makeStyles(theme), [theme]); // 👈 memo styles
+  const { theme } = useThemeContext();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  // Dynamic header location label
+  const [headerLoc, setHeaderLoc] = useState("Singapore");
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await resolveLocationLabel();
+        // Prefer precise address if OneMap succeeded; otherwise region fallback
+        const label = res.address
+          ? `${res.address}${res.postal ? " " + res.postal : ""}, Singapore`
+          : `${res.region} Region, Singapore`;
+        if (mounted) setHeaderLoc(label);
+      } catch {
+        if (mounted) setHeaderLoc("Singapore");
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const openDonation = async () => {
     try {
@@ -111,7 +131,7 @@ export default function HomeScreen() {
             />
             <View style={{ marginLeft: 6 }}>
               <Text style={styles.subtle}>Your Location</Text>
-              <Text style={styles.locationText}>Commonwealth, Singapore</Text>
+              <Text style={styles.locationText}>{headerLoc}</Text>
             </View>
           </View>
           <TouchableOpacity
