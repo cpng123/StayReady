@@ -1,3 +1,4 @@
+// screens/SOSScreen.js
 import React, { useRef, useState, useEffect } from "react";
 import {
   SafeAreaView,
@@ -13,8 +14,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { getContacts, dispatchEmergency } from "../utils/emergencyContacts";
+import { useNavigation } from "@react-navigation/native";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function SOSScreen() {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { theme } = useThemeContext();
   const isDark = theme.key === "dark";
@@ -22,12 +27,25 @@ export default function SOSScreen() {
   const soundRef = useRef(null);
   const [active, setActive] = useState(false);
 
+  // keep a ref in sync so timers read the latest
+  const activeRef = useRef(false);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+
+  // one-shot dispatch guard + timer
+  const sendTimerRef = useRef(null);
+  const sentOnceRef = useRef(false);
+
   // FLASH / CAMERA
   const [camStatus, requestPermission] = useCameraPermissions();
   const [torchOn, setTorchOn] = useState(false);
   const [camReady, setCamReady] = useState(false);
   const strobeTimerRef = useRef(null);
   const STROBE_INTERVAL_MS = 800;
+
+  // Guardrail modal
+  const [guardOpen, setGuardOpen] = useState(false);
 
   // Configure audio (bypass iOS mute switch)
   useEffect(() => {
@@ -73,7 +91,7 @@ export default function SOSScreen() {
 
       const { sound } = await Audio.Sound.createAsync(
         require("../assets/Sound/alert.mp3"),
-        { shouldPlay: true, isLooping: true, volume: 1.0 } // app-level max; system volume still applies
+        { shouldPlay: true, isLooping: true, volume: 1.0 }
       );
       soundRef.current = sound;
 
@@ -82,14 +100,31 @@ export default function SOSScreen() {
 
       // FLASH (only if permitted)
       if (camStatus?.granted) {
-        // wait for camera to be ready; we’ll flip torch on in onCameraReady
-        setTorchOn(true); // desired initial state; will be applied when ready
+        setTorchOn(true);
         strobeTimerRef.current = setInterval(() => {
           setTorchOn((v) => !v);
         }, STROBE_INTERVAL_MS);
       }
 
+      // state flags
       setActive(true);
+      activeRef.current = true;
+      sentOnceRef.current = false;
+
+      // after 3s, if still active, send alerts
+      clearTimeout(sendTimerRef.current);
+      sendTimerRef.current = setTimeout(async () => {
+        if (!activeRef.current || sentOnceRef.current) return;
+        try {
+          const contacts = await getContacts();
+          if (Array.isArray(contacts) && contacts.length > 0) {
+            await dispatchEmergency(contacts);
+          }
+          sentOnceRef.current = true;
+        } catch {
+          // swallow for demo
+        }
+      }, 3000);
     } catch (e) {
       // ignore for demo
     }
@@ -104,23 +139,48 @@ export default function SOSScreen() {
         soundRef.current = null;
       }
     } finally {
+      // cancel timers/flags
+      clearTimeout(sendTimerRef.current);
+      sendTimerRef.current = null;
+      sentOnceRef.current = false;
+
       // VIBRATION
       Vibration.cancel();
+
       // FLASH
       if (strobeTimerRef.current) {
         clearInterval(strobeTimerRef.current);
         strobeTimerRef.current = null;
       }
       setTorchOn(false);
+
+      // state
       setActive(false);
+      activeRef.current = false;
     }
   };
 
-  const onTap = () => {
-    if (active) stopAlarm();
-    else startAlarm();
+  // When user taps the SOS button
+  const onTap = async () => {
+    if (active) {
+      stopAlarm();
+      return;
+    }
+    // Not active: check if any contacts exist; show guardrail if 0
+    try {
+      const contacts = await getContacts();
+      if (!contacts || contacts.length === 0) {
+        setGuardOpen(true);
+      } else {
+        startAlarm();
+      }
+    } catch {
+      // If anything goes wrong reading contacts, still allow alarm to start
+      startAlarm();
+    }
   };
 
+  // Long press placeholder
   const onHold = () => {
     // reserved for future help-message flow
   };
@@ -153,6 +213,7 @@ export default function SOSScreen() {
           <Text style={[styles.title, { color: theme.colors.text }]}>
             SOS Emergency Alarm
           </Text>
+
           <Text
             style={[
               styles.subtitle,
@@ -169,10 +230,9 @@ export default function SOSScreen() {
           <CameraView
             facing="back"
             enableTorch={camReady && torchOn}
-            // Keep it tiny/invisible but mounted so the session runs
             style={{
               position: "absolute",
-              width: 24, // <-- slight bump helps some devices
+              width: 24,
               height: 24,
               opacity: 0.001,
             }}
@@ -244,36 +304,83 @@ export default function SOSScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Bottom banner */}
+        {/* Bottom dock: banner + full-width contacts button */}
         <View
           style={[
-            styles.banner,
-            {
-              left: 16,
-              right: 16,
-              bottom: bannerBottom,
-              backgroundColor: isDark ? "#75041cff" : "#ED5160",
-            },
+            styles.bottomDock,
+            { left: 16, right: 16, bottom: bannerBottom },
           ]}
         >
-          <View style={[styles.bannerIcon, { backgroundColor: "#fff" }]}>
-            <Ionicons
-              name="alert"
-              size={32}
-              color={isDark ? "#75041cff" : "#ED5160"}
-            />
+          {/* Banner */}
+          <View
+            style={[
+              styles.banner,
+              { backgroundColor: isDark ? "#75041cff" : "#ED5160" },
+            ]}
+          >
+            <View style={[styles.bannerIcon, { backgroundColor: "#fff" }]}>
+              <Ionicons
+                name="alert"
+                size={32}
+                color={isDark ? "#75041cff" : "#ED5160"}
+              />
+            </View>
+            <Text style={[styles.bannerText, { color: "#fff" }]}>
+              {active
+                ? `Alarm is ON.${
+                    camStatus?.granted
+                      ? " Flashlight strobing."
+                      : " Enable camera permission to use flashlight."
+                  } Raise volume for sound; vibration is active.`
+                : "Tap to activate SOS alarm (sound, vibration & light)."}
+            </Text>
           </View>
-          <Text style={[styles.bannerText, { color: "#fff" }]}>
-            {active
-              ? `Alarm is ON.${
-                  camStatus?.granted
-                    ? " Flashlight strobing."
-                    : " Enable camera permission to use flashlight."
-                } Raise volume for sound; vibration is active.`
-              : "Tap to activate SOS alarm (sound, vibration & light)."}
-          </Text>
+
+          {/* Full-width themed contacts button */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EmergencyContacts")}
+            activeOpacity={0.9}
+            style={[
+              styles.contactsBtn,
+              isDark ? styles.contactsBtnDark : styles.contactsBtnLight,
+            ]}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            <Ionicons
+              name="people-outline"
+              size={18}
+              color={isDark ? "#fff" : theme.colors.primary}
+              style={{ marginRight: 8 }}
+            />
+            <Text
+              style={[
+                styles.contactsBtnText,
+                { color: isDark ? "#fff" : theme.colors.primary },
+              ]}
+            >
+              Manage emergency contacts
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
+
+      {/* Guardrail modal (0 contacts) */}
+      <ConfirmModal
+        visible={guardOpen}
+        title="Add an emergency contact?"
+        message="Auto alerts need at least one emergency contact. You can still start the alarm now, but no messages will be sent."
+        confirmLabel="Add contact"
+        cancelLabel="Not now"
+        onCancel={() => {
+          setGuardOpen(false);
+          // user chose to proceed without contacts → start alarm
+          startAlarm();
+        }}
+        onConfirm={() => {
+          setGuardOpen(false);
+          navigation.navigate("EmergencyContacts");
+        }}
+      />
     </View>
   );
 }
@@ -313,15 +420,23 @@ const styles = StyleSheet.create({
   core: { flex: 1, alignItems: "center", justifyContent: "center" },
   coreText: { fontSize: 80, letterSpacing: 5, fontWeight: "600" },
 
-  banner: {
+  bottomDock: {
     position: "absolute",
+  },
+
+  banner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     borderRadius: 14,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   bannerIcon: {
     width: 35,
@@ -332,4 +447,26 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   bannerText: { flex: 1, fontSize: 16, fontWeight: "500" },
+
+  contactsBtn: {
+    width: "100%",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  contactsBtnLight: {
+    backgroundColor: "#EEF5FF",
+  },
+  contactsBtnDark: {
+    backgroundColor: "#1F2430",
+  },
+  contactsBtnText: { fontWeight: "800", fontSize: 14 },
 });

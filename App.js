@@ -22,6 +22,7 @@ import BookmarkScreen from "./screens/BookmarkScreen";
 import BadgeRewardScreen from "./screens/BadgeRewardScreen";
 import RewardDetailScreen from "./screens/RewardDetailScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import EmergencyContactsScreen from "./screens/EmergencyContactsScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -63,6 +64,7 @@ function RootNav() {
           <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
           <Stack.Screen name="RewardDetail" component={RewardDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
