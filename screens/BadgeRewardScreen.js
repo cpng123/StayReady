@@ -19,11 +19,23 @@ import SegmentToggle from "../components/SegmentToggle";
 import BadgeCard from "../components/BadgeCard";
 import BadgeModal from "../components/BadgeModal";
 import { buildBadgeList, buildSharePayload } from "../utils/badges";
+import RewardCard from "../components/RewardCard";
+import { getRewards } from "../utils/rewards";
+import {
+  BADGE_SORTS,
+  REWARD_SORTS,
+  sortBadges,
+  sortRewards,
+} from "../utils/sorters";
+
+/* ---------- constants ---------- */
 
 const ICONS = {
   badges: require("../assets/General/badge.png"),
   points: require("../assets/General/point.png"),
 };
+
+/* ---------- component ---------- */
 
 export default function BadgeRewardScreen() {
   const nav = useNavigation();
@@ -33,7 +45,21 @@ export default function BadgeRewardScreen() {
   const [tab, setTab] = useState("badge");
   const [summary, setSummary] = useState({ badgesEarned: 0, points: 0 });
   const [items, setItems] = useState([]);
+  const [rewards, setRewards] = useState(getRewards());
 
+  // Sort state
+  const [badgeSortIx, setBadgeSortIx] = useState(0);
+  const [rewardSortIx, setRewardSortIx] = useState(1); // keep your existing default (Price ↑)
+
+  const cycleSort = () => {
+    if (tab === "badge") {
+      setBadgeSortIx((i) => (i + 1) % BADGE_SORTS.length);
+    } else {
+      setRewardSortIx((i) => (i + 1) % REWARD_SORTS.length);
+    }
+  };
+
+  // Modal state
   const [activeBadge, setActiveBadge] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -63,14 +89,28 @@ export default function BadgeRewardScreen() {
     } catch {}
   }, [activeBadge]);
 
+  const sortedBadges = useMemo(
+    () => sortBadges(items, badgeSortIx),
+    [items, badgeSortIx]
+  );
+  const sortedRewards = useMemo(
+    () => sortRewards(rewards, rewardSortIx),
+    [rewards, rewardSortIx]
+  );
+
   const renderBadge = useCallback(
     ({ item }) => <BadgeCard item={item} theme={theme} onPress={openBadge} />,
     [theme, openBadge]
   );
   const keyExtractor = useCallback((it) => it.id, []);
+  const renderReward = useCallback(
+    ({ item }) => <RewardCard item={item} theme={theme} />,
+    [theme]
+  );
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
+
       {/* HERO */}
       <View style={s.heroWrap}>
         <ImageBackground
@@ -86,12 +126,20 @@ export default function BadgeRewardScreen() {
             style={s.heroOverlay}
           />
 
+          {/* Back (left) */}
           <Pressable onPress={() => nav.goBack()} style={s.backBtn} hitSlop={10}>
             <Ionicons name="chevron-back" size={26} color="#fff" />
           </Pressable>
 
+          {/* Title (center) */}
           <Text style={s.heroTitle}>Badge &amp; Reward</Text>
 
+          {/* Sort (right) */}
+          <Pressable onPress={cycleSort} style={s.sortBtn} hitSlop={10}>
+            <Ionicons name="swap-vertical" size={18} color="#fff" />
+          </Pressable>
+
+          {/* Stats under title */}
           <View style={s.statsContainer}>
             {/* Badges */}
             <View style={s.statCellCompact}>
@@ -116,8 +164,8 @@ export default function BadgeRewardScreen() {
         </ImageBackground>
       </View>
 
-      {/* Tabs */}
-      <View style={{ paddingHorizontal: 14, marginTop: 12 }}>
+      {/* Tabs + sort label */}
+      <View style={{ paddingHorizontal: 14, marginTop: 12, marginBottom: 2 }}>
         <SegmentToggle
           options={[
             { id: "badge", label: "Badge" },
@@ -126,13 +174,16 @@ export default function BadgeRewardScreen() {
           value={tab}
           onChange={setTab}
         />
+        <Text style={[s.sortHint, { color: theme.colors.subtext }]}>
+          Sort: {tab === "badge" ? BADGE_SORTS[badgeSortIx] : REWARD_SORTS[rewardSortIx]}
+        </Text>
       </View>
 
       {/* Content */}
       {tab === "badge" ? (
         <FlatList
           contentContainerStyle={{ padding: 14, paddingBottom: 24 }}
-          data={items}
+          data={sortedBadges}
           keyExtractor={keyExtractor}
           renderItem={renderBadge}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -141,12 +192,19 @@ export default function BadgeRewardScreen() {
           removeClippedSubviews
         />
       ) : (
-        <View style={{ padding: 24 }}>
-          <Text style={{ color: theme.colors.subtext }}>Rewards coming soon.</Text>
-        </View>
+        <FlatList
+          contentContainerStyle={{ padding: 14, paddingBottom: 24 }}
+          data={sortedRewards}
+          keyExtractor={(r) => r.id}
+          renderItem={renderReward}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          initialNumToRender={8}
+          windowSize={8}
+          removeClippedSubviews
+        />
       )}
 
-      {/* Modal */}
+      {/* Badge Modal */}
       <BadgeModal
         open={showModal}
         badge={activeBadge}
@@ -157,6 +215,8 @@ export default function BadgeRewardScreen() {
     </SafeAreaView>
   );
 }
+
+/* ---------- styles ---------- */
 
 const makeStyles = (theme) =>
   StyleSheet.create({
@@ -174,6 +234,17 @@ const makeStyles = (theme) =>
     backBtn: {
       position: "absolute",
       left: 14,
+      top: 10,
+      width: 36,
+      height: 36,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 8,
+      backgroundColor: "rgba(0,0,0,0.25)",
+    },
+    sortBtn: {
+      position: "absolute",
+      right: 14,
       top: 10,
       width: 36,
       height: 36,
@@ -238,4 +309,5 @@ const makeStyles = (theme) =>
       backgroundColor: "rgba(255,255,255,0.75)",
       marginHorizontal: 6,
     },
+    sortHint: { marginTop: 8, marginBottom: -6, fontSize: 12, fontWeight: "800" },
   });
