@@ -21,6 +21,7 @@ import { PREPAREDNESS, getHomePreparedness, ROUTINE } from "../data/homeData";
 import ConfirmModal from "../components/ConfirmModal";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
+import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +35,21 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await resolveLocationLabel();
+        if (!alive) return;
+        setCenter({ lat: res.coords.latitude, lon: res.coords.longitude });
+      } catch {
+        // keep default center
+      }
+    })();
+    return () => (alive = false);
+  }, []);
 
   // Dynamic header location label
   const [headerLoc, setHeaderLoc] = useState(
@@ -200,23 +216,23 @@ export default function HomeScreen() {
           {t("home.section.emergencies_info")}
         </Text>
 
-        {/* Map Card */}
-        <View style={styles.mapCard}>
-          <View style={styles.mapCanvas}>
-            <MaterialIcons
-              name="map"
-              size={40}
-              color={theme.key === "dark" ? "#9CA3AF" : "#8AA0C8"}
-            />
-            <Text style={styles.mapPlaceholderText}>
-              {t("home.map.placeholder")}
-            </Text>
-          </View>
-          <Ionicons
-            name="location-sharp"
-            size={22}
-            color={theme.colors.danger}
-            style={styles.mapPin}
+        {/* Map Card (Leaflet preview) */}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={styles.mapCard}
+          onPress={() =>
+            navigation.navigate("MapView")
+          }
+        >
+          <LeafletMapWebView
+            lat={center.lat}
+            lon={center.lon}
+            height={200}
+            zoom={15}
+            // showMarker={false}      // keep clean preview
+            interactive={false}     // no gestures on home
+            showMarker
+            showLegend={false}
           />
           <View style={styles.hazardBanner}>
             <Ionicons name="shield-checkmark" size={34} color="#fff" />
@@ -227,7 +243,7 @@ export default function HomeScreen() {
               </Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Emergency Contacts */}
         <View style={styles.sectionHeader}>
@@ -371,7 +387,7 @@ export default function HomeScreen() {
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("Chatbot")} // 👈 change to your chatbot route name
+        onPress={() => navigation.navigate("Chatbot")}
         accessibilityRole="button"
         accessibilityLabel="Open Chatbot"
       >

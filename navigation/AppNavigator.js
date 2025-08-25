@@ -6,6 +6,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,12 +17,16 @@ import HomeScreen from "../screens/HomeScreen";
 import ResourceHubScreen from "../screens/ResourceHubScreen";
 import SOSScreen from "../screens/SOSScreen";
 import GamesScreen from "../screens/GamesScreen";
+import MapScreen from "../screens/MapScreen";
 
 import { useThemeContext } from "../theme/ThemeProvider";
 import ThemeToggle from "../components/ThemeToggle";
 
+import Chatbot from "../screens/ChatbotScreen";
+
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
 
 function EmptyScreen() {
   return <View style={{ flex: 1 }} />;
@@ -256,25 +261,37 @@ const { t } = useTranslation();
 export default function AppNavigator() {
   const { theme } = useThemeContext();
   return (
-    <Drawer.Navigator
-      screenOptions={{
-        headerShown: false,
-        drawerPosition: "right",
-        drawerType: "front",
-        overlayColor: theme.colors.overlay,
-        drawerStyle: {
-          width: 300,
-          backgroundColor: theme.colors.drawerBg,
-          borderTopLeftRadius: 16,
-          borderBottomLeftRadius: 16,
-          overflow: "hidden",
-        },
-        swipeEdgeWidth: 60,
-      }}
-      drawerContent={(props) => <SideMenu {...props} />}
-    >
-      <Drawer.Screen name="Tabs" component={MainTabs} />
-    </Drawer.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Drawer + Tabs as the main app shell */}
+      <Stack.Screen name="RootDrawer" options={{ headerShown: false }}>
+        {() => (
+          <Drawer.Navigator
+            screenOptions={{
+              headerShown: false,
+              drawerPosition: "right",
+              drawerType: "front",
+              overlayColor: theme.colors.overlay,
+              drawerStyle: {
+                width: 300,
+                backgroundColor: theme.colors.drawerBg,
+                borderTopLeftRadius: 16,
+                borderBottomLeftRadius: 16,
+                overflow: "hidden",
+              },
+              swipeEdgeWidth: 60,
+            }}
+            drawerContent={(props) => <SideMenu {...props} />}
+          >
+            <Drawer.Screen name="Tabs" component={MainTabs} />
+          </Drawer.Navigator>
+        )}
+      </Stack.Screen>
+      {/* Full-screen Leaflet map */}
+      <Stack.Screen name="MapView" component={MapScreen} />
+
+      <Stack.Screen name="Chatbot" component={Chatbot} options={{ headerShown: false }} />
+    </Stack.Navigator>
+    
   );
 }
 
