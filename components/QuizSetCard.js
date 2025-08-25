@@ -3,6 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 /**
  * Quiz set card
@@ -12,11 +13,12 @@ import { useThemeContext } from "../theme/ThemeProvider";
 export default function QuizSetCard({
   title,
   questionsCount = 10,
-  thumbnail,           // require(...) image or undefined
+  thumbnail,
   onPress,
   style,
 }) {
   const { theme } = useThemeContext();
+  const { t } = useTranslation();
 
   return (
     <TouchableOpacity
@@ -36,7 +38,10 @@ export default function QuizSetCard({
             {title}
           </Text>
           <Text style={[styles.count, { color: theme.colors.subtext }]}>
-            {questionsCount} Questions
+            {t("games.daily.questions_count", {
+              count: questionsCount,
+              defaultValue: "{{count}} Questions",
+            })}
           </Text>
         </View>
 

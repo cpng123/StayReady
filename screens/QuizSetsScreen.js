@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
-import QUIZ from "../data/quiz.json";
 import QuizSetCard from "../components/QuizSetCard";
+import { useTranslation } from "react-i18next";
 
 const QUIZ_IMAGES = {
   flood: require("../assets/General/quiz-flood.jpg"),
@@ -36,6 +36,24 @@ const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 export default function QuizSetsScreen({ navigation, route }) {
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { i18n } = useTranslation();
+  const QUIZ = useMemo(() => {
+    try {
+      switch (i18n.language) {
+        case "ms":
+          return require("../i18n/resources/ms/quiz.json");
+        case "ta":
+          return require("../i18n/resources/ta/quiz.json");
+        case "zh":
+          return require("../i18n/resources/zh/quiz.json");
+        default:
+          return require("../i18n/resources/en/quiz.json");
+      }
+    } catch (e) {
+      console.warn("Could not load localized quiz.json, fallback to EN.", e);
+      return require("../i18n/resources/en/quiz.json");
+    }
+  }, [i18n.language]);
 
   const categoryId = route?.params?.categoryId;
   const category =
@@ -43,12 +61,15 @@ export default function QuizSetsScreen({ navigation, route }) {
     (QUIZ?.categories ?? [])[0];
 
   const heroImage = QUIZ_IMAGES[category?.id] ?? QUIZ_IMAGES.flood;
-  const title = `${category?.title ?? "Quiz"} Quizzes`;
+  const titleBase = route?.params?.title || category?.title || "Quiz";
+  const title = `${titleBase} ${QUIZ?.strings?.quizzesSuffix || "Quizzes"}`;
+
+  // Prefer a localized intro from the category; else build a simple fallback
   const intro =
-    category?.intro ??
-    `Complete these quizzes to build confidence and stay safe during ${
-      category?.title?.toLowerCase() || "emergencies"
-    }.`;
+    category?.intro ||
+    (QUIZ?.strings?.introTemplate
+      ? QUIZ.strings.introTemplate.replace("{{topic}}", titleBase.toLowerCase())
+      : `Complete these quizzes to build confidence and stay safe during ${titleBase.toLowerCase()}.`);
 
   const sets = category?.sets ?? [];
 

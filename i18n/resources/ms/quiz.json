@@ -1,5 +1,9 @@
 {
   "version": "1.0",
+  "strings": {
+    "quizzesSuffix": "Kuiz",
+    "introTemplate": "Lengkapkan kuiz ini untuk membina keyakinan dan kekal selamat semasa {{topic}}."
+  },
   "categories": [
     {
       "id": "flood",

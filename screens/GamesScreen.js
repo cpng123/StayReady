@@ -13,7 +13,6 @@ import {
 import { useThemeContext } from "../theme/ThemeProvider";
 import ImageOverlayCard from "../components/ImageOverlayCard";
 import QuickTipsCarousel from "../components/QuickTipsCarousel";
-import QUIZ from "../data/quiz.json";
 import { pickRandomTips } from "../utils/tips";
 import { getDailyToday } from "../utils/dailyChallenge";
 import { getStatsSummary } from "../utils/progressStats";
@@ -44,11 +43,33 @@ export default function GamesScreen({ navigation }) {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { t, i18n } = useTranslation();
 
+  // Dynamically load quiz.json based on the selected language
+  const QUIZ = useMemo(() => {
+    try {
+      switch (i18n.language) {
+        case "ms":
+          return require("../i18n/resources/ms/quiz.json");
+        case "ta":
+          return require("../i18n/resources/ta/quiz.json");
+        case "zh":
+          return require("../i18n/resources/zh/quiz.json");
+        default:
+          return require("../i18n/resources/en/quiz.json");
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️ Could not load localized quiz.json, falling back to EN.",
+        e
+      );
+      return require("../i18n/resources/en/quiz.json");
+    }
+  }, [i18n.language]);
+
   const categories = useMemo(
     () =>
       (QUIZ?.categories ?? []).map((c) => ({
         id: c.id,
-        title: t(`games.categories.${c.id}`, c.title),
+        title: c.title,
         image: QUIZ_IMAGES[c.id],
         setCount: (c.sets ?? []).length,
       })),
@@ -63,8 +84,14 @@ export default function GamesScreen({ navigation }) {
     return (rawTips || []).map((tip) => {
       // Category title from preparedness ns; fallback to home.prep.topic.*; fallback to existing title
       const categoryTitle =
-        t(`${tip.categoryId}.title`, { ns: "preparedness", defaultValue: "" }) ||
-        t(`home.prep.topic.${tip.categoryId}`, { ns: "common", defaultValue: tip.categoryTitle || "" }) ||
+        t(`${tip.categoryId}.title`, {
+          ns: "preparedness",
+          defaultValue: "",
+        }) ||
+        t(`home.prep.topic.${tip.categoryId}`, {
+          ns: "common",
+          defaultValue: tip.categoryTitle || "",
+        }) ||
         tip.categoryTitle ||
         "";
 
@@ -74,7 +101,10 @@ export default function GamesScreen({ navigation }) {
       // 3) fallback to original tip.text
       const text =
         (tip.i18nKey ? t(tip.i18nKey) : "") ||
-        t(`tips.${tip.id}.text`, { ns: "common", defaultValue: tip.text || "" }) ||
+        t(`tips.${tip.id}.text`, {
+          ns: "common",
+          defaultValue: tip.text || "",
+        }) ||
         tip.text ||
         "";
 
@@ -100,7 +130,7 @@ export default function GamesScreen({ navigation }) {
     React.useCallback(() => {
       refreshDaily();
       refreshStats();
-    }, [])
+    }, [i18n.language])
   );
 
   const onDailyPress = () => {
@@ -111,13 +141,12 @@ export default function GamesScreen({ navigation }) {
       nav.navigate("ReviewAnswer", {
         title: t("games.daily.review_title", "Daily Challenge — Review"),
         review: Array.isArray(review) ? review : [],
-        meta:
-          meta || {
-            setId: key,
-            setTitle: t("games.daily.title", "Daily Challenge"),
-            categoryId: "daily",
-            categoryLabel: t("games.daily.category_label", "Daily"),
-          },
+        meta: meta || {
+          setId: key,
+          setTitle: t("games.daily.title", "Daily Challenge"),
+          categoryId: "daily",
+          categoryLabel: t("games.daily.category_label", "Daily"),
+        },
       });
     } else {
       nav.navigate("QuizPlay", {
@@ -218,7 +247,12 @@ export default function GamesScreen({ navigation }) {
       <Text style={styles.sectionTitle}>
         {t("games.quick_tips", "Quick Tips")}
       </Text>
-      <QuickTipsCarousel tips={tips} theme={theme} styles={styles} onPressTip={goToGuide} />
+      <QuickTipsCarousel
+        tips={tips}
+        theme={theme}
+        styles={styles}
+        onPressTip={goToGuide}
+      />
 
       <Text style={[styles.sectionTitle, { marginTop: 10 }]}>
         {t("games.categories_quiz", "Categories Quiz")}
@@ -227,7 +261,9 @@ export default function GamesScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
+    >
       <FlatList
         data={categories}
         keyExtractor={(i) => i.id}
@@ -257,8 +293,12 @@ export default function GamesScreen({ navigation }) {
 function StatCol({ label, value, theme }) {
   return (
     <View style={pillStyles.col}>
-      <Text style={[pillStyles.value, { color: theme.colors.text }]}>{value}</Text>
-      <Text style={[pillStyles.label, { color: theme.colors.subtext }]}>{label}</Text>
+      <Text style={[pillStyles.value, { color: theme.colors.text }]}>
+        {value}
+      </Text>
+      <Text style={[pillStyles.label, { color: theme.colors.subtext }]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -274,7 +314,12 @@ const makeStyles = (theme) =>
     safe: { flex: 1 },
     headerWrap: { paddingTop: 10, paddingBottom: 8 },
     h1: { fontSize: 22, fontWeight: "800", color: theme.colors.text },
-    hSub: { color: theme.colors.subtext, fontSize: 14, marginTop: 2, marginBottom: 14 },
+    hSub: {
+      color: theme.colors.subtext,
+      fontSize: 14,
+      marginTop: 2,
+      marginBottom: 14,
+    },
     statsCard: {
       flexDirection: "row",
       alignItems: "stretch",
@@ -288,14 +333,44 @@ const makeStyles = (theme) =>
       shadowOffset: { width: 0, height: 4 },
       elevation: 3,
     },
-    dailyCard: { borderRadius: 16, overflow: "hidden", marginBottom: 14, paddingVertical: 2 },
-    dailyOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.25)" },
-    dailyRow: { padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    dailyCard: {
+      borderRadius: 16,
+      overflow: "hidden",
+      marginBottom: 14,
+      paddingVertical: 2,
+    },
+    dailyOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0,0,0,0.25)",
+    },
+    dailyRow: {
+      padding: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
     dailyTitle: { color: "#fff", fontWeight: "800", fontSize: 20 },
-    dailySub: { color: "#E5ECFF", marginTop: 2, marginBottom: 10, fontSize: 14 },
-    dailyBtn: { alignSelf: "flex-start", backgroundColor: "#fff", paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 },
+    dailySub: {
+      color: "#E5ECFF",
+      marginTop: 2,
+      marginBottom: 10,
+      fontSize: 14,
+    },
+    dailyBtn: {
+      alignSelf: "flex-start",
+      backgroundColor: "#fff",
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 12,
+    },
     dailyBtnText: { color: "#1D4ED8", fontWeight: "800" },
-    sectionTitle: { fontSize: 18, fontWeight: "800", color: theme.colors.text, marginTop: 6, marginBottom: 4 },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: theme.colors.text,
+      marginTop: 6,
+      marginBottom: 4,
+    },
     tipCard: {
       flexDirection: "row",
       alignItems: "center",
@@ -308,9 +383,23 @@ const makeStyles = (theme) =>
       shadowOffset: { width: 0, height: 2 },
       elevation: 2,
     },
-    tipBar: { width: 4, alignSelf: "stretch", borderRadius: 3, marginRight: 10 },
-    tipTitle: { fontWeight: "800", fontSize: 14, marginBottom: 4, lineHeight: 18 },
-    tipBodyWrap: { height: 34, justifyContent: "flex-start", overflow: "hidden" },
+    tipBar: {
+      width: 4,
+      alignSelf: "stretch",
+      borderRadius: 3,
+      marginRight: 10,
+    },
+    tipTitle: {
+      fontWeight: "800",
+      fontSize: 14,
+      marginBottom: 4,
+      lineHeight: 18,
+    },
+    tipBodyWrap: {
+      height: 34,
+      justifyContent: "flex-start",
+      overflow: "hidden",
+    },
     tipBody: { fontSize: 12, lineHeight: 17 },
     tipCta: { fontSize: 12, fontWeight: "800", marginLeft: 10 },
   });

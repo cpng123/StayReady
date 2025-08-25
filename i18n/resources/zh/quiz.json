@@ -1,5 +1,9 @@
 {
   "version": "1.0",
+  "strings": {
+    "quizzesSuffix": "测验",
+    "introTemplate": "完成这些测验以建立信心并在{{topic}}期间保持安全。"
+  },
   "categories": [
     {
       "id": "flood",
