@@ -368,6 +368,18 @@ export default function HomeScreen() {
         onCancel={closeConfirm}
         onConfirm={confirm.onConfirm}
       />
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("Chatbot")} // 👈 change to your chatbot route name
+        accessibilityRole="button"
+        accessibilityLabel="Open Chatbot"
+      >
+        <Image
+          source={require("../assets/General/bot.png")}
+          style={styles.fabIcon}
+        />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -538,5 +550,28 @@ const makeStyles = (theme) =>
       lineHeight: 14,
       color: theme.colors.subtext,
       textAlign: "center",
+    },
+
+    fab: {
+      position: "absolute",
+      bottom: 75,
+      right: 20,
+      width: 55,
+      height: 55,
+      borderRadius: 30,
+      backgroundColor: theme.colors.primary, // background behind bot icon
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.25,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 6,
+      elevation: 5, // Android shadow
+    },
+    fabIcon: {
+      width: 40,
+      height: 40,
+      resizeMode: "contain",
+      tintColor: "#fff",
     },
   });
