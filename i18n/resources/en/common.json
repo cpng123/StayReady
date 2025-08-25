@@ -117,13 +117,19 @@
     "location": "Location",
     "country_sg": "Singapore",
     "emergency_contacts_setup": "Emergency Contacts Setup",
-    "account_settings": "Account Settings",
-    "change_password": "Change Password",
-    "logout": "Logout",
     "done": "Done",
     "cancel": "Cancel",
     "theme_light": "Light",
-    "theme_dark": "Dark"
+    "theme_dark": "Dark",
+    "data_management": "Data Management",
+    "clear_cache": "Clear cache",
+    "reset_all": "Reset all data",
+    "clear_cache_title": "Clear cache?",
+    "clear_cache_msg": "This will remove temporary data like images, prefetches, and cached lookups. Your bookmarks and preferences will remain.",
+    "clear": "Clear",
+    "reset_all_title": "Reset all data?",
+    "reset_all_msg": "This will delete ALL local data: bookmarks, quiz history, preferences, and caches. This cannot be undone.",
+    "reset": "Reset"
   },
 
   "sos": {

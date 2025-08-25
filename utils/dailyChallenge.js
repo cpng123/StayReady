@@ -127,7 +127,7 @@ export async function markDailyCompleted(review, meta) {
   return status;
 }
 
-// ✅ NEW: single helper to return today's merged data (what your GamesScreen expects)
+// Dingle helper to return today's merged data (what your GamesScreen expects)
 export async function getDailyToday(quizData) {
   const set = await getOrCreateDailySet(quizData);
   const status = await getDailyStatus();

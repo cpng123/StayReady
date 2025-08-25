@@ -17,16 +17,17 @@ import { useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
 import TopBar from "../components/TopBar";
 import ThemeToggle from "../components/ThemeToggle";
+import ConfirmModal from "../components/ConfirmModal";
 import { useTranslation } from "react-i18next";
 import { setAppLanguage } from "../i18n";
+import { clearCache, resetAll } from "../utils/storage";
 
-/* ----------------------- storage keys ----------------------- */
-const K_LANG = "pref:language";
-const K_NOTIF = "pref:notificationsEnabled";
-const K_SFX = "pref:sfxEnabled";
-const K_HAPTIC = "pref:hapticsEnabled";
+import { KEYS } from "../utils/storage";
+const K_LANG = KEYS.PREF_LANG;
+const K_NOTIF = KEYS.PREF_NOTIF;
+const K_SFX = KEYS.PREF_SFX;
+const K_HAPTIC = KEYS.PREF_HAPTICS;
 
-/* Simple language list for the demo */
 const LANGS = [
   { id: "en", label: "English" },
   { id: "zh", label: "中文 (Chinese)" },
@@ -52,6 +53,10 @@ export default function SettingsScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [tempLanguage, setTempLanguage] = useState(language); // for the modal "Done" flow
+
+  // new confirm modals for data actions
+  const [clearOpen, setClearOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
 
   /* load persisted values */
   useEffect(() => {
@@ -117,35 +122,23 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
-      <TopBar title={t("settings.title")} onBack={() => nav.goBack()} />
+      <TopBar
+        title={t("settings.title", "Settings")}
+        onBack={() => nav.goBack()}
+      />
 
       {/* SCROLLABLE PAGE CONTENT */}
       <ScrollView contentContainerStyle={s.content}>
-        {/* profile card */}
-        <View style={[s.profileCard, { backgroundColor: theme.colors.card }]}>
-          <View style={s.avatar} />
-          <View style={{ flex: 1 }}>
-            <Text style={[s.profileName, { color: theme.colors.text }]}>
-              Tester
-            </Text>
-            <Text style={[s.profileEmail, { color: theme.colors.subtext }]}>
-              example123@gmail.com
-            </Text>
-          </View>
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color={theme.colors.subtext}
-          />
-        </View>
-
-        <SectionTitle>{t("settings.pref_controls")}</SectionTitle>
+        {/* ---------------- Preferences & Controls ---------------- */}
+        <SectionTitle>
+          {t("settings.pref_controls", "Preferences & Controls")}
+        </SectionTitle>
 
         <Row
           icon={
             <Ionicons name="language" size={18} color={theme.colors.text} />
           }
-          label={t("settings.language")}
+          label={t("settings.language", "Language")}
           onPress={() => {
             setTempLanguage(language);
             setLangOpen(true);
@@ -172,7 +165,7 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.theme")}
+          label={t("settings.theme", "Theme")}
           onPress={() => setThemeOpen(true)}
           right={
             <Ionicons
@@ -191,7 +184,7 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.notifications")}
+          label={t("settings.notifications", "Notifications")}
           right={<Switch value={notif} onValueChange={setNotif} />}
         />
 
@@ -203,7 +196,7 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.sound")}
+          label={t("settings.sound", "Sound effects")}
           right={<Switch value={sound} onValueChange={setSound} />}
         />
 
@@ -215,11 +208,17 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.vibration")}
+          label={t("settings.vibration", "Haptics")}
           right={<Switch value={vibration} onValueChange={setVibration} />}
         />
 
-        <SectionTitle>{t("settings.preparedness_settings")}</SectionTitle>
+        {/* ---------------- Preparedness-specific settings ---------------- */}
+        <SectionTitle>
+          {t(
+            "settings.preparedness_settings",
+            "Preparedness-specific Settings"
+          )}
+        </SectionTitle>
 
         <Row
           icon={
@@ -229,12 +228,12 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.location")}
+          label={t("settings.location", "Location")}
           onPress={() => nav.navigate("LocationSettings")}
           right={
             <View style={s.rightInline}>
               <Text style={[s.rightText, { color: theme.colors.subtext }]}>
-                {t("settings.country_sg")}
+                {t("settings.country_sg", "Singapore")}
               </Text>
               <Ionicons
                 name="chevron-forward"
@@ -249,7 +248,7 @@ export default function SettingsScreen() {
           icon={
             <Ionicons name="call-outline" size={18} color={theme.colors.text} />
           }
-          label={t("settings.emergency_contacts_setup")}
+          label={t("settings.emergency_contacts_setup", "Emergency Contacts")}
           onPress={() => nav.navigate("EmergencyContacts")}
           right={
             <Ionicons
@@ -260,18 +259,21 @@ export default function SettingsScreen() {
           }
         />
 
-        <SectionTitle>{t("settings.account_settings")}</SectionTitle>
+        {/* ---------------- Data management (replaces account settings) ---------------- */}
+        <SectionTitle>
+          {t("settings.data_management", "Data Management")}
+        </SectionTitle>
 
         <Row
           icon={
             <Ionicons
-              name="lock-closed-outline"
+              name="sparkles-outline"
               size={18}
               color={theme.colors.text}
             />
           }
-          label={t("settings.change_password")}
-          onPress={() => nav.navigate("ChangePassword")}
+          label={t("settings.clear_cache", "Clear cache")}
+          onPress={() => setClearOpen(true)}
           right={
             <Ionicons
               name="chevron-forward"
@@ -284,13 +286,13 @@ export default function SettingsScreen() {
         <Row
           icon={
             <Ionicons
-              name="log-out-outline"
-              size={18}
+              name="alert-circle-outline"
+              size={20}
               color={theme.colors.text}
             />
           }
-          label={t("settings.logout")}
-          onPress={() => nav.navigate("Logout")}
+          label={t("settings.reset_all", "Reset all data")}
+          onPress={() => setResetOpen(true)}
           right={
             <Ionicons
               name="chevron-forward"
@@ -303,7 +305,7 @@ export default function SettingsScreen() {
         <View style={{ height: 24 }} />
       </ScrollView>
 
-      {/* Language modal WITH Done button */}
+      {/* Language modal (unchanged except Done flow) */}
       <Modal
         visible={langOpen}
         transparent
@@ -314,7 +316,7 @@ export default function SettingsScreen() {
         <View style={s.modalCenter} pointerEvents="box-none">
           <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
             <Text style={[s.modalTitle, { color: theme.colors.text }]}>
-              {t("settings.choose_language")}
+              {t("settings.choose_language", "Choose language")}
             </Text>
 
             <FlatList
@@ -367,19 +369,18 @@ export default function SettingsScreen() {
               style={[s.modalBtn, { backgroundColor: theme.colors.primary }]}
               activeOpacity={0.9}
               onPress={async () => {
-                // Persist + apply globally
                 setLanguage(tempLanguage);
                 await setAppLanguage(tempLanguage);
                 setLangOpen(false);
               }}
             >
-              <Text style={s.modalBtnText}>{t("settings.done")}</Text>
+              <Text style={s.modalBtnText}>{t("settings.done", "Done")}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* Theme modal (unchanged) */}
+      {/* Theme modal */}
       <Modal
         visible={themeOpen}
         transparent
@@ -393,7 +394,7 @@ export default function SettingsScreen() {
         <View style={s.modalCenter} pointerEvents="box-none">
           <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
             <Text style={[s.modalTitle, { color: theme.colors.text }]}>
-              {t("settings.theme")}
+              {t("settings.theme", "Theme")}
             </Text>
             <View style={{ marginTop: 6 }}>
               <ThemeToggle />
@@ -403,11 +404,49 @@ export default function SettingsScreen() {
               activeOpacity={0.9}
               onPress={() => setThemeOpen(false)}
             >
-              <Text style={s.modalBtnText}>{t("settings.done")}</Text>
+              <Text style={s.modalBtnText}>{t("settings.done", "Done")}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
+      {/* ✅ Confirm clear cache */}
+      <ConfirmModal
+        visible={clearOpen}
+        title={t("settings.clear_cache_title", "Clear cache?")}
+        message={t(
+          "settings.clear_cache_msg",
+          "This will remove temporary data like images, prefetches, and cached lookups. Your bookmarks and preferences will remain."
+        )}
+        confirmLabel={t("settings.clear", "Clear")}
+        cancelLabel={t("common.cancel", "Cancel")}
+        onConfirm={async () => {
+          try {
+            await clearCache();
+          } catch {}
+          setClearOpen(false);
+        }}
+        onCancel={() => setClearOpen(false)}
+      />
+
+      {/* ✅ Confirm reset all */}
+      <ConfirmModal
+        visible={resetOpen}
+        title={t("settings.reset_all_title", "Reset all data?")}
+        message={t(
+          "settings.reset_all_msg",
+          "This will delete ALL local data: bookmarks, quiz history, preferences, and caches. This cannot be undone."
+        )}
+        confirmLabel={t("settings.reset", "Reset")}
+        cancelLabel={t("common.cancel", "Cancel")}
+        onConfirm={async () => {
+          try {
+            await resetAll();
+          } catch {}
+          setResetOpen(false);
+        }}
+        onCancel={() => setResetOpen(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -418,28 +457,6 @@ const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 14, gap: 10 },
-
-    /* profile */
-    profileCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      borderRadius: 14,
-      padding: 12,
-      gap: 12,
-      shadowColor: "#000",
-      shadowOpacity: 0.06,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 3 },
-      elevation: 2,
-    },
-    avatar: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: "#F59E0B",
-    },
-    profileName: { fontSize: 16, fontWeight: "900" },
-    profileEmail: { fontSize: 12, fontWeight: "600" },
 
     /* sections */
     sectionTitle: {
@@ -503,7 +520,7 @@ const makeStyles = (theme) =>
       borderRadius: 12,
       paddingVertical: 12,
       alignItems: "center",
-      alignSelf: "stretch", // full width
+      alignSelf: "stretch",
     },
     modalBtnText: { color: "#fff", fontWeight: "900", fontSize: 15 },
 

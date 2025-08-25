@@ -122,13 +122,19 @@
     "location": "Lokasi",
     "country_sg": "Singapura",
     "emergency_contacts_setup": "Tetapan Kenalan Kecemasan",
-    "account_settings": "Tetapan Akaun",
-    "change_password": "Tukar Kata Laluan",
-    "logout": "Log Keluar",
     "done": "Selesai",
     "cancel": "Batal",
     "theme_light": "Terang",
-    "theme_dark": "Gelap"
+    "theme_dark": "Gelap",
+    "data_management": "Pengurusan Data",
+    "clear_cache": "Kosongkan cache",
+    "reset_all": "Tetapkan semula semua data",
+    "clear_cache_title": "Kosongkan cache?",
+    "clear_cache_msg": "Ini akan mengalih keluar data sementara seperti imej, prefetch dan carian cache. Penanda halaman dan pilihan anda akan kekal.",
+    "clear": "Jelas",
+    "reset_all_title": "Tetapkan semula semua data?",
+    "reset_all_msg": "Ini akan memadam SEMUA data setempat: penanda halaman, sejarah kuiz, keutamaan dan cache. Ini tidak boleh dibuat asal.",
+    "reset": "Set Semula"
   },
   "sos": {
     "title": "Penggera Kecemasan SOS",

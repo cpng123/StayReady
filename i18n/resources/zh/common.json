@@ -102,13 +102,19 @@
     "location": "位置",
     "country_sg": "新加坡",
     "emergency_contacts_setup": "紧急联系人设置",
-    "account_settings": "账户设置",
-    "change_password": "更改密码",
-    "logout": "退出登录",
     "done": "完成",
     "cancel": "取消",
     "theme_light": "浅色",
-    "theme_dark": "深色"
+    "theme_dark": "深色",
+    "data_management": "数据管理",
+    "clear_cache": "清除缓存",
+    "reset_all": "重置所有数据",
+    "clear_cache_title": "清除缓存?",
+    "clear_cache_msg": "这将删除临时数据，例如图片、预取数据和缓存的查找数据。您的书签和偏好设置将保留。",
+    "clear": "清除",
+    "reset_all_title": "重置所有数据？",
+    "reset_all_msg": "这将删除所有本地数据：书签、测验历史记录、偏好设置和缓存。此操作无法撤消。",
+    "reset": "重置"
   },
   "sos": {
     "title": "SOS 紧急警报",

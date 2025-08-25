@@ -240,14 +240,6 @@ const { t } = useTranslation();
               setTimeout(() => rootNavigate("Settings"), 0);
             }}
           />
-          <Row
-            icon={
-              <Ionicons name="log-out" size={24} color={theme.colors.text} />
-            }
-            label={t("drawer.logout")}
-            textColor={theme.colors.text}
-            onPress={() => {}}
-          />
         </View>
 
         <View style={{ flex: 1 }} />
