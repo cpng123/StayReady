@@ -178,26 +178,35 @@
 
     "sections": {
       "Prevention": {
-        "dengue-01": "Remove stagnant water from flower pots, buckets, and trays.",
-        "dengue-02": "Clear roof gutters and always ensure proper drainage.",
-        "dengue-03": "Change water in vases, bowls, and birdbaths every 2 days.",
-        "dengue-04": "Install window and door screens to block mosquitoes."
+        "title": "Prevention",
+        "items": {
+          "dengue-01": "Remove stagnant water from flower pots, buckets, and trays.",
+          "dengue-02": "Clear roof gutters and always ensure proper drainage.",
+          "dengue-03": "Change water in vases, bowls, and birdbaths every 2 days.",
+          "dengue-04": "Install window and door screens to block mosquitoes."
+        }
       },
-      "Recognising Symptoms": {
-        "dengue-05": "Sudden high fever lasting 2 to 7 days.",
-        "dengue-06": "Severe headache, especially behind eyes.",
-        "dengue-07": "Body muscle and joint pains.",
-        "dengue-08": "Nausea, vomiting, or loss of appetite.",
-        "dengue-09": "Skin rash appearing a few days after fever starts.",
-        "dengue-10": "Bleeding gums, persistent vomiting, abdominal pain."
+      "RecognisingSymptoms": {
+        "title": "Recognising Symptoms",
+        "items": {
+          "dengue-05": "Sudden high fever lasting 2 to 7 days.",
+          "dengue-06": "Severe headache, especially behind eyes.",
+          "dengue-07": "Body muscle and joint pains.",
+          "dengue-08": "Nausea, vomiting, or loss of appetite.",
+          "dengue-09": "Skin rash appearing a few days after fever starts.",
+          "dengue-10": "Bleeding gums, persistent vomiting, abdominal pain."
+        }
       },
-      "Treatment & Care": {
-        "dengue-11": "Seek medical attention immediately if dengue is suspected.",
-        "dengue-12": "Remember to drink plenty of fluids to prevent dehydration.",
-        "dengue-13": "Rest well and avoid physical exertion until full recovery.",
-        "dengue-14": "Take doctor approved medicines (avoid aspirin/ibuprofen).",
-        "dengue-15": "Use mosquito nets or repellents to avoid infecting others.",
-        "dengue-16": "Follow up with healthcare providers for monitoring."
+      "Treatment&Care": {
+        "title": "Treatment & Care",
+        "items": {
+          "dengue-11": "Seek medical attention immediately if dengue is suspected.",
+          "dengue-12": "Remember to drink plenty of fluids to prevent dehydration.",
+          "dengue-13": "Rest well and avoid physical exertion until full recovery.",
+          "dengue-14": "Take doctor approved medicines (avoid aspirin/ibuprofen).",
+          "dengue-15": "Use mosquito nets or repellents to avoid infecting others.",
+          "dengue-16": "Follow up with healthcare providers for monitoring."
+        }
       }
     },
 

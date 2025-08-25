@@ -190,6 +190,7 @@ export const PREPAREDNESS_GUIDES = {
     ],
     sections: [
       {
+        id: "prepareBefore",
         title: "Prepare Before",
         items: [
           {
@@ -215,6 +216,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "protectDuring",
         title: "Protect Yourself During",
         items: [
           {
@@ -240,6 +242,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "recoverAfter",
         title: "Recover After",
         items: [
           {
@@ -344,6 +347,7 @@ export const PREPAREDNESS_GUIDES = {
     ],
     sections: [
       {
+        id: "Prevention",
         title: "Prevention",
         items: [
           {
@@ -369,6 +373,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "RecognisingSymptoms",
         title: "Recognising Symptoms",
         items: [
           {
@@ -404,6 +409,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "Treatment&Care",
         title: "Treatment & Care",
         items: [
           {
@@ -504,6 +510,7 @@ export const PREPAREDNESS_GUIDES = {
     ],
     sections: [
       {
+        id: "prepareBefore",
         title: "Prepare Before",
         items: [
           {
@@ -529,6 +536,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "protectDuring",
         title: "Protect Yourself During",
         items: [
           {
@@ -554,6 +562,7 @@ export const PREPAREDNESS_GUIDES = {
         ],
       },
       {
+        id: "recoverAfter",
         title: "Recover After",
         items: [
           {

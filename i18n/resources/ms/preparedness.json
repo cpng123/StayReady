@@ -176,26 +176,35 @@
     },
     "sections": {
       "Prevention": {
-        "dengue-01": "Buang air bertakung di pasu bunga, baldi, dan dulang air.",
-        "dengue-02": "Pastikan talang bumbung bersih dan tidak tersumbat.",
-        "dengue-03": "Tukar air dalam pasu, mangkuk, dan kolam burung setiap 2 hari.",
-        "dengue-04": "Pasang jaring pada pintu dan tingkap untuk menghalang nyamuk."
+        "title": "Pencegahan",
+        "items": {
+          "dengue-01": "Buang air bertakung di pasu, baldi dan dulang.",
+          "dengue-02": "Bersihkan longkang bumbung dan pastikan saliran lancar.",
+          "dengue-03": "Tukar air dalam pasu, mangkuk dan kolah burung setiap 2 hari.",
+          "dengue-04": "Pasang jaring tingkap dan pintu untuk menghalang nyamuk."
+        }
       },
-      "Recognising Symptoms": {
-        "dengue-05": "Demam panas mendadak selama 2 hingga 7 hari.",
-        "dengue-06": "Sakit kepala teruk, terutama di belakang mata.",
-        "dengue-07": "Sakit otot dan sendi di seluruh badan.",
-        "dengue-08": "Loya, muntah, atau hilang selera makan.",
-        "dengue-09": "Ruam kulit muncul beberapa hari selepas demam bermula.",
-        "dengue-10": "Gusi berdarah, muntah berterusan, sakit perut."
+      "RecognisingSymptoms": {
+        "title": "Mengenal Pasti Gejala",
+        "items": {
+          "dengue-05": "Demam tinggi secara tiba-tiba selama 2–7 hari.",
+          "dengue-06": "Sakit kepala teruk, terutama di belakang mata.",
+          "dengue-07": "Sakit otot dan sendi.",
+          "dengue-08": "Loya, muntah atau hilang selera makan.",
+          "dengue-09": "Ruam kulit muncul beberapa hari selepas demam bermula.",
+          "dengue-10": "Gusi berdarah, muntah berterusan, sakit perut."
+        }
       },
-      "Treatment & Care": {
-        "dengue-11": "Dapatkan rawatan perubatan segera jika disyaki denggi.",
-        "dengue-12": "Minum banyak air untuk mengelakkan dehidrasi.",
-        "dengue-13": "Rehat secukupnya dan elakkan aktiviti fizikal sehingga pulih sepenuhnya.",
-        "dengue-14": "Ambil ubat yang disyorkan doktor (elakkan aspirin/ibuprofen).",
-        "dengue-15": "Gunakan kelambu atau ubat penghalau nyamuk untuk mencegah jangkitan kepada orang lain.",
-        "dengue-16": "Lakukan pemeriksaan susulan dengan penyedia penjagaan kesihatan."
+      "Treatment&Care": {
+        "title": "Rawatan & Penjagaan",
+        "items": {
+          "dengue-11": "Dapatkan rawatan perubatan segera jika disyaki denggi.",
+          "dengue-12": "Minum air secukupnya untuk elak dehidrasi.",
+          "dengue-13": "Banyakkan rehat dan elakkan aktiviti berat sehingga pulih.",
+          "dengue-14": "Ambil ubat yang diluluskan doktor (elakkan aspirin/ibuprofen).",
+          "dengue-15": "Guna kelambu atau penghalau nyamuk untuk elakkan jangkitan kepada orang lain.",
+          "dengue-16": "Ikuti temujanji susulan untuk pemantauan."
+        }
       }
     },
     "externalResources": {
