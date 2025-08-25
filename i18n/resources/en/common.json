@@ -521,5 +521,33 @@
         ]
       }
     }
+  },
+  "bookmarks": {
+    "title": "Bookmarked Questions",
+    "chips": {
+      "all": "All",
+      "flood": "Flood",
+      "haze": "Haze",
+      "storm": "Thunderstorm",
+      "dengue": "Dengue",
+      "wind": "Wind",
+      "aid": "First Aid",
+      "fire": "Fire",
+      "kit": "Emergency Kit",
+      "disease": "Disease",
+      "earthquake": "Earthquake"
+    },
+    "empty": {
+      "no_matches_title": "No matches here",
+      "no_matches_body": "Try a different category or clear your search.",
+      "none_title": "No bookmarked questions",
+      "none_body": "Tap the bookmark icon on any question to save it here."
+    },
+    "confirm": {
+      "title": "Delete bookmark?",
+      "message": "This question will be removed from your bookmarks.",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
   }
 }

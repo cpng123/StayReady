@@ -507,5 +507,33 @@
         ]
       }
     }
+  },
+  "bookmarks": {
+    "title": "已收藏的问题",
+    "chips": {
+      "all": "全部",
+      "flood": "洪水",
+      "haze": "烟霾",
+      "storm": "雷暴",
+      "dengue": "登革热",
+      "wind": "强风",
+      "aid": "急救",
+      "fire": "火灾",
+      "kit": "应急包",
+      "disease": "传染病",
+      "earthquake": "地震"
+    },
+    "empty": {
+      "no_matches_title": "没有匹配结果",
+      "no_matches_body": "试试其他分类或清空搜索。",
+      "none_title": "还没有收藏题目",
+      "none_body": "点按任意题目的收藏图标即可保存到这里。"
+    },
+    "confirm": {
+      "title": "删除收藏？",
+      "message": "该题目将从你的收藏中移除。",
+      "delete": "删除",
+      "cancel": "取消"
+    }
   }
 }

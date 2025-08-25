@@ -534,5 +534,33 @@
         ]
       }
     }
+  },
+  "bookmarks": {
+    "title": "Soalan Ditanda",
+    "chips": {
+      "all": "Semua",
+      "flood": "Banjir",
+      "haze": "Jerebu",
+      "storm": "Ribut Petir",
+      "dengue": "Denggi",
+      "wind": "Angin Kencang",
+      "aid": "Pertolongan Cemas",
+      "fire": "Kebakaran",
+      "kit": "Kit Kecemasan",
+      "disease": "Penyakit",
+      "earthquake": "Gempa Bumi"
+    },
+    "empty": {
+      "no_matches_title": "Tiada padanan di sini",
+      "no_matches_body": "Cuba kategori lain atau kosongkan carian.",
+      "none_title": "Tiada soalan yang ditanda",
+      "none_body": "Ketik ikon penanda pada mana-mana soalan untuk simpan di sini."
+    },
+    "confirm": {
+      "title": "Padam tanda buku?",
+      "message": "Soalan ini akan dibuang daripada senarai tanda buku anda.",
+      "delete": "Padam",
+      "cancel": "Batal"
+    }
   }
 }
