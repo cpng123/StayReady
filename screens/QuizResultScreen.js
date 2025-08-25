@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
-import { StatusBar } from "expo-status-bar";
+import React, { useState, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   View,
@@ -13,24 +12,30 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
-// Local quotes — short, positive, preparedness-themed
-const QUOTES = [
-  "Learning is a journey, and you just leveled up.",
-  "Prepared today, confident tomorrow.",
-  "Small steps build strong readiness.",
-  "Knowledge now is safety later.",
-  "Readiness is a habit, not a moment.",
-  "Practice makes prepared.",
-  "Stay calm, stay ready, stay safe.",
-  "Every question answered adds another layer of safety.",
-  "Preparedness is the best plan B.",
-  "Your future self thanks you for training today.",
-  "In an emergency, knowledge is power.",
-  "A little learning today can save a lot tomorrow.",
-];
+// Build quotes from i18n so they translate
+function useQuotes(t) {
+  return useMemo(
+    () => [
+      t("games.result.quotes.1", "Learning is a journey, and you just leveled up."),
+      t("games.result.quotes.2", "Prepared today, confident tomorrow."),
+      t("games.result.quotes.3", "Small steps build strong readiness."),
+      t("games.result.quotes.4", "Knowledge now is safety later."),
+      t("games.result.quotes.5", "Readiness is a habit, not a moment."),
+      t("games.result.quotes.6", "Practice makes prepared."),
+      t("games.result.quotes.7", "Stay calm, stay ready, stay safe."),
+      t("games.result.quotes.8", "Every question answered adds another layer of safety."),
+      t("games.result.quotes.9", "Preparedness is the best plan B."),
+      t("games.result.quotes.10", "Your future self thanks you for training today."),
+      t("games.result.quotes.11", "In an emergency, knowledge is power."),
+      t("games.result.quotes.12", "A little learning today can save a lot tomorrow."),
+    ],
+    [t]
+  );
+}
 
 export default function QuizResultScreen() {
   const insets = useSafeAreaInsets();
@@ -38,11 +43,12 @@ export default function QuizResultScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   // Params from QuizPlay (with safe fallbacks)
   const {
-    title = "Quiz Challenge",
-    score = 0, // XP gained
+    title = t("games.result.default_title", "Quiz Challenge"),
+    score = 0,
     correct = 0,
     total = 0,
     timeTakenSec = 0,
@@ -50,57 +56,64 @@ export default function QuizResultScreen() {
     meta = {},
   } = route.params || {};
 
-  const pct =
-    total > 0 ? Math.round((Number(correct) / Number(total)) * 100) : 0;
+  const pct = total > 0 ? Math.round((Number(correct) / Number(total)) * 100) : 0;
 
   const minutes = Math.floor(timeTakenSec / 60);
   const seconds = timeTakenSec % 60;
 
-  // Pick a quote once on mount
+  // Localized quotes
+  const QUOTES = useQuotes(t);
   const [quote] = useState(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-  const getResultTitle = (pct) => {
-    if (pct >= 80) return "Outstanding! Preparedness Pro!";
-    if (pct >= 60) return "Great job—Ready Ranger!";
-    if (pct >= 40) return "Nice effort—Keep training!";
-    return "Good start—Let's level up!";
+
+  const getResultTitle = (p) => {
+    if (p >= 80) return t("games.result.titles.outstanding", "Outstanding! Preparedness Pro!");
+    if (p >= 60) return t("games.result.titles.great", "Great job—Ready Ranger!");
+    if (p >= 40) return t("games.result.titles.ok", "Nice effort—Keep training!");
+    return t("games.result.titles.start", "Good start—Let's level up!");
   };
+
   const onShare = async () => {
     try {
-      const msg = `🎉 I scored ${pct}% (+${score} XP) in "${title}" in ${
-        minutes > 0 ? `${minutes}m ` : ""
-      }${seconds}s. Think you can beat me?`;
+      const msg = t("games.result.share_message", {
+        defaultValue:
+          "🎉 I scored {{pct}}% (+{{score}} XP) in \"{{title}}\" in {{time}}. Think you can beat me?",
+        pct,
+        score,
+        title,
+        time:
+          (minutes > 0
+            ? t("games.result.time_min_sec", "{{m}}m {{s}}s", { m: minutes, s: seconds })
+            : t("games.result.time_sec", "{{s}}s", { s: seconds })),
+      });
       await Share.share({ message: msg });
-    } catch (e) {
-      // no-op
-    }
+    } catch {}
   };
 
   const handleBackToGames = () => {
-  // reset so the user can't back-navigate to results
-  navigation.reset({
-    index: 0,
-    routes: [
-      {
-        name: "Main",
-        state: {
-          routes: [
-            {
-              name: "Tabs",
-              state: {
-                routes: [{ name: "GamesTab" }],
-                index: 0,
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "Main",
+          state: {
+            routes: [
+              {
+                name: "Tabs",
+                state: {
+                  routes: [{ name: "GamesTab" }],
+                  index: 0,
+                },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-    ],
-  });
-};
+      ],
+    });
+  };
 
   const onReview = () => {
     navigation.navigate("ReviewAnswer", {
-      title: "Review Questions",
+      title: t("games.result.review_title", "Review Questions"),
       review,
       meta,
     });
@@ -121,12 +134,13 @@ export default function QuizResultScreen() {
           imageStyle={s.heroImage}
         >
           <View style={s.scoreWrap}>
-            {/* soft rings */}
             <View style={s.circleLarge} />
             <View style={s.circleMedium} />
             <View style={s.circleSmall} />
 
-            <Text style={[s.scoreLabel, { color: "#1976FF" }]}>Your Score</Text>
+            <Text style={[s.scoreLabel, { color: "#1976FF" }]}>
+              {t("games.result.your_score", "Your Score")}
+            </Text>
             <Text style={[s.scoreValue, { color: "#1976FF" }]}>{pct}%</Text>
           </View>
         </ImageBackground>
@@ -179,7 +193,7 @@ export default function QuizResultScreen() {
                   { color: theme.key === "dark" ? "#9CA3AF" : "#6B7280" },
                 ]}
               >
-                Time Taken
+                {t("games.result.time_taken", "Time Taken")}
               </Text>
             </View>
             <Text
@@ -188,8 +202,12 @@ export default function QuizResultScreen() {
                 { color: theme.key === "dark" ? "#E5E7EB" : "#111827" },
               ]}
             >
-              {minutes > 0 ? `${minutes} min ` : ""}
-              {seconds} sec
+              {minutes > 0
+                ? t("games.result.time_min_sec", "{{m}} min {{s}} sec", {
+                    m: minutes,
+                    s: seconds,
+                  })
+                : t("games.result.time_sec", "{{s}} sec", { s: seconds })}
             </Text>
           </View>
 
@@ -206,7 +224,7 @@ export default function QuizResultScreen() {
                   { color: theme.key === "dark" ? "#9CA3AF" : "#6B7280" },
                 ]}
               >
-                XP Gained
+                {t("games.result.xp_gained", "XP Gained")}
               </Text>
             </View>
             <Text
@@ -215,7 +233,7 @@ export default function QuizResultScreen() {
                 { color: theme.key === "dark" ? "#E5E7EB" : "#111827" },
               ]}
             >
-              +{score} XP
+              {t("games.result.xp_plus", "+{{xp}} XP", { xp: score })}
             </Text>
           </View>
         </View>
@@ -242,7 +260,7 @@ export default function QuizResultScreen() {
               style={{ marginRight: 6 }}
             />
             <Text style={[s.halfBtnText, { color: theme.colors.primary }]}>
-              Review Answer
+              {t("games.result.review_answer", "Review Answer")}
             </Text>
           </TouchableOpacity>
 
@@ -264,7 +282,7 @@ export default function QuizResultScreen() {
               style={{ marginRight: 6 }}
             />
             <Text style={[s.halfBtnText, { color: theme.colors.primary }]}>
-              Share Result
+              {t("games.result.share_result", "Share Result")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -274,7 +292,9 @@ export default function QuizResultScreen() {
           activeOpacity={0.95}
           onPress={handleBackToGames}
         >
-          <Text style={s.homeBtnText}>Back to Games</Text>
+          <Text style={s.homeBtnText}>
+            {t("games.result.back_to_games", "Back to Games")}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -283,12 +303,7 @@ export default function QuizResultScreen() {
 
 const makeStyles = (theme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: "center",
-    },
-
-    // Top hero
+    container: { flex: 1, alignItems: "center" },
     heroWrap: {
       width,
       height: height * 0.52,
@@ -297,30 +312,15 @@ const makeStyles = (theme) =>
       borderBottomRightRadius: 40,
       backgroundColor: "#1976FF",
     },
-    hero: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-    },
+    hero: { flex: 1, justifyContent: "center", alignItems: "center" },
     heroImage: {
       resizeMode: "cover",
       borderBottomLeftRadius: 40,
       borderBottomRightRadius: 40,
     },
-
-    // Score ring
-    scoreWrap: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    scoreLabel: {
-      fontSize: 17,
-      fontWeight: "700",
-    },
-    scoreValue: {
-      fontSize: 46,
-      fontWeight: "700",
-    },
+    scoreWrap: { alignItems: "center", justifyContent: "center" },
+    scoreLabel: { fontSize: 17, fontWeight: "700" },
+    scoreValue: { fontSize: 46, fontWeight: "700" },
     circleLarge: {
       position: "absolute",
       width: width * 0.63,
@@ -342,8 +342,6 @@ const makeStyles = (theme) =>
       backgroundColor: "rgba(255,255,255,0.95)",
       borderRadius: 999,
     },
-
-    // Card
     card: {
       width: "86%",
       borderRadius: 20,
@@ -366,8 +364,6 @@ const makeStyles = (theme) =>
       fontSize: 15,
       fontWeight: "600",
     },
-
-    // Stats
     statsRow: {
       flexDirection: "row",
       justifyContent: "space-around",
@@ -378,8 +374,6 @@ const makeStyles = (theme) =>
     iconLabelRow: { flexDirection: "row", alignItems: "center", gap: 4 },
     statLabel: { fontSize: 13, fontWeight: "600" },
     statValue: { marginTop: 2, fontWeight: "800", fontSize: 14 },
-
-    // Actions
     actionsWrap: {
       width: "90%",
       marginTop: "auto",
@@ -402,11 +396,6 @@ const makeStyles = (theme) =>
       justifyContent: "center",
     },
     halfBtnText: { fontWeight: "700" },
-    homeBtn: {
-      width: "100%",
-      borderRadius: 14,
-      paddingVertical: 14,
-      alignItems: "center",
-    },
+    homeBtn: { width: "100%", borderRadius: 14, paddingVertical: 14, alignItems: "center" },
     homeBtnText: { color: "#fff", fontWeight: "900", fontSize: 16 },
   });

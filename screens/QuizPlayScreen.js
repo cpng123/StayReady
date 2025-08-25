@@ -11,10 +11,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useThemeContext } from "../theme/ThemeProvider";
 import TopBar from "../components/TopBar";
 import ConfirmModal from "../components/ConfirmModal";
-import QUIZ from "../data/quiz.json";
 import { normalizeQuestions } from "../utils/quizLogic";
 import { markDailyCompleted } from "../utils/dailyChallenge";
 import { addQuizAttempt } from "../utils/progressStats";
+import { useTranslation } from "react-i18next";
 
 import {
   useQuizEngine,
@@ -36,6 +36,20 @@ export default function QuizPlayScreen({ navigation, route }) {
   const { theme } = useThemeContext();
   const insets = useSafeAreaInsets();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t, i18n } = useTranslation();
+
+  const QUIZ_L10N = useMemo(() => {
+    const ns = "quiz";
+    const lng = i18n.language;
+    const fallbackLng = Array.isArray(i18n.options?.fallbackLng)
+      ? i18n.options.fallbackLng[0]
+      : i18n.options?.fallbackLng || "en";
+    return (
+      i18n.getResourceBundle(lng, ns) ||
+      i18n.getResourceBundle(fallbackLng, ns) ||
+      {}
+    );
+  }, [i18n.language]);
 
   const mode = route?.params?.mode; // "daily" | undefined
   const meta = route?.params?.meta || null;
@@ -44,13 +58,16 @@ export default function QuizPlayScreen({ navigation, route }) {
   const categoryId = route?.params?.categoryId;
   const setId = route?.params?.setId;
   const setTitle =
-    route?.params?.title ?? (mode === "daily" ? "Daily Challenge" : "Quiz");
+    route?.params?.title ??
+    (mode === "daily"
+      ? t("games.daily.title", "Daily Challenge")
+      : t("games.generic.quiz", "Quiz"));
 
   const questions = useMemo(() => {
     if (Array.isArray(customQuestions) && customQuestions.length)
       return customQuestions;
-    return normalizeQuestions(QUIZ, categoryId, setId);
-  }, [customQuestions, categoryId, setId]);
+    return normalizeQuestions(QUIZ_L10N, categoryId, setId, t);
+  }, [customQuestions, categoryId, setId, QUIZ_L10N]);
 
   const sfx = useSound();
   const haptics = useHaptics();
@@ -67,8 +84,8 @@ export default function QuizPlayScreen({ navigation, route }) {
       setTitle,
       categoryId: categoryId ?? "cat",
       categoryLabel:
-        (QUIZ?.categories || []).find((c) => c.id === categoryId)?.title ||
-        "Quiz",
+        (QUIZ_L10N?.categories || []).find((c) => c.id === categoryId)?.title ||
+        t("games.generic.quiz", "Quiz"),
     };
 
     if (mode === "daily") {
@@ -154,7 +171,7 @@ export default function QuizPlayScreen({ navigation, route }) {
           style={[s.hintBtn, { backgroundColor: theme.colors.primary }]}
           onPress={() => setHintOpen(true)}
         >
-          <Text style={s.hintText}>Hint</Text>
+          <Text style={s.hintText}>{t("common.hint", "Hint")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -185,10 +202,13 @@ export default function QuizPlayScreen({ navigation, route }) {
       {/* Leave confirm */}
       <ConfirmModal
         visible={back.visible}
-        title="Leave quiz?"
-        message="Your progress won’t be saved. Are you sure you want to exit?"
-        confirmLabel="Leave"
-        cancelLabel="Stay"
+        title={t("games.leave.title", "Leave quiz?")}
+        message={t(
+          "games.leave.message",
+          "Your progress won’t be saved. Are you sure you want to exit?"
+        )}
+        confirmLabel={t("games.leave.confirm", "Leave")}
+        cancelLabel={t("games.leave.cancel", "Stay")}
         onConfirm={back.confirmExit}
         onCancel={back.close}
       />

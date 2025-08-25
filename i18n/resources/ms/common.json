@@ -6,7 +6,9 @@
     "proceed": "Teruskan",
     "error": "Ralat",
     "close": "Tutup",
-    "see_more": "Lihat Lagi"
+    "see_more": "Lihat Lagi",
+    "hint": "Petunjuk",
+    "done": "selesai"
   },
 
   "home": {
@@ -164,22 +166,93 @@
   "games": {
     "title": "Kuiz Keselamatan",
     "subtitle": "Uji kemahiran kesiapsiagaan anda.",
+
     "stats": {
       "taken": "Kuiz Diambil",
       "accuracy": "Ketepatan Terkini",
-      "streak": "Rentetan Hari"
+      "streak": "Hari Berturut"
     },
+
     "daily": {
       "title": "Cabaran Harian",
-      "review_title": "Cabaran Harian — Ulas",
+      "review_title": "Cabaran Harian — Semakan",
       "category_label": "Harian",
       "loading": "Memuatkan...",
       "review_answer": "Semak Jawapan",
       "start": "Mula Cabaran",
       "questions_count": "{{count}} Soalan"
     },
-    "quick_tips": "Tip Pantas",
-    "categories_quiz": "Kuiz Mengikut Kategori"
+
+    "quick_tips": "Petua Pantas",
+    "categories_quiz": "Kuiz Mengikut Kategori",
+
+    "toast": {
+      "correct": "Betul!",
+      "incorrect": "Salah!",
+      "timesup": "Masa sudah tamat!"
+    },
+    "encourage": {
+      "1": "Oof! Itu rumit.",
+      "2": "XP terlepas... tetapi pengetahuan diperoleh!",
+      "3": "Anda akan mendapat yang seterusnya!"
+    },
+    "generic": {
+      "quiz": "Kuiz",
+      "question": "Soalan {{index}}"
+    },
+
+    "leave": {
+      "title": "Tinggalkan kuiz?",
+      "message": "Kemajuan anda tidak akan disimpan. Adakah anda pasti mahu keluar?",
+      "confirm": "Tinggalkan",
+      "cancel": "Kekal"
+    },
+
+    "play": {
+      "time": "Masa",
+      "times_up": "Masa tamat!",
+      "no_hint": "Tiada petunjuk untuk soalan ini."
+    },
+
+    "settings": {
+      "title": "Tetapan Kuiz",
+      "sound": "Kesan bunyi",
+      "haptics": "Getaran"
+    },
+    "result": {
+      "default_title": "Cabaran Kuiz",
+      "your_score": "Skor Anda",
+      "titles": {
+        "outstanding": "Hebat! Pakar Kesiapsiagaan!",
+        "great": "Bagus—Wira Bersedia!",
+        "ok": "Usaha yang baik—Terus berlatih!",
+        "start": "Permulaan yang baik—Jom tingkatkan lagi!"
+      },
+      "time_taken": "Masa Diambil",
+      "xp_gained": "XP Diperoleh",
+      "xp_plus": "+{{xp}} XP",
+      "review_answer": "Semak Jawapan",
+      "share_result": "Kongsi Keputusan",
+      "back_to_games": "Kembali ke Permainan",
+      "review_title": "Semak Soalan",
+      "time_min_sec": "{{m}} min {{s}} saat",
+      "time_sec": "{{s}} saat",
+      "share_message": "🎉 Saya mendapat {{pct}}% (+{{score}} XP) dalam \"{{title}}\" dalam {{time}}. Berani cabar saya?",
+      "quotes": {
+        "1": "Pembelajaran ialah perjalanan, dan anda baru naik tahap.",
+        "2": "Bersedia hari ini, yakin esok.",
+        "3": "Langkah kecil membina kesiapsiagaan yang kukuh.",
+        "4": "Ilmu sekarang, keselamatan kemudian.",
+        "5": "Kesiapsiagaan ialah satu tabiat, bukan saat.",
+        "6": "Latihan menjadikan anda bersedia.",
+        "7": "Tenang, bersedia, selamat.",
+        "8": "Setiap soalan dijawab menambah satu lapisan keselamatan.",
+        "9": "Kesiapsiagaan ialah pelan B terbaik.",
+        "10": "Diri anda pada masa depan berterima kasih atas latihan hari ini.",
+        "11": "Dalam kecemasan, ilmu ialah kuasa.",
+        "12": "Sedikit pembelajaran hari ini boleh menyelamatkan banyak esok."
+      }
+    }
   },
   "preparedness_screen": {
     "preparedness_word": "Kesiapsiagaan",

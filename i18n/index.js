@@ -28,11 +28,16 @@ import zhPreparedness from "./resources/zh/preparedness.json";
 import msPreparedness from "./resources/ms/preparedness.json";
 import taPreparedness from "./resources/ta/preparedness.json";
 
+import quizEn from "./resources/en/quiz.json";
+import quizMs from "./resources/ms/quiz.json";
+import quizTa from "./resources/ta/quiz.json";
+import quizZh from "./resources/zh/quiz.json";
+
 const resources = {
-  en: { common: enCommon, checklist: enChecklist, preparedness: enPreparedness },
-  zh: { common: zhCommon, checklist: zhChecklist, preparedness: zhPreparedness },
-  ms: { common: msCommon, checklist: msChecklist, preparedness: msPreparedness },
-  ta: { common: taCommon, checklist: taChecklist, preparedness: taPreparedness },
+  en: { common: enCommon, checklist: enChecklist, preparedness: enPreparedness, quiz: quizEn },
+  zh: { common: zhCommon, checklist: zhChecklist, preparedness: zhPreparedness, quiz: quizZh },
+  ms: { common: msCommon, checklist: msChecklist, preparedness: msPreparedness, quiz: quizMs },
+  ta: { common: taCommon, checklist: taChecklist, preparedness: taPreparedness, quiz: quizTa },
 };
 
 // Use ONE canonical key; still read legacy keys for older builds

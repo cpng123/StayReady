@@ -20,12 +20,13 @@ import { useThemeContext } from "../theme/ThemeProvider";
 import {
   QUESTION_SECONDS,
   REVEAL_DELAY_MS,
-  TOAST_THEME,
   computeXp,
   pickEncouragement,
   deriveRevealFlags,
+  getToastTheme,
 } from "../utils/quizLogic";
 import ThemeToggle from "../components/ThemeToggle";
+import { useTranslation } from "react-i18next";
 
 /* --------------------------- SOUND (SFX + BGM) --------------------------- */
 
@@ -220,6 +221,8 @@ export function useBackConfirm(navigation) {
 /* ------------------------------- QUIZ ENGINE ------------------------------- */
 
 export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
+  const { t } = useTranslation();
+
   const total = Array.isArray(questions) ? questions.length : 0;
   const [idx, setIdx] = useState(0);
   const current = questions[idx] || {};
@@ -359,7 +362,10 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       stopAllTimers();
       sfx?.play?.("timesup");
       haptics?.notify?.("warning");
-      showToast({ type: "timesup", text: "Time's up!" });
+      showToast({
+        type: "timesup",
+        text: t("games.play.times_up", "Time's up!"),
+      });
       revealTimeoutRef.current = setTimeout(goNext, REVEAL_DELAY_MS);
     }
   }, [time, locked]);
@@ -393,7 +399,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     } else {
       sfx?.play?.("incorrect");
       haptics?.notify?.("error");
-      showToast({ type: "incorrect", text: pickEncouragement() });
+      showToast({ type: "incorrect", text: pickEncouragement(t) });
     }
 
     clearTimeout(revealTimeoutRef.current);
@@ -499,9 +505,13 @@ export function QuestionCard({ text }) {
 export function TimerBar({ barW, onLayout, time }) {
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
+
   return (
     <View style={s.timeRow}>
-      <Text style={[s.timeLabel, { color: theme.colors.subtext }]}>Time</Text>
+      <Text style={[s.timeLabel, { color: theme.colors.subtext }]}>
+        {t("games.play.time", "Time")}
+      </Text>
       <View
         style={[
           s.timeTrack,
@@ -567,11 +577,14 @@ export function OptionItem({ text, flags, disabled, onPress }) {
 
 export function ToastOverlay({ toast, y, opacity }) {
   const { theme } = useThemeContext();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const s = useMemo(() => makeStyles(theme), [theme]);
 
   if (!toast) return null;
-  const t = TOAST_THEME[toast.type] || TOAST_THEME.correct;
+
+  const themeObj = getToastTheme(t);
+  const tt = themeObj[toast.type] || themeObj.correct;
 
   return (
     <Animated.View
@@ -585,10 +598,10 @@ export function ToastOverlay({ toast, y, opacity }) {
         },
       ]}
     >
-      <View style={[s.toastCard, { backgroundColor: t.bg }]}>
-        <Text style={s.toastTitle}>{t.title}</Text>
+      <View style={[s.toastCard, { backgroundColor: tt.bg }]}>
+        <Text style={s.toastTitle}>{tt.title}</Text>
         <View style={s.toastPill}>
-          <Text style={[s.toastPillText, { color: t.pillText }]}>
+          <Text style={[s.toastPillText, { color: tt.pillText }]}>
             {toast.text}
           </Text>
         </View>
@@ -600,6 +613,7 @@ export function ToastOverlay({ toast, y, opacity }) {
 export function HintModal({ open, onClose, hint }) {
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -613,16 +627,19 @@ export function HintModal({ open, onClose, hint }) {
       </View>
       <View style={s.modalCenter} pointerEvents="box-none">
         <View style={[s.modalCard, { backgroundColor: theme.colors.card }]}>
-          <Text style={[s.modalTitle, { color: theme.colors.text }]}>Hint</Text>
+          <Text style={[s.modalTitle, { color: theme.colors.text }]}>
+            {t("common.hint", "Hint")}
+          </Text>
           <Text style={[s.modalBody, { color: theme.colors.subtext }]}>
-            {hint?.trim() || "No hint available for this question."}
+            {hint?.trim() ||
+              t("games.play.no_hint", "No hint available for this question.")}
           </Text>
           <TouchableOpacity
             onPress={onClose}
             style={[s.modalBtn, { backgroundColor: theme.colors.primary }]}
             activeOpacity={0.9}
           >
-            <Text style={s.modalBtnText}>Close</Text>
+            <Text style={s.modalBtnText}>{t("common.close", "Close")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -640,6 +657,7 @@ export function SettingsModal({
 }) {
   const { theme, themeKey, setThemeKey } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation();
 
   const setTheme = async (key) => {
     setThemeKey(key);
@@ -666,7 +684,7 @@ export function SettingsModal({
           ]}
         >
           <Text style={[s.modalTitle, { color: theme.colors.text }]}>
-            Quiz Settings
+            {t("games.settings.title", "Quiz Settings")}
           </Text>
 
           {/* Sound */}
@@ -677,7 +695,7 @@ export function SettingsModal({
                 { color: theme.colors.text, marginBottom: 0 },
               ]}
             >
-              Sound effects
+              {t("games.settings.sound", "Sound effects")}
             </Text>
             <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
           </View>
@@ -690,7 +708,7 @@ export function SettingsModal({
                 { color: theme.colors.text, marginBottom: 0 },
               ]}
             >
-              Haptics
+              {t("games.settings.haptics", "Haptics")}
             </Text>
             <Switch value={hapticEnabled} onValueChange={setHapticEnabled} />
           </View>
@@ -706,7 +724,7 @@ export function SettingsModal({
             ]}
             activeOpacity={0.9}
           >
-            <Text style={s.modalBtnText}>Done</Text>
+            <Text style={s.modalBtnText}>{t("common.done", "Done")}</Text>
           </TouchableOpacity>
         </View>
       </View>

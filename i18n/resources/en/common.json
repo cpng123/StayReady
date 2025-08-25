@@ -6,7 +6,9 @@
     "proceed": "Proceed",
     "error": "Error",
     "close": "Close",
-    "see_more": "See More"
+    "see_more": "See More",
+    "hint": "Hint",
+    "done": "Done"
   },
 
   "home": {
@@ -160,11 +162,13 @@
   "games": {
     "title": "Safety Quiz",
     "subtitle": "Quiz your preparedness skills.",
+
     "stats": {
       "taken": "Quiz Taken",
       "accuracy": "Recent Accuracy",
       "streak": "Day Streak"
     },
+
     "daily": {
       "title": "Daily Challenge",
       "review_title": "Daily Challenge — Review",
@@ -174,8 +178,77 @@
       "start": "Start Challenge",
       "questions_count": "{{count}} Questions"
     },
+
     "quick_tips": "Quick Tips",
-    "categories_quiz": "Categories Quiz"
+    "categories_quiz": "Categories Quiz",
+
+    "toast": {
+      "correct": "Correct!",
+      "incorrect": "Incorrect!",
+      "timesup": "Time's up!"
+    },
+    "encourage": {
+      "1": "Oof! That was tricky.",
+      "2": "XP missed... but knowledge gained!",
+      "3": "You'll get the next one!"
+    },
+    "generic": {
+      "quiz": "Quiz",
+      "question": "Question {{index}}"
+    },
+
+    "leave": {
+      "title": "Leave quiz?",
+      "message": "Your progress won’t be saved. Are you sure you want to exit?",
+      "confirm": "Leave",
+      "cancel": "Stay"
+    },
+
+    "play": {
+      "time": "Time",
+      "times_up": "Time's up!",
+      "no_hint": "No hint available for this question."
+    },
+
+    "settings": {
+      "title": "Quiz Settings",
+      "sound": "Sound effects",
+      "haptics": "Haptics"
+    },
+    "result": {
+      "default_title": "Quiz Challenge",
+      "your_score": "Your Score",
+      "titles": {
+        "outstanding": "Outstanding! Preparedness Pro!",
+        "great": "Great job—Ready Ranger!",
+        "ok": "Nice effort—Keep training!",
+        "start": "Good start—Let's level up!"
+      },
+      "time_taken": "Time Taken",
+      "xp_gained": "XP Gained",
+      "xp_plus": "+{{xp}} XP",
+      "review_answer": "Review Answer",
+      "share_result": "Share Result",
+      "back_to_games": "Back to Games",
+      "review_title": "Review Questions",
+      "time_min_sec": "{{m}} min {{s}} sec",
+      "time_sec": "{{s}} sec",
+      "share_message": "🎉 I scored {{pct}}% (+{{score}} XP) in \"{{title}}\" in {{time}}. Think you can beat me?",
+      "quotes": {
+        "1": "Learning is a journey, and you just leveled up.",
+        "2": "Prepared today, confident tomorrow.",
+        "3": "Small steps build strong readiness.",
+        "4": "Knowledge now is safety later.",
+        "5": "Readiness is a habit, not a moment.",
+        "6": "Practice makes prepared.",
+        "7": "Stay calm, stay ready, stay safe.",
+        "8": "Every question answered adds another layer of safety.",
+        "9": "Preparedness is the best plan B.",
+        "10": "Your future self thanks you for training today.",
+        "11": "In an emergency, knowledge is power.",
+        "12": "A little learning today can save a lot tomorrow."
+      }
+    }
   },
   "preparedness_screen": {
     "preparedness_word": "Preparedness",

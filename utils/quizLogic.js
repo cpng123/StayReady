@@ -4,21 +4,36 @@
 export const QUESTION_SECONDS = 20;
 export const REVEAL_DELAY_MS = 2800;
 
-export const TOAST_THEME = {
-  correct: { bg: "#16A34A", pillText: "#16A34A", title: "Correct!" }, // green
-  incorrect: { bg: "#DC2626", pillText: "#DC2626", title: "Incorrect!" }, // red
-  timesup: { bg: "#2563EB", pillText: "#2563EB", title: "Time’s up!" }, // blue
-};
+/** Build localized toast theme */
+export const getToastTheme = (t) => ({
+  correct: {
+    bg: "#16A34A",
+    pillText: "#16A34A",
+    title: t("games.toast.correct", "Correct!"),
+  },
+  incorrect: {
+    bg: "#DC2626",
+    pillText: "#DC2626",
+    title: t("games.toast.incorrect", "Incorrect!"),
+  },
+  timesup: {
+    bg: "#2563EB",
+    pillText: "#2563EB",
+    title: t("games.toast.timesup", "Time's up!"),
+  },
+});
 
-// Lightweight encouragement pool for wrong answers
-const ENCOURAGE = [
-  "Oof! That was tricky.",
-  "XP missed... but knowledge gained!",
-  "You'll get the next one!",
+/** Localized encouragement messages */
+export const getEncouragement = (t) => [
+  t("games.encourage.1", "Oof! That was tricky."),
+  t("games.encourage.2", "XP missed... but knowledge gained!"),
+  t("games.encourage.3", "You'll get the next one!"),
 ];
 
-export const pickEncouragement = () =>
-  ENCOURAGE[Math.floor(Math.random() * ENCOURAGE.length)];
+export const pickEncouragement = (t) => {
+  const msgs = getEncouragement(t);
+  return msgs[Math.floor(Math.random() * msgs.length)];
+};
 
 // Map A/B/C/D → 0/1/2/3
 export const letterToIndex = (k) =>
@@ -37,15 +52,18 @@ export function shuffleWithAnswer(options, answerIndex) {
   };
 }
 
-// Normalize a variety of quiz shapes into a single array:
-// [{ id, text, options[], answerIndex, hint }]
-export function normalizeQuestions(quizData, categoryId, setId) {
+// Normalize quiz structure into a single standard shape
+export function normalizeQuestions(quizData, categoryId, setId, t) {
   const categories = quizData?.categories || [];
-  const cat = categories.find((c) => c.id === categoryId) ||
-    categories[0] || { title: "Quiz", sets: [] };
+  const cat =
+    categories.find((c) => c.id === categoryId) ||
+    categories[0] ||
+    { title: t("games.generic.quiz", "Quiz"), sets: [] };
 
-  const set = (cat.sets || []).find((x) => x.id === setId) ||
-    (cat.sets || [])[0] || { questions: [] };
+  const set =
+    (cat.sets || []).find((x) => x.id === setId) ||
+    (cat.sets || [])[0] ||
+    { questions: [] };
 
   const getFirst = (...vals) =>
     vals.find((v) => typeof v === "string" && v.trim().length) || "";
@@ -54,7 +72,6 @@ export function normalizeQuestions(quizData, categoryId, setId) {
     const options =
       q.options?.map((o) => (typeof o === "string" ? o : o?.text ?? "")) ?? [];
 
-    // Resolve the correct answer index from various shapes
     let rawIndex =
       typeof q.correctIndex === "number"
         ? q.correctIndex
@@ -84,7 +101,10 @@ export function normalizeQuestions(quizData, categoryId, setId) {
       id: q.id ?? `q-${idx}`,
       text:
         getFirst(q.text, q.question, q.prompt, q.title, q.q) ||
-        `Question ${idx + 1}`,
+        t("games.generic.question", {
+          index: idx + 1,
+          defaultValue: `Question ${idx + 1}`,
+        }),
       options: shuffled.options,
       answerIndex: shuffled.answerIndex,
       hint: getFirst(q.hint, q.explanation, q.why, q.note),
@@ -97,7 +117,7 @@ export function computeXp(timeLeft, total = QUESTION_SECONDS) {
   return Math.max(1, Math.round((timeLeft / total) * 20));
 }
 
-// Given option index & state, return reveal flags the UI can style around
+// Given option index & state, return reveal flags
 export function deriveRevealFlags(i, answerIndex, selected, locked, timesUp) {
   if (selected === null && !locked && timesUp) {
     return { showGreen: false, showRed: false, showBlue: false };
