@@ -198,7 +198,7 @@ export default function MapScreen({ route, navigation }) {
     mapRef.current?.setOverlay(kind);
   };
 
-  // -------- Banner helpers (current date, 10 min ago, fixed location) ----------
+  // -------- Banner helpers ----------
   const isFlood = hazard.kind === "flood";
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
@@ -206,7 +206,7 @@ export default function MapScreen({ route, navigation }) {
     day: "numeric",
     month: "long",
     year: "numeric",
-  }); // e.g., "Mon, 7 July 2025"
+  });
   const timeAgoStr = "10 min ago";
   const locLabel = isFlood ? hazard.locationName || "Clementi Park" : null;
 
@@ -250,14 +250,18 @@ export default function MapScreen({ route, navigation }) {
         key={item.key}
         style={[
           styles.metricItem,
-          isActive && { borderWidth: 2, borderColor: "#2563EB" },
+          isActive && { borderWidth: 2, borderColor: theme.colors.primary },
         ]}
         activeOpacity={0.8}
         onPress={() => selectOverlay(item.key)}
         accessibilityRole="button"
         accessibilityLabel={item.label}
       >
-        <MaterialCommunityIcons name={item.icon} size={22} color="#2563EB" />
+        <MaterialCommunityIcons
+          name={item.icon}
+          size={22}
+          color={theme.colors.primary}
+        />
         <Text style={styles.metricText}>{item.label}</Text>
       </TouchableOpacity>
     );
@@ -283,6 +287,7 @@ export default function MapScreen({ route, navigation }) {
         overlay={overlay}
         showLegend
         legendBottom={172}
+        dark={theme.key === "dark"} // ← basemap & legend switch
       />
 
       {/* top-left back */}
@@ -292,7 +297,7 @@ export default function MapScreen({ route, navigation }) {
         accessibilityRole="button"
         accessibilityLabel={t("common.back", "Back")}
       >
-        <Ionicons name="chevron-back" size={24} color="#111827" />
+        <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
       </TouchableOpacity>
 
       {/* recenter (bottom-right, above warning) */}
@@ -303,7 +308,7 @@ export default function MapScreen({ route, navigation }) {
         accessibilityRole="button"
         accessibilityLabel={t("home.map.recenter", "Recenter to my location")}
       >
-        <Ionicons name="locate" size={22} color="#111827" />
+        <Ionicons name="locate" size={22} color={theme.colors.text} />
       </TouchableOpacity>
 
       {/* warning banner (bottom) */}
@@ -384,6 +389,7 @@ export default function MapScreen({ route, navigation }) {
 const makeStyles = (theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.appBg },
+
     backBtn: {
       position: "absolute",
       top: 14,
@@ -391,15 +397,16 @@ const makeStyles = (theme) =>
       width: 40,
       height: 40,
       borderRadius: 12,
-      backgroundColor: "#fff",
+      backgroundColor: theme.colors.card,
       alignItems: "center",
       justifyContent: "center",
       shadowColor: "#000",
-      shadowOpacity: 0.15,
+      shadowOpacity: theme.key === "dark" ? 0.3 : 0.15,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 6,
       elevation: 3,
     },
+
     recenterBtn: {
       position: "absolute",
       right: 12,
@@ -407,34 +414,36 @@ const makeStyles = (theme) =>
       width: 44,
       height: 44,
       borderRadius: 12,
-      backgroundColor: "#fff",
+      backgroundColor: theme.colors.card,
       alignItems: "center",
       justifyContent: "center",
       shadowColor: "#000",
-      shadowOpacity: 0.16,
+      shadowOpacity: theme.key === "dark" ? 0.35 : 0.16,
       shadowOffset: { width: 0, height: 3 },
       shadowRadius: 6,
       elevation: 3,
     },
+
     warningCard: {
       position: "absolute",
       left: 12,
       right: 12,
       bottom: 96,
-      backgroundColor: theme.colors.success, // green when no hazard
+      backgroundColor: theme.colors.success,
       borderRadius: 14,
       paddingHorizontal: 12,
       paddingVertical: 10,
       flexDirection: "row",
       alignItems: "center",
       shadowColor: "#000",
-      shadowOpacity: 0.2,
+      shadowOpacity: theme.key === "dark" ? 0.35 : 0.2,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 8,
       elevation: 4,
     },
     warnTitle: { color: "#fff", fontWeight: "800", fontSize: 14 },
     warnMeta: { color: "#fff", fontSize: 12, marginLeft: 6 },
+
     metricBar: {
       position: "absolute",
       left: 0,
@@ -447,7 +456,7 @@ const makeStyles = (theme) =>
       justifyContent: "space-between",
     },
     metricItem: {
-      backgroundColor: "#fff",
+      backgroundColor: theme.colors.card,
       marginHorizontal: 4,
       borderRadius: 12,
       alignItems: "center",
@@ -455,7 +464,7 @@ const makeStyles = (theme) =>
       paddingVertical: 10,
       minWidth: 110,
       shadowColor: "#000",
-      shadowOpacity: 0.08,
+      shadowOpacity: theme.key === "dark" ? 0.25 : 0.08,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 6,
       elevation: 2,
@@ -463,7 +472,7 @@ const makeStyles = (theme) =>
     metricText: {
       fontSize: 12,
       marginTop: 4,
-      color: "#111827",
+      color: theme.colors.text,
       fontWeight: "600",
       textAlign: "center",
     },

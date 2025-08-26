@@ -1,6 +1,6 @@
 // hooks/useNotifyOnHazard.js
 import { useEffect, useRef } from "react";
-import { maybeNotifyFlood } from "../utils/notify";
+import { maybeNotifyFlood } from "./notify";
 
 export default function useNotifyOnHazard(hazard) {
   const prevKindRef = useRef(hazard?.kind);

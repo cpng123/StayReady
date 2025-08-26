@@ -25,9 +25,9 @@ import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
 import { getRainfallLatest, getRelativeHumidityLatest } from "../utils/api";
-import { decideHazard } from "../utils/hazard"
+import { decideHazard } from "../utils/hazard";
 import { getMockFloodEnabled } from "../utils/mockFlags";
-import useNotifyOnHazard from "../hooks/useNotifyOnHazard";
+import useNotifyOnHazard from "../utils/useNotifyOnHazard";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 const HOME_WARNINGS = getHomeWarnings(4);
@@ -39,7 +39,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
-  
+
   const [hazard, setHazard] = useState({
     kind: "none",
     title: t("home.hazard.none", "No Hazard Detected"),
@@ -336,6 +336,7 @@ export default function HomeScreen() {
             interactive={false}
             showMarker
             showLegend={false}
+            dark={theme.key === "dark"}
           />
 
           {/* Hazard banner */}

@@ -16,7 +16,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-// ⚠️ For testing only. Do NOT ship secrets in a client app.
 const OPENROUTER_API_KEY =
   "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";
 
@@ -60,7 +59,7 @@ export default function ChatbotScreen() {
           "X-Title": "StayReady App",
         },
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b:free", // or 'deepseek/deepseek-chat-v3-0324:free'
+          model: "openai/gpt-oss-20b:free",
           messages: [...messages, userMessage],
           temperature: 0.5,
           top_p: 0.95,
