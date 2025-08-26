@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import LeafletMapWebView from "../components/LeafletMapWebView";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
@@ -18,8 +19,10 @@ import {
   getAirTemperatureLatest,
   getRelativeHumidityLatest,
   getPM25Latest,
-  getDengueClustersGeoJSON, // 👈 NEW
+  getDengueClustersGeoJSON,
 } from "../utils/api";
+import { decideHazard } from "../utils/hazard";
+import { getMockFloodEnabled } from "../utils/mockFlags";
 
 export default function MapScreen({ route, navigation }) {
   const mapRef = useRef(null);
@@ -31,16 +34,21 @@ export default function MapScreen({ route, navigation }) {
   const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
   const [recenterLoading, setRecenterLoading] = useState(false);
 
+  const [hazard, setHazard] = useState({
+    kind: "none",
+    title: t("home.hazard.none", "No Hazard Detected"),
+  });
+
   // datasets
   const [rainPoints, setRainPoints] = useState([]);
   const [windPoints, setWindPoints] = useState([]);
   const [tempPoints, setTempPoints] = useState([]);
   const [humPoints, setHumPoints] = useState([]);
   const [pmPoints, setPmPoints] = useState([]);
-  const [dengueGeoJSON, setDengueGeoJSON] = useState(null); // 👈 NEW
+  const [dengueGeoJSON, setDengueGeoJSON] = useState(null);
 
   // active overlay
-  const [overlay, setOverlay] = useState("rain"); // 'rain' | 'wind' | 'temp' | 'hum' | 'pm' | 'dengue'
+  const [overlay, setOverlay] = useState("rain");
 
   // get user location once
   useEffect(() => {
@@ -75,7 +83,7 @@ export default function MapScreen({ route, navigation }) {
           getAirTemperatureLatest(),
           getRelativeHumidityLatest(),
           getPM25Latest(),
-          getDengueClustersGeoJSON().catch(() => null), // dengue may be null if fetch fails
+          getDengueClustersGeoJSON().catch(() => null),
         ]);
         if (!alive) return;
 
@@ -102,6 +110,78 @@ export default function MapScreen({ route, navigation }) {
     };
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const mockFlood = await getMockFloodEnabled();
+        const result = decideHazard({
+          center,
+          rainfallPoints: rainPoints,
+          humPoints: humPoints,
+          mockFlood,
+        });
+        if (alive) setHazard(result);
+      } catch {
+        if (alive)
+          setHazard({
+            kind: "none",
+            title: t("home.hazard.none", "No Hazard Detected"),
+          });
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [center, rainPoints, humPoints, t]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let alive = true;
+      (async () => {
+        const [rain, hum, mockFlood] = await Promise.all([
+          getRainfallLatest().catch(() => ({ points: [] })),
+          getRelativeHumidityLatest().catch(() => ({ points: [] })),
+          getMockFloodEnabled(),
+        ]);
+        if (!alive) return;
+        const result = decideHazard({
+          center,
+          rainfallPoints: rain.points || [],
+          humPoints: humPoints.length ? humPoints : hum.points || [],
+          mockFlood,
+        });
+        setHazard(result);
+      })();
+      return () => {
+        alive = false;
+      };
+    }, [center])
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let alive = true;
+      (async () => {
+        try {
+          const res = await resolveLocationLabel(); // respects mock flag
+          if (!alive) return;
+          const lat = res.coords.latitude;
+          const lon = res.coords.longitude;
+          setCenter({ lat, lon });
+
+          // move the Leaflet camera without reloading the WebView
+          mapRef.current?.recenter(lat, lon, 13);
+        } catch {
+          // ignore; keep previous center
+        }
+      })();
+      return () => {
+        alive = false;
+      };
+    }, [])
+  );
+
   const recenterToMe = async () => {
     try {
       setRecenterLoading(true);
@@ -117,6 +197,18 @@ export default function MapScreen({ route, navigation }) {
     setOverlay(kind);
     mapRef.current?.setOverlay(kind);
   };
+
+  // -------- Banner helpers (current date, 10 min ago, fixed location) ----------
+  const isFlood = hazard.kind === "flood";
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-SG", {
+    weekday: "short",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }); // e.g., "Mon, 7 July 2025"
+  const timeAgoStr = "10 min ago";
+  const locLabel = isFlood ? hazard.locationName || "Clementi Park" : null;
 
   // Bottom nav items (FlatList) incl. Dengue
   const navItems = useMemo(
@@ -146,7 +238,7 @@ export default function MapScreen({ route, navigation }) {
         key: "dengue",
         icon: "mosquito",
         label: t("home.metric.dengue", "Dengue"),
-      }, // 👈 NEW
+      },
     ],
     [t]
   );
@@ -187,10 +279,10 @@ export default function MapScreen({ route, navigation }) {
         tempPoints={tempPoints}
         humPoints={humPoints}
         pmPoints={pmPoints}
-        dengueGeoJSON={dengueGeoJSON} // 👈 NEW
+        dengueGeoJSON={dengueGeoJSON}
         overlay={overlay}
         showLegend
-        legendBottom={172} // keep legend above the warning card (bottom: 96)
+        legendBottom={172}
       />
 
       {/* top-left back */}
@@ -215,21 +307,62 @@ export default function MapScreen({ route, navigation }) {
       </TouchableOpacity>
 
       {/* warning banner (bottom) */}
-      <View style={styles.warningCard}>
+      <View
+        style={[
+          styles.warningCard,
+          isFlood && {
+            backgroundColor: hazard.severity === "high" ? "#DC2626" : "#F59E0B",
+          },
+        ]}
+      >
         <Ionicons
-          name="warning"
+          name={isFlood ? "warning" : "shield-checkmark"}
           size={22}
           color="#fff"
           style={{ marginRight: 10 }}
         />
         <View style={{ flex: 1 }}>
           <Text style={styles.warnTitle}>
-            {t("home.warning.flash", "Flash Flood Warning")}
+            {isFlood
+              ? hazard.title || t("home.warning.flash", "Flash Flood Warning")
+              : t("home.hazard.none", "No Hazard Detected")}
           </Text>
-          <Text style={styles.warnSub}>
-            {t("home.warning.meta", "Mon, 7 July 2025  · 10 min ago")} •{" "}
-            {t("home.warning.area", "Toa Payoh, Commonwealth, Bishan")}
-          </Text>
+
+          {isFlood ? (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 2,
+                }}
+              >
+                <Ionicons name="calendar" size={14} color="#fff" />
+                <Text style={styles.warnMeta}>{dateStr}</Text>
+                <Ionicons
+                  name="time-outline"
+                  size={14}
+                  color="#fff"
+                  style={{ marginLeft: 10 }}
+                />
+                <Text style={styles.warnMeta}>{timeAgoStr}</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 2,
+                }}
+              >
+                <Ionicons name="location-outline" size={14} color="#fff" />
+                <Text style={styles.warnMeta}>{locLabel}</Text>
+              </View>
+            </>
+          ) : (
+            <Text style={[styles.warnMeta, { marginTop: 2 }]}>
+              {t("home.hazard.slogan")}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -270,7 +403,7 @@ const makeStyles = (theme) =>
     recenterBtn: {
       position: "absolute",
       right: 12,
-      bottom: 200, // slightly above the warning card (which is bottom: 96)
+      bottom: 200,
       width: 44,
       height: 44,
       borderRadius: 12,
@@ -288,7 +421,7 @@ const makeStyles = (theme) =>
       left: 12,
       right: 12,
       bottom: 96,
-      backgroundColor: "#EF4444",
+      backgroundColor: theme.colors.success, // green when no hazard
       borderRadius: 14,
       paddingHorizontal: 12,
       paddingVertical: 10,
@@ -301,7 +434,7 @@ const makeStyles = (theme) =>
       elevation: 4,
     },
     warnTitle: { color: "#fff", fontWeight: "800", fontSize: 14 },
-    warnSub: { color: "#FFE4E6", fontSize: 12, marginTop: 2 },
+    warnMeta: { color: "#fff", fontSize: 12, marginLeft: 6 },
     metricBar: {
       position: "absolute",
       left: 0,

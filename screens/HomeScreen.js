@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { CONTACTS, getHomeWarnings } from "../data/homeData";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import WarningCard from "../components/WarningCard";
 import ImageOverlayCard from "../components/ImageOverlayCard";
 import { PREPAREDNESS, getHomePreparedness, ROUTINE } from "../data/homeData";
@@ -24,6 +24,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
+import { getRainfallLatest, getRelativeHumidityLatest } from "../utils/api";
+import { decideHazard } from "../utils/hazard"
+import { getMockFloodEnabled } from "../utils/mockFlags";
+import useNotifyOnHazard from "../hooks/useNotifyOnHazard";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 const HOME_WARNINGS = getHomeWarnings(4);
@@ -35,6 +39,12 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  
+  const [hazard, setHazard] = useState({
+    kind: "none",
+    title: t("home.hazard.none", "No Hazard Detected"),
+  });
+  useNotifyOnHazard(hazard);
 
   const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
   useEffect(() => {
@@ -50,6 +60,38 @@ export default function HomeScreen() {
     })();
     return () => (alive = false);
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const [rain, hum, mockFlood] = await Promise.all([
+          getRainfallLatest().catch(() => ({ points: [] })),
+          getRelativeHumidityLatest().catch(() => ({ points: [] })),
+          getMockFloodEnabled(),
+        ]);
+        if (!alive) return;
+
+        const result = decideHazard({
+          center,
+          rainfallPoints: rain.points || [],
+          humPoints: hum.points || [],
+          mockFlood,
+        });
+
+        setHazard(result);
+      } catch {
+        if (!alive)
+          setHazard({
+            kind: "none",
+            title: t("home.hazard.none", "No Hazard Detected"),
+          });
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [center, t]);
 
   // Dynamic header location label
   const [headerLoc, setHeaderLoc] = useState(
@@ -77,6 +119,59 @@ export default function HomeScreen() {
       mounted = false;
     };
   }, [t]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let alive = true;
+      (async () => {
+        const [rain, hum, mockFlood] = await Promise.all([
+          getRainfallLatest().catch(() => ({ points: [] })),
+          getRelativeHumidityLatest().catch(() => ({ points: [] })),
+          getMockFloodEnabled(),
+        ]);
+        if (!alive) return;
+        const result = decideHazard({
+          center,
+          rainfallPoints: rain.points || [],
+          humPoints: hum.points || [],
+          mockFlood,
+        });
+        setHazard(result);
+      })();
+      return () => {
+        alive = false;
+      };
+    }, [center])
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let alive = true;
+      (async () => {
+        try {
+          const res = await resolveLocationLabel(); // respects your mock flag
+          if (!alive) return;
+          setCenter({ lat: res.coords.latitude, lon: res.coords.longitude });
+
+          // also refresh the header label so it matches mock/real
+          const country = t("settings.country_sg", "Singapore");
+          const regionName = t(
+            `location.region_names.${String(res.region || "").toLowerCase()}`,
+            res.region
+          );
+          const label = res.address
+            ? `${res.address}${res.postal ? " " + res.postal : ""}, ${country}`
+            : `${regionName} ${t("home.region", "Region")}, ${country}`;
+          setHeaderLoc(label);
+        } catch {
+          setHeaderLoc(t("settings.country_sg", "Singapore"));
+        }
+      })();
+      return () => {
+        alive = false;
+      };
+    }, [t])
+  );
 
   const openDonation = async () => {
     try {
@@ -128,7 +223,6 @@ export default function HomeScreen() {
   };
 
   const renderContact = ({ item }) => {
-    // Translate titles/subtitles by id, with English fallback from data file
     const tTitle = t(`home.contacts.card.${item.id}.title`, item.title);
     const tSub = t(`home.contacts.card.${item.id}.subtitle`, item.subtitle);
 
@@ -148,6 +242,18 @@ export default function HomeScreen() {
       </TouchableOpacity>
     );
   };
+
+  // -------- Banner helpers (current date, 10 min ago, fixed location) ----------
+  const isFlood = hazard.kind === "flood";
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-SG", {
+    weekday: "short",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }); // e.g., "Mon, 7 July 2025"
+  const timeAgoStr = "10 min ago";
+  const locLabel = isFlood ? hazard.locationName || "Clementi Park" : null;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -220,33 +326,82 @@ export default function HomeScreen() {
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.mapCard}
-          onPress={() =>
-            navigation.navigate("MapView")
-          }
+          onPress={() => navigation.navigate("MapView")}
         >
           <LeafletMapWebView
             lat={center.lat}
             lon={center.lon}
             height={200}
             zoom={15}
-            // showMarker={false}      // keep clean preview
-            interactive={false}     // no gestures on home
+            interactive={false}
             showMarker
             showLegend={false}
           />
-          <View style={styles.hazardBanner}>
-            <Ionicons name="shield-checkmark" size={34} color="#fff" />
-            <View style={{ marginLeft: 10 }}>
-              <Text style={styles.hazardTitle}>{t("home.hazard.none")}</Text>
-              <Text style={styles.hazardSubtitle}>
-                {t("home.hazard.slogan")}
+
+          {/* Hazard banner */}
+          <View
+            style={[
+              styles.hazardBanner,
+              isFlood && {
+                backgroundColor:
+                  hazard.severity === "high" ? "#DC2626" : "#F59E0B",
+              },
+            ]}
+          >
+            <Ionicons
+              name={isFlood ? "warning" : "shield-checkmark"}
+              size={34}
+              color="#fff"
+            />
+            <View style={{ marginLeft: 10, flex: 1 }}>
+              <Text style={styles.hazardTitle}>
+                {isFlood
+                  ? hazard.title ||
+                    t("home.warning.flash", "Flash Flood Warning")
+                  : t("home.hazard.none", "No Hazard Detected")}
               </Text>
+
+              {isFlood ? (
+                <>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Ionicons name="calendar" size={14} color="#fff" />
+                    <Text style={styles.hazardMeta}>{dateStr}</Text>
+                    <Ionicons
+                      name="time-outline"
+                      size={14}
+                      color="#fff"
+                      style={{ marginLeft: 10 }}
+                    />
+                    <Text style={styles.hazardMeta}>{timeAgoStr}</Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Ionicons name="location-outline" size={14} color="#fff" />
+                    <Text style={styles.hazardMeta}>{locLabel}</Text>
+                  </View>
+                </>
+              ) : (
+                <Text style={[styles.hazardMeta, { marginTop: 2 }]}>
+                  {t("home.hazard.slogan")}
+                </Text>
+              )}
             </View>
           </View>
         </TouchableOpacity>
 
         {/* Emergency Contacts */}
-        <View style={styles.sectionHeader}>
+        <View className="sectionHeader" style={styles.sectionHeader}>
           <Text style={styles.sectionTitle2}>{t("home.contacts.title")}</Text>
         </View>
         <Text style={styles.sectionNote}>{t("home.contacts.note")}</Text>
@@ -507,14 +662,6 @@ const makeStyles = (theme) =>
       shadowRadius: 10,
       elevation: 3,
     },
-    mapCanvas: {
-      height: 200,
-      backgroundColor: theme.key === "dark" ? "#1F2937" : "#E6EEF9",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    mapPlaceholderText: { marginTop: 6, color: theme.colors.subtext },
-    mapPin: { position: "absolute", top: 12, right: 12 },
     hazardBanner: {
       position: "absolute",
       left: 12,
@@ -524,7 +671,7 @@ const makeStyles = (theme) =>
       alignItems: "center",
       paddingVertical: 12,
       paddingHorizontal: 14,
-      backgroundColor: theme.colors.success,
+      backgroundColor: theme.colors.success, // green when no hazard
       borderRadius: 12,
       shadowColor: "#000",
       shadowOpacity: 0.15,
@@ -533,7 +680,7 @@ const makeStyles = (theme) =>
       elevation: 2,
     },
     hazardTitle: { color: "#fff", fontWeight: "800", fontSize: 15 },
-    hazardSubtitle: { color: "#E9FFF1", fontSize: 12, marginTop: 2 },
+    hazardMeta: { color: "#fff", fontSize: 12, marginLeft: 6 },
     contactCard: {
       flexDirection: "row",
       alignItems: "center",
@@ -567,7 +714,6 @@ const makeStyles = (theme) =>
       color: theme.colors.subtext,
       textAlign: "center",
     },
-
     fab: {
       position: "absolute",
       bottom: 75,
@@ -575,14 +721,14 @@ const makeStyles = (theme) =>
       width: 55,
       height: 55,
       borderRadius: 30,
-      backgroundColor: theme.colors.primary, // background behind bot icon
+      backgroundColor: theme.colors.primary,
       alignItems: "center",
       justifyContent: "center",
       shadowColor: "#000",
       shadowOpacity: 0.25,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 6,
-      elevation: 5, // Android shadow
+      elevation: 5,
     },
     fabIcon: {
       width: 40,

@@ -12,6 +12,7 @@ import {
   FlatList,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getNotificationsEnabled, setNotificationsEnabled, initNotifications } from "../utils/notify";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
@@ -24,7 +25,6 @@ import { clearCache, resetAll } from "../utils/storage";
 
 import { KEYS } from "../utils/storage";
 const K_LANG = KEYS.PREF_LANG;
-const K_NOTIF = KEYS.PREF_NOTIF;
 const K_SFX = KEYS.PREF_SFX;
 const K_HAPTIC = KEYS.PREF_HAPTICS;
 
@@ -62,11 +62,11 @@ export default function SettingsScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const [l, n, sfx, hap] = await Promise.all([
+        const [l, sfx, hap, notifEnabled] = await Promise.all([
           AsyncStorage.getItem(K_LANG),
-          AsyncStorage.getItem(K_NOTIF),
           AsyncStorage.getItem(K_SFX),
           AsyncStorage.getItem(K_HAPTIC),
+          getNotificationsEnabled(),
         ]);
 
         // language
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
           await setAppLanguage(savedLang);
         }
 
-        if (n != null) setNotif(n === "1");
+        setNotif(!!notifEnabled);
         if (sfx != null) setSound(sfx === "1");
         if (hap != null) setVibration(hap === "1");
       } catch {}
@@ -89,7 +89,13 @@ export default function SettingsScreen() {
     AsyncStorage.setItem(K_LANG, language).catch(() => {});
   }, [language]);
   useEffect(() => {
-    AsyncStorage.setItem(K_NOTIF, notif ? "1" : "0").catch(() => {});
+    (async () => {
+      await setNotificationsEnabled(notif); // writes notify:enabled & cancels scheduled when OFF
+      if (notif) {
+        // make sure channel/permission exists when turning ON
+        await initNotifications();
+      }
+    })();
   }, [notif]);
   useEffect(() => {
     AsyncStorage.setItem(K_SFX, sound ? "1" : "0").catch(() => {});

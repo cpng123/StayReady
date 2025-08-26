@@ -1,4 +1,3 @@
-// App.js
 import "react-native-gesture-handler";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -6,8 +5,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./navigation/RootNavigation";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import i18n, { initI18n } from "./i18n";           // <-- import the configured instance
+import i18n, { initI18n } from "./i18n";
 import { I18nextProvider } from "react-i18next";
+import { initNotifications } from "./utils/notify";
 
 import SplashScreen from "./screens/SplashScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
@@ -67,10 +67,10 @@ function RootNav() {
 
 export default function App() {
   const [ready, setReady] = useState(false);
-
   useEffect(() => {
     (async () => {
-      await initI18n();    // ensures saved language is loaded BEFORE first render
+      await initI18n();
+      await initNotifications(); // prime _notifyEnabledCache before any screen mounts
       setReady(true);
     })();
   }, []);

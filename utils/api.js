@@ -4,7 +4,7 @@
 // Dengue dataset (GEOJSON) via public datasets API v1
 
 const API_BASE = "https://api-open.data.gov.sg/v2/real-time/api";
-const DATASET_API_BASE = "https://api-open.data.gov.sg/v1/public/api"; // 👈 NEW
+const DATASET_API_BASE = "https://api-open.data.gov.sg/v1/public/api";
 
 function buildUrl(base, path, params = {}) {
   const url = new URL(`${base}${path}`);

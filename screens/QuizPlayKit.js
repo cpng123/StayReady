@@ -27,6 +27,11 @@ import {
 } from "../utils/quizLogic";
 import ThemeToggle from "../components/ThemeToggle";
 import { useTranslation } from "react-i18next";
+import { 
+   getNotificationsEnabled, 
+   setNotificationsEnabled as setNotifyPref, 
+   initNotifications 
+ } from "../utils/notify";
 
 /* --------------------------- SOUND (SFX + BGM) --------------------------- */
 
@@ -666,6 +671,25 @@ export function SettingsModal({
     } catch {}
   };
 
+  // --- Notifications toggle (local to this modal) ---
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const v = await getNotificationsEnabled();
+        if (alive) setNotifEnabled(v);
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const onToggleNotif = async (v) => {
+    setNotifEnabled(v);
+    await setNotifyPref(v);     // persists + cancels/dismisses when OFF
+    if (v) await initNotifications(); // ensure permissions/channel when turning ON
+  };
+
   return (
     <Modal
       visible={open}
@@ -711,6 +735,19 @@ export function SettingsModal({
               {t("games.settings.haptics", "Haptics")}
             </Text>
             <Switch value={hapticEnabled} onValueChange={setHapticEnabled} />
+          </View>
+
+          {/* Notifications */}
+          <View style={[s.rowBetween, { marginBottom: 20 }]}>
+            <Text
+              style={[
+                s.modalBody,
+                { color: theme.colors.text, marginBottom: 0 },
+              ]}
+            >
+              {t("games.settings.notifications", "Flood alerts")}
+            </Text>
+            <Switch value={notifEnabled} onValueChange={onToggleNotif} />
           </View>
 
           {/* Theme */}

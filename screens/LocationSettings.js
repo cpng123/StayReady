@@ -18,10 +18,13 @@ import {
   setDemoLocationEnabled,
 } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
+import { getMockFloodEnabled, setMockFloodEnabled } from "../utils/mockFlags";
+
 
 export default function LocationSettings() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
+  const [mockFlood, setMockFlood] = useState(false);
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
@@ -34,7 +37,7 @@ export default function LocationSettings() {
     setLoading(true);
     setErr("");
     try {
-      const [label, demo] = await Promise.all([
+      const [label, demo, notif] = await Promise.all([
         resolveLocationLabel(),
         getDemoLocationEnabled(),
       ]);
@@ -50,6 +53,20 @@ export default function LocationSettings() {
   useEffect(() => {
     load();
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const v = await getMockFloodEnabled();
+      if (alive) setMockFlood(v);
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const toggle = async (v) => {
+    setMockFlood(v);
+    await setMockFloodEnabled(v);
+  };
 
   const onToggleDemo = async (v) => {
     setDemoOn(v);
@@ -153,6 +170,28 @@ export default function LocationSettings() {
           </View>
           <Text style={[s.small, { color: theme.colors.subtext }]}>
             {t("location.demo_desc", { ns: "common" })}
+          </Text>
+        </View>
+
+        {/* Mock Disaster: Flash Flood */}
+        <View style={[s.card, { backgroundColor: theme.colors.card }]}>
+          <Text style={[s.cardTitle, { color: theme.colors.text }]}>
+            {t("location.mock_disaster_title", { ns: "common", defaultValue: "Mock Disaster" })}
+          </Text>
+
+          <View style={s.rowBetween}>
+            <Text style={[s.label, { color: theme.colors.text }]}>
+              {t("location.mock_flood_label", { ns: "common", defaultValue: "Mock Flood (Demo)" })}
+            </Text>
+            <Switch value={mockFlood} onValueChange={toggle} />
+          </View>
+
+          <Text style={[s.small, { color: theme.colors.subtext, marginTop: 6 }]}>
+            {t("location.mock_flood_desc", {
+              ns: "common",
+              defaultValue:
+                "When ON, Home & Map will show a Flash Flood warning near your current/ demo location.",
+            })}
           </Text>
         </View>
 
