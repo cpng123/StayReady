@@ -15,9 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
-const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_API_KEY =
-  "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";
+const OPENROUTER_ENDPOINT = process.env.EXPO_PUBLIC_OPENROUTER_ENDPOINT;
+const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
 
 export default function ChatbotScreen() {
   const insets = useSafeAreaInsets();
