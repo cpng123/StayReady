@@ -26,6 +26,8 @@ import RewardDetailScreen from "./screens/RewardDetailScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import EmergencyContactsScreen from "./screens/EmergencyContactsScreen";
 import LocationSettings from "./screens/LocationSettings";
+import MapScreen from "./screens/MapScreen";
+import Chatbot from "./screens/ChatbotScreen";
 
 import { ThemeProvider, useThemeContext } from "./theme/ThemeProvider";
 
@@ -46,8 +48,14 @@ function RootNav() {
           <Stack.Screen name="Main" component={AppNavigator} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
-          <Stack.Screen name="PreparednessGuide" component={PreparednessGuideScreen} />
-          <Stack.Screen name="ExternalResources" component={ExternalResourceScreen} />
+          <Stack.Screen
+            name="PreparednessGuide"
+            component={PreparednessGuideScreen}
+          />
+          <Stack.Screen
+            name="ExternalResources"
+            component={ExternalResourceScreen}
+          />
           <Stack.Screen name="Checklist" component={ChecklistScreen} />
           <Stack.Screen name="QuizSets" component={QuizSetsScreen} />
           <Stack.Screen name="QuizPlay" component={QuizPlayScreen} />
@@ -57,8 +65,13 @@ function RootNav() {
           <Stack.Screen name="BadgeReward" component={BadgeRewardScreen} />
           <Stack.Screen name="RewardDetail" component={RewardDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
+          <Stack.Screen
+            name="EmergencyContacts"
+            component={EmergencyContactsScreen}
+          />
           <Stack.Screen name="LocationSettings" component={LocationSettings} />
+          <Stack.Screen name="MapView" component={MapScreen} />
+          <Stack.Screen name="Chatbot" component={Chatbot} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

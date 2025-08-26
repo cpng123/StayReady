@@ -28,6 +28,7 @@ import { getRainfallLatest, getRelativeHumidityLatest } from "../utils/api";
 import { decideHazard } from "../utils/hazard";
 import { getMockFloodEnabled } from "../utils/mockFlags";
 import useNotifyOnHazard from "../utils/useNotifyOnHazard";
+import HazardBanner from "../components/HazardBanner";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 const HOME_WARNINGS = getHomeWarnings(4);
@@ -280,9 +281,13 @@ export default function HomeScreen() {
               { backgroundColor: theme.key === "dark" ? "#1F2937" : "#EAF2FF" },
             ]}
             activeOpacity={0.8}
+            onPress={() => navigation.navigate("Settings")}
+            accessibilityRole="button"
+            accessibilityLabel={t("settings.title", "Settings")}
+            testID="settings-button"
           >
             <Ionicons
-              name="notifications-outline"
+              name="settings-outline"
               size={22}
               color={theme.colors.primary}
             />
@@ -340,64 +345,13 @@ export default function HomeScreen() {
           />
 
           {/* Hazard banner */}
-          <View
-            style={[
-              styles.hazardBanner,
-              isFlood && {
-                backgroundColor:
-                  hazard.severity === "high" ? "#DC2626" : "#F59E0B",
-              },
-            ]}
-          >
-            <Ionicons
-              name={isFlood ? "warning" : "shield-checkmark"}
-              size={34}
-              color="#fff"
+          <View pointerEvents="none" style={styles.hazardOverlay}>
+            <HazardBanner
+              hazard={hazard}
+              dateStr={dateStr}
+              timeAgoStr={timeAgoStr}
+              locLabel={locLabel}
             />
-            <View style={{ marginLeft: 10, flex: 1 }}>
-              <Text style={styles.hazardTitle}>
-                {isFlood
-                  ? hazard.title ||
-                    t("home.warning.flash", "Flash Flood Warning")
-                  : t("home.hazard.none", "No Hazard Detected")}
-              </Text>
-
-              {isFlood ? (
-                <>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 2,
-                    }}
-                  >
-                    <Ionicons name="calendar" size={14} color="#fff" />
-                    <Text style={styles.hazardMeta}>{dateStr}</Text>
-                    <Ionicons
-                      name="time-outline"
-                      size={14}
-                      color="#fff"
-                      style={{ marginLeft: 10 }}
-                    />
-                    <Text style={styles.hazardMeta}>{timeAgoStr}</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 2,
-                    }}
-                  >
-                    <Ionicons name="location-outline" size={14} color="#fff" />
-                    <Text style={styles.hazardMeta}>{locLabel}</Text>
-                  </View>
-                </>
-              ) : (
-                <Text style={[styles.hazardMeta, { marginTop: 2 }]}>
-                  {t("home.hazard.slogan")}
-                </Text>
-              )}
-            </View>
           </View>
         </TouchableOpacity>
 
@@ -663,25 +617,15 @@ const makeStyles = (theme) =>
       shadowRadius: 10,
       elevation: 3,
     },
-    hazardBanner: {
+    hazardOverlay: {
       position: "absolute",
       left: 12,
       right: 12,
       bottom: 12,
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-      backgroundColor: theme.colors.success, // green when no hazard
-      borderRadius: 12,
-      shadowColor: "#000",
-      shadowOpacity: 0.15,
-      shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 6,
+      zIndex: 2,
       elevation: 2,
     },
-    hazardTitle: { color: "#fff", fontWeight: "800", fontSize: 15 },
-    hazardMeta: { color: "#fff", fontSize: 12, marginLeft: 6 },
+
     contactCard: {
       flexDirection: "row",
       alignItems: "center",

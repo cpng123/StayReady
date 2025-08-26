@@ -96,6 +96,8 @@
     "more": "More"
   },
   "drawer": {
+    "map": "Map",
+    "early_warning": "Early Warning",
     "checklist": "Checklist",
     "external_resources": "External Resources",
     "bookmark": "Bookmark",

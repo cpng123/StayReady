@@ -103,7 +103,7 @@ export default function ChatbotScreen() {
   };
 
   return (
-    <View style={[styles.page, { paddingTop: insets.top }]}>
+    <View style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity

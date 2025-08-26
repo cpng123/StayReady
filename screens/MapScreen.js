@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Image,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,6 +24,9 @@ import {
 } from "../utils/api";
 import { decideHazard } from "../utils/hazard";
 import { getMockFloodEnabled } from "../utils/mockFlags";
+import HazardBanner from "../components/HazardBanner";
+
+const DENGUE_ICON = require("../assets/General/dengue.png");
 
 export default function MapScreen({ route, navigation }) {
   const mapRef = useRef(null);
@@ -49,6 +53,11 @@ export default function MapScreen({ route, navigation }) {
 
   // active overlay
   const [overlay, setOverlay] = useState("rain");
+  const [sheetHeight, setSheetHeight] = useState(180); // sensible default
+  const onSheetLayout = React.useCallback(
+    (e) => setSheetHeight(Math.ceil(e.nativeEvent.layout.height)),
+    []
+  );
 
   // get user location once
   useEffect(() => {
@@ -236,7 +245,7 @@ export default function MapScreen({ route, navigation }) {
       { key: "pm", icon: "blur", label: t("home.metric.pm", "PM2.5") },
       {
         key: "dengue",
-        icon: "mosquito",
+        img: DENGUE_ICON,
         label: t("home.metric.dengue", "Dengue"),
       },
     ],
@@ -257,11 +266,19 @@ export default function MapScreen({ route, navigation }) {
         accessibilityRole="button"
         accessibilityLabel={item.label}
       >
-        <MaterialCommunityIcons
-          name={item.icon}
-          size={22}
-          color={theme.colors.primary}
-        />
+        {item.img ? (
+          <Image
+            source={item.img}
+            style={[styles.metricIcon, { tintColor: theme.colors.primary }]}
+            accessible={false}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name={item.icon}
+            size={30}
+            color={theme.colors.primary}
+          />
+        )}
         <Text style={styles.metricText}>{item.label}</Text>
       </TouchableOpacity>
     );
@@ -286,8 +303,8 @@ export default function MapScreen({ route, navigation }) {
         dengueGeoJSON={dengueGeoJSON}
         overlay={overlay}
         showLegend
-        legendBottom={172}
-        dark={theme.key === "dark"} // ← basemap & legend switch
+        legendBottom={sheetHeight + 12}
+        dark={theme.key === "dark"}
       />
 
       {/* top-left back */}
@@ -297,12 +314,16 @@ export default function MapScreen({ route, navigation }) {
         accessibilityRole="button"
         accessibilityLabel={t("common.back", "Back")}
       >
-        <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
+        <Ionicons name="chevron-back" size={26} color={theme.colors.text} />
       </TouchableOpacity>
 
       {/* recenter (bottom-right, above warning) */}
       <TouchableOpacity
-        style={[styles.recenterBtn, recenterLoading && { opacity: 0.7 }]}
+        style={[
+          styles.recenterBtn,
+          { bottom: sheetHeight + 12 },
+          recenterLoading && { opacity: 0.7 },
+        ]}
         onPress={recenterToMe}
         disabled={recenterLoading}
         accessibilityRole="button"
@@ -311,84 +332,62 @@ export default function MapScreen({ route, navigation }) {
         <Ionicons name="locate" size={22} color={theme.colors.text} />
       </TouchableOpacity>
 
-      {/* warning banner (bottom) */}
-      <View
-        style={[
-          styles.warningCard,
-          isFlood && {
-            backgroundColor: hazard.severity === "high" ? "#DC2626" : "#F59E0B",
-          },
-        ]}
-      >
-        <Ionicons
-          name={isFlood ? "warning" : "shield-checkmark"}
-          size={22}
-          color="#fff"
-          style={{ marginRight: 10 }}
+      {/* bottom sheet wrapper */}
+      <View style={styles.bottomSheet} onLayout={onSheetLayout}>
+        {/* warning banner */}
+        <HazardBanner
+          hazard={hazard}
+          dateStr={dateStr}
+          timeAgoStr={timeAgoStr}
+          locLabel={
+            hazard.kind === "flood"
+              ? hazard.locationName || "Clementi Park"
+              : null
+          }
+          style={{ marginBottom: 10 }} // spacing above the metric bar
         />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.warnTitle}>
-            {isFlood
-              ? hazard.title || t("home.warning.flash", "Flash Flood Warning")
-              : t("home.hazard.none", "No Hazard Detected")}
-          </Text>
 
-          {isFlood ? (
-            <>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 2,
-                }}
-              >
-                <Ionicons name="calendar" size={14} color="#fff" />
-                <Text style={styles.warnMeta}>{dateStr}</Text>
-                <Ionicons
-                  name="time-outline"
-                  size={14}
-                  color="#fff"
-                  style={{ marginLeft: 10 }}
-                />
-                <Text style={styles.warnMeta}>{timeAgoStr}</Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 2,
-                }}
-              >
-                <Ionicons name="location-outline" size={14} color="#fff" />
-                <Text style={styles.warnMeta}>{locLabel}</Text>
-              </View>
-            </>
-          ) : (
-            <Text style={[styles.warnMeta, { marginTop: 2 }]}>
-              {t("home.hazard.slogan")}
-            </Text>
-          )}
+        {/* metric bar */}
+        <View>
+          <FlatList
+            data={navItems}
+            keyExtractor={(i) => i.key}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.edgeToEdge}
+            contentContainerStyle={styles.metricListContent}
+            renderItem={renderNavItem}
+          />
         </View>
-      </View>
-
-      {/* bottom nav (FlatList) */}
-      <View style={styles.metricBar}>
-        <FlatList
-          data={navItems}
-          keyExtractor={(i) => i.key}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.metricListContent}
-          renderItem={renderNavItem}
-        />
       </View>
     </View>
   );
 }
 
-const makeStyles = (theme) =>
-  StyleSheet.create({
+const makeStyles = (theme) => {
+  const sheetBg =
+    theme.key === "dark" ? "rgba(25,25,27,0.92)" : "rgba(255,255,255,0.94)";
+
+  return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.appBg },
+
+    bottomSheet: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: sheetBg,
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+      paddingTop: 10,
+      paddingHorizontal: 12,
+      paddingBottom: 10,
+      shadowColor: "#000",
+      shadowOpacity: theme.key === "dark" ? 0.35 : 0.15,
+      shadowOffset: { width: 0, height: -2 },
+      shadowRadius: 10,
+      elevation: 12,
+    },
 
     backBtn: {
       position: "absolute",
@@ -396,7 +395,7 @@ const makeStyles = (theme) =>
       left: 12,
       width: 40,
       height: 40,
-      borderRadius: 12,
+      borderRadius: 10,
       backgroundColor: theme.colors.card,
       alignItems: "center",
       justifyContent: "center",
@@ -410,7 +409,6 @@ const makeStyles = (theme) =>
     recenterBtn: {
       position: "absolute",
       right: 12,
-      bottom: 200,
       width: 44,
       height: 44,
       borderRadius: 12,
@@ -424,36 +422,13 @@ const makeStyles = (theme) =>
       elevation: 3,
     },
 
-    warningCard: {
-      position: "absolute",
-      left: 12,
-      right: 12,
-      bottom: 96,
-      backgroundColor: theme.colors.success,
-      borderRadius: 14,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      flexDirection: "row",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOpacity: theme.key === "dark" ? 0.35 : 0.2,
-      shadowOffset: { width: 0, height: 4 },
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    warnTitle: { color: "#fff", fontWeight: "800", fontSize: 14 },
-    warnMeta: { color: "#fff", fontSize: 12, marginLeft: 6 },
+    edgeToEdge: { marginHorizontal: -16 },
 
-    metricBar: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 12,
-      paddingHorizontal: 12,
-    },
     metricListContent: {
       flexGrow: 1,
       justifyContent: "space-between",
+      paddingVertical: 1,
+      paddingHorizontal: 15,
     },
     metricItem: {
       backgroundColor: theme.colors.card,
@@ -462,13 +437,15 @@ const makeStyles = (theme) =>
       alignItems: "center",
       justifyContent: "center",
       paddingVertical: 10,
-      minWidth: 110,
+      minWidth: 70,
+      height: 80,
       shadowColor: "#000",
       shadowOpacity: theme.key === "dark" ? 0.25 : 0.08,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 6,
       elevation: 2,
     },
+    metricIcon: { width: 30, height: 30, resizeMode: "contain" },
     metricText: {
       fontSize: 12,
       marginTop: 4,
@@ -477,3 +454,4 @@ const makeStyles = (theme) =>
       textAlign: "center",
     },
   });
+};

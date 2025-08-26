@@ -135,7 +135,6 @@ export default function SettingsScreen() {
 
       {/* SCROLLABLE PAGE CONTENT */}
       <ScrollView contentContainerStyle={s.content}>
-        {/* ---------------- Preferences & Controls ---------------- */}
         <SectionTitle>
           {t("settings.pref_controls", "Preferences & Controls")}
         </SectionTitle>
@@ -462,7 +461,7 @@ export default function SettingsScreen() {
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: 14, gap: 10 },
+    content: { padding: 14, gap: 10, marginTop: -10 },
 
     /* sections */
     sectionTitle: {

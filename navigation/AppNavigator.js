@@ -17,12 +17,9 @@ import HomeScreen from "../screens/HomeScreen";
 import ResourceHubScreen from "../screens/ResourceHubScreen";
 import SOSScreen from "../screens/SOSScreen";
 import GamesScreen from "../screens/GamesScreen";
-import MapScreen from "../screens/MapScreen";
 
 import { useThemeContext } from "../theme/ThemeProvider";
 import ThemeToggle from "../components/ThemeToggle";
-
-import Chatbot from "../screens/ChatbotScreen";
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -98,8 +95,8 @@ function MainTabs() {
         name="HomeTab"
         component={HomeScreen}
         options={{
-         title: t("nav.home"),
-         tabBarLabel: t("nav.home"),
+          title: t("nav.home"),
+          tabBarLabel: t("nav.home"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="home" size={22} color={color} />
           ),
@@ -109,8 +106,8 @@ function MainTabs() {
         name="GamesTab"
         component={GamesScreen}
         options={{
-         title: t("nav.games"),
-         tabBarLabel: t("nav.games"),
+          title: t("nav.games"),
+          tabBarLabel: t("nav.games"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="game-controller" size={22} color={color} />
           ),
@@ -120,8 +117,8 @@ function MainTabs() {
         name="MoreTab"
         component={EmptyScreen}
         options={{
-         title: t("nav.more"),
-         tabBarLabel: t("nav.more"),
+          title: t("nav.more"),
+          tabBarLabel: t("nav.more"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="grid" size={22} color={color} />
           ),
@@ -150,7 +147,7 @@ function Row({ icon, label, onPress, textColor }) {
 
 function SideMenu({ navigation }) {
   const { theme, themeKey, setThemeKey } = useThemeContext();
-const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.drawerBg }}>
@@ -180,6 +177,32 @@ const { t } = useTranslation();
         />
 
         <View style={styles.leftMargin}>
+          <Row
+            icon={
+              <MaterialCommunityIcons
+                name="map"
+                size={24}
+                color={theme.colors.text}
+              />
+            }
+            label={t("drawer.map", "Map")}
+            textColor={theme.colors.text}
+            onPress={() => {
+              navigation.closeDrawer();
+              setTimeout(() => rootNavigate("MapView"), 0);
+            }}
+          />
+          <Row
+            icon={
+              <Ionicons name="warning" size={24} color={theme.colors.text} />
+            }
+            label={t("drawer.early_warning", "Early Warning")}
+            textColor={theme.colors.text}
+            onPress={() => {
+              navigation.closeDrawer();
+              setTimeout(() => rootNavigate("EarlyWarning"), 0);
+            }}
+          />
           <Row
             icon={
               <MaterialCommunityIcons
@@ -286,12 +309,7 @@ export default function AppNavigator() {
           </Drawer.Navigator>
         )}
       </Stack.Screen>
-      {/* Full-screen Leaflet map */}
-      <Stack.Screen name="MapView" component={MapScreen} />
-
-      <Stack.Screen name="Chatbot" component={Chatbot} options={{ headerShown: false }} />
     </Stack.Navigator>
-    
   );
 }
 

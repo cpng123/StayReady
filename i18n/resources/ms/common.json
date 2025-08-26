@@ -102,6 +102,8 @@
     "more": "Lagi"
   },
   "drawer": {
+    "map": "Peta",
+    "early_warning": "Amaran Awal",
     "checklist": "Senarai Semak",
     "external_resources": "Sumber Luaran",
     "bookmark": "Penanda Buku",

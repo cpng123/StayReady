@@ -82,6 +82,8 @@
     "more": "更多"
   },
   "drawer": {
+    "map": "地图",
+    "early_warning": "预警",
     "checklist": "清单",
     "external_resources": "外部资源",
     "bookmark": "书签",
