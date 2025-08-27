@@ -366,7 +366,7 @@ export default function MapScreen({ route, navigation }) {
 
 const makeStyles = (theme) => {
   const sheetBg =
-    theme.key === "dark" ? "rgba(25,25,27,0.92)" : "rgba(255,255,255,0.94)";
+    theme.key === "dark" ? "rgba(25,25,27,0.92)" : "rgba(255,255,255,0.75)";
 
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.appBg },
