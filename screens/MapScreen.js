@@ -23,8 +23,8 @@ import {
   getDengueClustersGeoJSON,
   getClinicsGeoJSON,
 } from "../utils/api";
-import { decideHazard } from "../utils/hazard";
-import { getMockFloodEnabled } from "../utils/mockFlags";
+import { decideGlobalHazard } from "../utils/hazard";
+import { getMockFlags } from "../utils/mockFlags";
 import HazardBanner from "../components/HazardBanner";
 
 const DENGUE_ICON = require("../assets/General/dengue.png");
@@ -130,12 +130,16 @@ export default function MapScreen({ route, navigation }) {
     let alive = true;
     (async () => {
       try {
-        const mockFlood = await getMockFloodEnabled();
-        const result = decideHazard({
+        const mockFlags = await getMockFlags().catch(() => ({}));
+        const result = decideGlobalHazard({
           center,
           rainfallPoints: rainPoints,
           humPoints: humPoints,
-          mockFlood,
+          pmPoints: pmPoints,
+          windPoints: windPoints,
+          tempPoints: tempPoints,
+          dengueGeoJSON: dengueGeoJSON,
+          mockFlags,
         });
         if (alive) setHazard(result);
       } catch {
@@ -149,7 +153,16 @@ export default function MapScreen({ route, navigation }) {
     return () => {
       alive = false;
     };
-  }, [center, rainPoints, humPoints, t]);
+  }, [
+    center,
+    rainPoints,
+    humPoints,
+    pmPoints,
+    windPoints,
+    tempPoints,
+    dengueGeoJSON,
+    t,
+  ]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -158,14 +171,17 @@ export default function MapScreen({ route, navigation }) {
         const [rain, hum, mockFlood] = await Promise.all([
           getRainfallLatest().catch(() => ({ points: [] })),
           getRelativeHumidityLatest().catch(() => ({ points: [] })),
-          getMockFloodEnabled(),
+          getMockFlags().catch(() => ({})),
         ]);
         if (!alive) return;
-        const result = decideHazard({
+        const result = decideGlobalHazard({
           center,
           rainfallPoints: rain.points || [],
           humPoints: humPoints.length ? humPoints : hum.points || [],
-          mockFlood,
+          pmPoints: pmPoints,
+          windPoints: windPoints,
+          tempPoints: tempPoints,
+          dengueGeoJSON: dengueGeoJSON,
         });
         setHazard(result);
       })();
@@ -215,17 +231,24 @@ export default function MapScreen({ route, navigation }) {
   };
 
   // -------- Banner helpers ----------
-  const isFlood = hazard.kind === "flood";
+  // Current date in Singapore
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
     weekday: "short",
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Asia/Singapore",
   });
-  const timeAgoStr = "10 min ago";
-  const locLabel = isFlood ? hazard.locationName || "Clementi Park" : null;
+  let timeStr = now.toLocaleTimeString("en-SG", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Singapore",
+  });
+  timeStr = timeStr.replace(/am|pm/, (m) => m.toUpperCase());
 
+  const locLabel = hazard.locationName || null;
   // Bottom nav items (FlatList) incl. Dengue
   const navItems = useMemo(
     () => [
@@ -351,12 +374,8 @@ export default function MapScreen({ route, navigation }) {
         <HazardBanner
           hazard={hazard}
           dateStr={dateStr}
-          timeAgoStr={timeAgoStr}
-          locLabel={
-            hazard.kind === "flood"
-              ? hazard.locationName || "Clementi Park"
-              : null
-          }
+          timeAgoStr={timeStr}
+          locLabel={locLabel}
           style={{ marginBottom: 10 }} // spacing above the metric bar
         />
 

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Switch,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -18,13 +19,23 @@ import {
   setDemoLocationEnabled,
 } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
-import { getMockFloodEnabled, setMockFloodEnabled } from "../utils/mockFlags";
-
+import {
+  getMockFlags,
+  setMockFlag,
+  getMockFloodEnabled,
+  setMockFloodEnabled,
+} from "../utils/mockFlags";
 
 export default function LocationSettings() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
+
   const [mockFlood, setMockFlood] = useState(false);
+  const [mockHaze, setMockHaze] = useState(false);
+  const [mockDengue, setMockDengue] = useState(false);
+  const [mockWind, setMockWind] = useState(false);
+  const [mockHeat, setMockHeat] = useState(false);
+
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
@@ -57,15 +68,38 @@ export default function LocationSettings() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const v = await getMockFloodEnabled();
-      if (alive) setMockFlood(v);
+      const flags = await getMockFlags();
+      if (!alive) return;
+      setMockFlood(!!flags.flood);
+      setMockHaze(!!flags.haze);
+      setMockDengue(!!flags.dengue);
+      setMockWind(!!flags.wind);
+      setMockHeat(!!flags.heat);
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const toggle = async (v) => {
+  const toggleFlood = async (v) => {
     setMockFlood(v);
     await setMockFloodEnabled(v);
+  };
+  const toggleHaze = async (v) => {
+    setMockHaze(v);
+    await setMockFlag("haze", v);
+  };
+  const toggleDengue = async (v) => {
+    setMockDengue(v);
+    await setMockFlag("dengue", v);
+  };
+  const toggleWind = async (v) => {
+    setMockWind(v);
+    await setMockFlag("wind", v);
+  };
+  const toggleHeat = async (v) => {
+    setMockHeat(v);
+    await setMockFlag("heat", v);
   };
 
   const onToggleDemo = async (v) => {
@@ -96,7 +130,7 @@ export default function LocationSettings() {
       </View>
 
       {/* Body */}
-      <View style={s.body}>
+      <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
         {/* Current Location */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
@@ -176,21 +210,92 @@ export default function LocationSettings() {
         {/* Mock Disaster: Flash Flood */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
-            {t("location.mock_disaster_title", { ns: "common", defaultValue: "Mock Disaster" })}
+            {t("location.mock_disaster_title", {
+              ns: "common",
+              defaultValue: "Mock Disaster",
+            })}
           </Text>
 
           <View style={s.rowBetween}>
             <Text style={[s.label, { color: theme.colors.text }]}>
-              {t("location.mock_flood_label", { ns: "common", defaultValue: "Mock Flood (Demo)" })}
+              {t("location.mock_flood_label", {
+                ns: "common",
+                defaultValue: "Mock Flood (Demo)",
+              })}
             </Text>
-            <Switch value={mockFlood} onValueChange={toggle} />
+            <Switch value={mockFlood} onValueChange={toggleFlood} />
           </View>
 
-          <Text style={[s.small, { color: theme.colors.subtext, marginTop: 6 }]}>
+          <Text
+            style={[s.small, { color: theme.colors.subtext, marginTop: 6 }]}
+          >
             {t("location.mock_flood_desc", {
               ns: "common",
               defaultValue:
                 "When ON, Home & Map will show a Flash Flood warning near your current/ demo location.",
+            })}
+          </Text>
+          <View style={[s.rowBetween, { marginTop: 14 }]}>
+            <Text style={[s.label, { color: theme.colors.text }]}>
+              {t("location.mock_haze_label", {
+                ns: "common",
+                defaultValue: "Mock Haze (Warning)",
+              })}
+            </Text>
+            <Switch value={mockHaze} onValueChange={toggleHaze} />
+          </View>
+          <Text style={[s.small, { color: theme.colors.subtext }]}>
+            {t("location.mock_haze_desc", {
+              ns: "common",
+              defaultValue: "For testing the Haze Advisory banner.",
+            })}
+          </Text>
+
+          <View style={[s.rowBetween, { marginTop: 14 }]}>
+            <Text style={[s.label, { color: theme.colors.text }]}>
+              {t("location.mock_dengue_label", {
+                ns: "common",
+                defaultValue: "Mock Dengue (Warning)",
+              })}
+            </Text>
+            <Switch value={mockDengue} onValueChange={toggleDengue} />
+          </View>
+          <Text style={[s.small, { color: theme.colors.subtext }]}>
+            {t("location.mock_dengue_desc", {
+              ns: "common",
+              defaultValue: "Simulates a nearby dengue cluster (within 5 km).",
+            })}
+          </Text>
+
+          <View style={[s.rowBetween, { marginTop: 14 }]}>
+            <Text style={[s.label, { color: theme.colors.text }]}>
+              {t("location.mock_wind_label", {
+                ns: "common",
+                defaultValue: "Mock Wind (Warning)",
+              })}
+            </Text>
+            <Switch value={mockWind} onValueChange={toggleWind} />
+          </View>
+          <Text style={[s.small, { color: theme.colors.subtext }]}>
+            {t("location.mock_wind_desc", {
+              ns: "common",
+              defaultValue: "For testing the Strong Winds banner.",
+            })}
+          </Text>
+
+          <View style={[s.rowBetween, { marginTop: 14 }]}>
+            <Text style={[s.label, { color: theme.colors.text }]}>
+              {t("location.mock_heat_label", {
+                ns: "common",
+                defaultValue: "Mock Heat (Danger)",
+              })}
+            </Text>
+            <Switch value={mockHeat} onValueChange={toggleHeat} />
+          </View>
+          <Text style={[s.small, { color: theme.colors.subtext }]}>
+            {t("location.mock_heat_desc", {
+              ns: "common",
+              defaultValue: "For testing the Heat Warning banner.",
             })}
           </Text>
         </View>
@@ -199,7 +304,7 @@ export default function LocationSettings() {
         <Text style={[s.note, { color: theme.colors.subtext }]}>
           {t("location.onemap_note", { ns: "common" })}
         </Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

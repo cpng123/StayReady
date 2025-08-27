@@ -24,9 +24,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
-import { getRainfallLatest, getRelativeHumidityLatest } from "../utils/api";
-import { decideHazard } from "../utils/hazard";
-import { getMockFloodEnabled } from "../utils/mockFlags";
+
+import {
+  getRainfallLatest,
+  getRelativeHumidityLatest,
+  getPM25Latest,
+  getWindLatest,
+  getAirTemperatureLatest,
+  getDengueClustersGeoJSON,
+} from "../utils/api";
+import { decideGlobalHazard } from "../utils/hazard";
+import { getMockFlags } from "../utils/mockFlags";
 import useNotifyOnHazard from "../utils/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
 
@@ -66,18 +74,27 @@ export default function HomeScreen() {
     let alive = true;
     (async () => {
       try {
-        const [rain, hum, mockFlood] = await Promise.all([
-          getRainfallLatest().catch(() => ({ points: [] })),
-          getRelativeHumidityLatest().catch(() => ({ points: [] })),
-          getMockFloodEnabled(),
-        ]);
+        const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] =
+          await Promise.all([
+            getRainfallLatest().catch(() => ({ points: [] })),
+            getRelativeHumidityLatest().catch(() => ({ points: [] })),
+            getPM25Latest().catch(() => ({ points: [] })),
+            getWindLatest().catch(() => ({ points: [] })),
+            getAirTemperatureLatest().catch(() => ({ points: [] })),
+            getDengueClustersGeoJSON().catch(() => null),
+            getMockFlags().catch(() => ({})),
+          ]);
         if (!alive) return;
 
-        const result = decideHazard({
+        const result = decideGlobalHazard({
           center,
           rainfallPoints: rain.points || [],
           humPoints: hum.points || [],
-          mockFlood,
+          pmPoints: pm.points || [],
+          windPoints: wind.points || [],
+          tempPoints: temp.points || [],
+          dengueGeoJSON: dengueJSON,
+          mockFlags,
         });
 
         setHazard(result);
@@ -125,17 +142,26 @@ export default function HomeScreen() {
     React.useCallback(() => {
       let alive = true;
       (async () => {
-        const [rain, hum, mockFlood] = await Promise.all([
-          getRainfallLatest().catch(() => ({ points: [] })),
-          getRelativeHumidityLatest().catch(() => ({ points: [] })),
-          getMockFloodEnabled(),
-        ]);
+        const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] =
+          await Promise.all([
+            getRainfallLatest().catch(() => ({ points: [] })),
+            getRelativeHumidityLatest().catch(() => ({ points: [] })),
+            getPM25Latest().catch(() => ({ points: [] })),
+            getWindLatest().catch(() => ({ points: [] })),
+            getAirTemperatureLatest().catch(() => ({ points: [] })),
+            getDengueClustersGeoJSON().catch(() => null),
+            getMockFlags().catch(() => ({})),
+          ]);
         if (!alive) return;
-        const result = decideHazard({
+        const result = decideGlobalHazard({
           center,
           rainfallPoints: rain.points || [],
           humPoints: hum.points || [],
-          mockFlood,
+          pmPoints: pm.points || [],
+          windPoints: wind.points || [],
+          tempPoints: temp.points || [],
+          dengueGeoJSON: dengueJSON,
+          mockFlags,
         });
         setHazard(result);
       })();
@@ -245,17 +271,27 @@ export default function HomeScreen() {
   };
 
   // -------- Banner helpers (current date, 10 min ago, fixed location) ----------
-  const isFlood = hazard.kind === "flood";
+  // Current date in Singapore
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
     weekday: "short",
     day: "numeric",
     month: "long",
     year: "numeric",
-  }); // e.g., "Mon, 7 July 2025"
-  const timeAgoStr = "10 min ago";
-  const locLabel = isFlood ? hazard.locationName || "Clementi Park" : null;
+    timeZone: "Asia/Singapore",
+  });
 
+  // 12-hour time with AM/PM (uppercase), Singapore TZ
+  let timeStr = now.toLocaleTimeString("en-SG", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Singapore",
+  });
+  // Normalize AM/PM to uppercase on platforms that return lowercase
+  timeStr = timeStr.replace(/am|pm/, (m) => m.toUpperCase());
+
+  const locLabel = hazard.locationName || null;
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
@@ -281,7 +317,7 @@ export default function HomeScreen() {
               { backgroundColor: theme.key === "dark" ? "#1F2937" : "#EAF2FF" },
             ]}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate("Settings")}
+            onPress={() => navigation.navigate("LocationSettings")}
             accessibilityRole="button"
             accessibilityLabel={t("settings.title", "Settings")}
             testID="settings-button"
@@ -349,7 +385,7 @@ export default function HomeScreen() {
             <HazardBanner
               hazard={hazard}
               dateStr={dateStr}
-              timeAgoStr={timeAgoStr}
+              timeAgoStr={timeStr}
               locLabel={locLabel}
             />
           </View>

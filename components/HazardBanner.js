@@ -26,17 +26,19 @@ export default function HazardBanner({
   const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(theme, compact), [theme, compact]);
 
-  const isFlood = hazard?.kind === "flood";
-  const bg = isFlood
-    ? hazard?.severity === "high"
-      ? "#DC2626"
-      : "#F59E0B"
-    : theme.colors.success;
+  const sev = String(hazard?.severity || "safe");
+  const isNone = (hazard?.kind ?? "none") === "none" || sev === "safe";
+  const bg = isNone
+    ? theme.colors.success
+    : sev === "danger"
+    ? "#DC2626"
+    : "#F59E0B";
+  const iconName = isNone ? "shield-checkmark" : "warning";
 
   return (
     <View style={[styles.banner, { backgroundColor: bg }, style]}>
       <Ionicons
-        name={isFlood ? "warning" : "shield-checkmark"}
+        name={iconName}
         size={compact ? 22 : 38}
         color="#fff"
         style={{ marginRight: compact ? 8 : 10 }}
@@ -45,12 +47,11 @@ export default function HazardBanner({
       />
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>
-          {isFlood
-            ? hazard?.title || t("home.warning.flash", "Flash Flood Warning")
-            : t("home.hazard.none", "No Hazard Detected")}
-        </Text>
+          {isNone
+            ? t("home.hazard.none", "No Hazard Detected")
+            : (hazard?.title || t("home.hazard.alert", "Hazard Alert"))}        </Text>
 
-        {isFlood ? (
+        {!isNone ? (
           <>
             <View style={[styles.metaRow, { marginBottom: 2, marginTop: 2 }]}>
               <Ionicons name="calendar" size={14} color="#fff" />
