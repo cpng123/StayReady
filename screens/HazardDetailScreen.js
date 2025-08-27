@@ -1,19 +1,33 @@
 // screens/HazardDetailScreen.js
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 import HazardBanner from "../components/HazardBanner";
 import LeafletMapWebView from "../components/LeafletMapWebView";
+import { getGuideById } from "../data/preparednessGuides";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const H_PADDING = 14; // matches body padding below
+const GAP = 10;
+const TILE_WIDTH = Math.floor((SCREEN_WIDTH - H_PADDING * 2 - GAP) / 2);
 
 // Card/header images for each hazard
 const HERO_IMG = {
-  flood:  require("../assets/General/flash-flood2.jpg"),
-  haze:   require("../assets/General/pm-haze2.jpg"),
+  flood: require("../assets/General/flash-flood2.jpg"),
+  haze: require("../assets/General/pm-haze2.jpg"),
   dengue: require("../assets/General/dengue-cluster2.jpg"),
-  wind:   require("../assets/General/strong-wind2.jpg"),
-  heat:   require("../assets/General/heat.jpg"),
+  wind: require("../assets/General/strong-wind2.jpg"),
+  heat: require("../assets/General/heat.jpg"),
 };
 
 // Which MapScreen overlay to open for each hazard
@@ -25,74 +39,183 @@ const OVERLAY_FOR = {
   heat: "temp",
 };
 
+// Map each hazard page to a Preparedness Guide ID for “See More”
+const GUIDE_ID_FOR = {
+  flood: "flood",
+  haze: "haze",
+  dengue: "dengue",
+  wind: "wind",
+  heat: "fire", // heat -> fire guide as requested
+};
+
 // Localized titles (reuse your i18n keys)
 const titleFor = (kind, t) =>
   ({
-    flood:  t("early.cards.flood.title",  "Flash Flood"),
-    haze:   t("early.cards.haze.title",   "Haze (PM2.5)"),
+    flood: t("early.cards.flood.title", "Flash Flood"),
+    haze: t("early.cards.haze.title", "Haze (PM2.5)"),
     dengue: t("early.cards.dengue.title", "Dengue Clusters"),
-    wind:   t("early.cards.wind.title",   "Strong Winds"),
-    heat:   t("early.cards.heat.title",   "Heat Advisory"),
+    wind: t("early.cards.wind.title", "Strong Winds"),
+    heat: t("early.cards.heat.title", "Heat Advisory"),
   }[kind] || t("home.hazard.alert", "Hazard Alert"));
 
 // Full (long) descriptions for the detail page
 const longDescFor = (h, t) => {
   const sev = h.severity || "safe";
   const m = h.metrics || {};
-  const place  = h.locationName || m.locality || t("settings.country_sg","Singapore");
-  const region = m.region || h.locationName || t("settings.country_sg","Singapore");
-  const km     = m.km != null ? m.km.toFixed(1) : undefined;
-  const cases  = m.cases != null ? m.cases : undefined;
-  const hi     = m.hi != null ? m.hi.toFixed(1) : undefined;
+  const place =
+    h.locationName || m.locality || t("settings.country_sg", "Singapore");
+  const region =
+    m.region || h.locationName || t("settings.country_sg", "Singapore");
+  const km = m.km != null ? m.km.toFixed(1) : undefined;
+  const cases = m.cases != null ? m.cases : undefined;
+  const hi = m.hi != null ? m.hi.toFixed(1) : undefined;
 
   switch (h.kind) {
     case "flood":
       return sev === "danger"
-        ? t("early.cards.flood.desc.danger",
-            "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements.", { place })
+        ? t(
+            "early.cards.flood.desc.danger",
+            "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements.",
+            { place }
+          )
         : sev === "warning"
-        ? t("early.cards.flood.desc.warning",
-            "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.", { place })
-        : t("early.cards.flood.desc.safe",
-            "No significant rain detected. Drains and canals at normal levels.");
+        ? t(
+            "early.cards.flood.desc.warning",
+            "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.",
+            { place }
+          )
+        : t(
+            "early.cards.flood.desc.safe",
+            "No significant rain detected. Drains and canals at normal levels."
+          );
     case "haze":
       return sev === "danger"
-        ? t("early.cards.haze.desc.danger",
-            "Unhealthy PM2.5 in the {{region}}. Stay indoors; use purifier; wear N95 if going out.", { region })
+        ? t(
+            "early.cards.haze.desc.danger",
+            "Unhealthy PM2.5 in the {{region}}. Stay indoors; use purifier; wear N95 if going out.",
+            { region }
+          )
         : sev === "warning"
-        ? t("early.cards.haze.desc.warning",
-            "Elevated PM2.5 in the {{region}}. Limit outdoor activity; consider a mask.", { region })
-        : t("early.cards.haze.desc.safe",
-            "Air quality is within normal range across Singapore.");
+        ? t(
+            "early.cards.haze.desc.warning",
+            "Elevated PM2.5 in the {{region}}. Limit outdoor activity; consider a mask.",
+            { region }
+          )
+        : t(
+            "early.cards.haze.desc.safe",
+            "Air quality is within normal range across Singapore."
+          );
     case "dengue":
       return sev === "danger"
-        ? t("early.cards.dengue.desc.danger",
-            "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists.", { place, cases })
+        ? t(
+            "early.cards.dengue.desc.danger",
+            "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists.",
+            { place, cases }
+          )
         : sev === "warning"
-        ? t("early.cards.dengue.desc.warning",
-            "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.", { place, km })
-        : t("early.cards.dengue.desc.safe",
-            "No active cluster within 5 km of your location.");
+        ? t(
+            "early.cards.dengue.desc.warning",
+            "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.",
+            { place, km }
+          )
+        : t(
+            "early.cards.dengue.desc.safe",
+            "No active cluster within 5 km of your location."
+          );
     case "wind":
       return sev === "danger"
-        ? t("early.cards.wind.desc.danger",
-            "Damaging winds in the {{region}}. Stay indoors; avoid coastal or open areas.", { region })
+        ? t(
+            "early.cards.wind.desc.danger",
+            "Damaging winds in the {{region}}. Stay indoors; avoid coastal or open areas.",
+            { region }
+          )
         : sev === "warning"
-        ? t("early.cards.wind.desc.warning",
-            "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.", { region })
-        : t("early.cards.wind.desc.safe","Winds are light to moderate.");
+        ? t(
+            "early.cards.wind.desc.warning",
+            "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.",
+            { region }
+          )
+        : t("early.cards.wind.desc.safe", "Winds are light to moderate.");
     case "heat":
       return sev === "danger"
-        ? t("early.cards.heat.desc.danger",
-            "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Stay in shade/AC; check the vulnerable.", { region, hi })
+        ? t(
+            "early.cards.heat.desc.danger",
+            "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Stay in shade/AC; check the vulnerable.",
+            { region, hi }
+          )
         : sev === "warning"
-        ? t("early.cards.heat.desc.warning",
-            "High heat in the {{region}} (HI ≈ {{hi}}°C). Reduce strenuous activity; drink water often.", { region, hi })
-        : t("early.cards.heat.desc.safe","Heat risk is low. Keep hydrated.");
+        ? t(
+            "early.cards.heat.desc.warning",
+            "High heat in the {{region}} (HI ≈ {{hi}}°C). Reduce strenuous activity; drink water often.",
+            { region, hi }
+          )
+        : t("early.cards.heat.desc.safe", "Heat risk is low. Keep hydrated.");
     default:
-      return t("home.hazard.slogan","Stay Alert, Stay Safe");
+      return t("home.hazard.slogan", "Stay Alert, Stay Safe");
   }
 };
+
+// Safety Tips — first grid of the corresponding Preparedness guide
+function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
+  const guideId = GUIDE_ID_FOR[hazardKind] || "flood";
+  const guide = getGuideById(guideId);
+  const firstSection = guide?.sections?.[0];
+  if (!firstSection) return null;
+
+  const sectionKey = firstSection.id || firstSection.key || "section";
+  const items = (firstSection.items || []).slice(0, 4);
+  const lastRowStart = items.length - (items.length % 2 === 0 ? 2 : 1);
+
+  return (
+    <View style={{ paddingHorizontal: H_PADDING, paddingTop: 14 }}>
+      <View style={styles.tipsHeaderRow}>
+        <Text style={styles.sectionTitle}>
+          {t("hazardDetail.safety_tips", "Safety Tips")}
+        </Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("PreparednessGuide", { id: guideId })}
+        >
+          <Text style={[styles.seeMore, { color: theme.colors.primary }]}>
+            {t("common.see_more", "See More")}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={items}
+        keyExtractor={(i) => i.id}
+        numColumns={2}
+        scrollEnabled={false}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={{ paddingTop: 8 }}
+        renderItem={({ item, index }) => {
+          const isLastRow = index >= lastRowStart;
+          return (
+            <View
+              style={[
+                styles.tileCard,
+                {
+                  width: TILE_WIDTH,
+                  backgroundColor: theme.colors.card,
+                  marginBottom: isLastRow ? 0 : GAP,
+                },
+              ]}
+            >
+              <Image source={item.img} style={styles.tileImg} />
+              <Text style={[styles.tileCaption, { color: theme.colors.text }]}>
+                {t(
+                  `${guideId}.sections.${sectionKey}.items.${item.id}`,
+                  item.text || ""
+                )}
+              </Text>
+            </View>
+          );
+        }}
+      />
+    </View>
+  );
+}
 
 export default function HazardDetailScreen({ navigation, route }) {
   const { theme } = useThemeContext();
@@ -107,19 +230,28 @@ export default function HazardDetailScreen({ navigation, route }) {
   // Current SG date/time strings for the banner
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
-    weekday: "short", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Singapore",
+    weekday: "short",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Singapore",
   });
-  let timeStr = now.toLocaleTimeString("en-SG", {
-    hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore",
-  }).replace(/am|pm/, (m) => m.toUpperCase());
+  let timeStr = now
+    .toLocaleTimeString("en-SG", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "Asia/Singapore",
+    })
+    .replace(/am|pm/, (m) => m.toUpperCase());
 
   const locLabel = hazard.locationName || null;
-
   const overlayKey = OVERLAY_FOR[kind] || "rain";
 
-  return (
-    <View style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
-      {/* Top hero image with back button */}
+  // Everything above Safety Tips is the list header
+  const ListHeader = (
+    <>
+      {/* Hero + back */}
       <View style={styles.hero}>
         <Image source={HERO_IMG[kind]} style={styles.heroImg} />
         <TouchableOpacity
@@ -131,11 +263,10 @@ export default function HazardDetailScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
+      {/* Body content */}
       <View style={styles.body}>
-        {/* Title */}
         <Text style={styles.h1}>{title}</Text>
 
-        {/* Hazard banner — uses the actual hazard object */}
         <HazardBanner
           hazard={hazard}
           dateStr={dateStr}
@@ -144,21 +275,19 @@ export default function HazardDetailScreen({ navigation, route }) {
           style={{ marginTop: 6, marginBottom: 12 }}
         />
 
-        {/* Description */}
-        <Text style={styles.sectionTitle}>{t("hazardDetail.description","Description")}</Text>
+        <Text style={styles.sectionTitle}>
+          {t("hazardDetail.description", "Description")}
+        </Text>
         <Text style={styles.p}>{longDescFor(hazard, t)}</Text>
 
-        {/* Affected Area (mini map preview) */}
         <Text style={[styles.sectionTitle, { marginTop: 14 }]}>
-          {t("hazardDetail.affected_area","Affected Area")}
+          {t("hazardDetail.affected_area", "Affected Area")}
         </Text>
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() =>
-            navigation.navigate("MapView", { overlay: overlayKey })
-          }
+          onPress={() => navigation.navigate("MapView", { overlay: overlayKey })}
           accessibilityRole="button"
-          accessibilityLabel={t("hazardDetail.open_map","Open map")}
+          accessibilityLabel={t("hazardDetail.open_map", "Open map")}
           style={styles.mapCard}
         >
           <LeafletMapWebView
@@ -173,17 +302,33 @@ export default function HazardDetailScreen({ navigation, route }) {
           <View style={styles.mapOverlay}>
             <Ionicons name="map" size={16} color="#fff" />
             <Text style={styles.mapOverlayText}>
-              {t("hazardDetail.view_on_map","View on Map")}
+              {t("hazardDetail.view_on_map", "View on Map")}
             </Text>
           </View>
         </TouchableOpacity>
-
-        {/* Safety tips section placeholder — wire later */}
-        <Text style={[styles.sectionTitle, { marginTop: 14 }]}>
-          {t("hazardDetail.safety_tips","Safety Tips")}
-        </Text>
-        <Text style={styles.p}>{t("hazardDetail.tips_coming","Tips coming soon.")}</Text>
       </View>
+    </>
+  );
+
+  return (
+    <View style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
+      {/* One main FlatList: header above, then Safety Tips as the only item */}
+      <FlatList
+        data={[{ type: "tips" }]}
+        keyExtractor={(i) => i.type}
+        ListHeaderComponent={ListHeader}
+        renderItem={() => (
+          <SafetyTipsGrid
+            hazardKind={kind}
+            navigation={navigation}
+            theme={theme}
+            t={t}
+            styles={styles}
+          />
+        )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 16 }}
+      />
     </View>
   );
 }
@@ -205,7 +350,7 @@ const makeStyles = (theme) =>
       backgroundColor:
         theme.key === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.35)",
     },
-    body: { padding: 14 },
+    body: { padding: H_PADDING },
     h1: { fontSize: 20, fontWeight: "800", color: theme.colors.text },
     sectionTitle: {
       marginTop: 8,
@@ -239,4 +384,29 @@ const makeStyles = (theme) =>
       gap: 6,
     },
     mapOverlayText: { color: "#fff", fontWeight: "800", fontSize: 12 },
+
+    // Safety tips grid
+    tipsHeaderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    seeMore: { fontWeight: "700" },
+    tileCard: {
+      borderRadius: 16,
+      overflow: "hidden",
+      shadowColor: "#000",
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 2,
+    },
+    tileImg: { width: "100%", height: 110, resizeMode: "cover" },
+    tileCaption: {
+      paddingHorizontal: 10,
+      paddingVertical: 10,
+      fontSize: 13,
+      lineHeight: 16,
+      textAlign: "center",
+    },
   });
