@@ -130,7 +130,10 @@ export default function LocationSettings() {
       </View>
 
       {/* Body */}
-      <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={s.body}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Current Location */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
@@ -207,7 +210,7 @@ export default function LocationSettings() {
           </Text>
         </View>
 
-        {/* Mock Disaster: Flash Flood */}
+        {/* Mock Disaster */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
             {t("location.mock_disaster_title", {
@@ -215,12 +218,24 @@ export default function LocationSettings() {
               defaultValue: "Mock Disaster",
             })}
           </Text>
+          <Text
+            style={[
+              s.small,
+              { color: theme.colors.subtext, marginTop: 4, marginBottom: 8 },
+            ]}
+          >
+            {t("location.mock_disclaimer", {
+              ns: "common",
+              defaultValue:
+                "When any mock is ON, real detections are temporarily disabled until all mocks are turned OFF.",
+            })}
+          </Text>
 
           <View style={s.rowBetween}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_flood_label", {
                 ns: "common",
-                defaultValue: "Mock Flood (Demo)",
+                defaultValue: "Mock Flood (Danger)",
               })}
             </Text>
             <Switch value={mockFlood} onValueChange={toggleFlood} />
@@ -232,7 +247,7 @@ export default function LocationSettings() {
             {t("location.mock_flood_desc", {
               ns: "common",
               defaultValue:
-                "When ON, Home & Map will show a Flash Flood warning near your current/ demo location.",
+                "Simulates a Flash Flood (Danger) near your current/demo location.",
             })}
           </Text>
           <View style={[s.rowBetween, { marginTop: 14 }]}>
@@ -247,7 +262,7 @@ export default function LocationSettings() {
           <Text style={[s.small, { color: theme.colors.subtext }]}>
             {t("location.mock_haze_desc", {
               ns: "common",
-              defaultValue: "For testing the Haze Advisory banner.",
+              defaultValue: "Simulates Haze (Warning) over a region.",
             })}
           </Text>
 
@@ -279,7 +294,7 @@ export default function LocationSettings() {
           <Text style={[s.small, { color: theme.colors.subtext }]}>
             {t("location.mock_wind_desc", {
               ns: "common",
-              defaultValue: "For testing the Strong Winds banner.",
+              defaultValue: "Simulates Strong Winds (Warning) over a region.",
             })}
           </Text>
 
@@ -295,7 +310,7 @@ export default function LocationSettings() {
           <Text style={[s.small, { color: theme.colors.subtext }]}>
             {t("location.mock_heat_desc", {
               ns: "common",
-              defaultValue: "For testing the Heat Warning banner.",
+              defaultValue: "Simulates Heat (Danger) over a region.",
             })}
           </Text>
         </View>

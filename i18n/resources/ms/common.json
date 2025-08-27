@@ -101,6 +101,28 @@
       "hum": "Kelembapan",
       "dengue": "Denggi",
       "clinics": "Klinik"
+    },
+    "warning": {
+      "flood": {
+        "danger": { "title": "Banjir Kilat (Bahaya)" },
+        "warning": { "title": "Banjir Kilat (Amaran)" }
+      },
+      "haze": {
+        "danger": { "title": "Jerebu (Bahaya)" },
+        "warning": { "title": "Jerebu (Amaran)" }
+      },
+      "dengue": {
+        "danger": { "title": "Kluster Denggi Berhampiran" },
+        "warning": { "title": "Waspada Denggi Berhampiran" }
+      },
+      "wind": {
+        "danger": { "title": "Angin Merosakkan (Bahaya)" },
+        "warning": { "title": "Angin Kencang (Amaran)" }
+      },
+      "heat": {
+        "danger": { "title": "Haba (Bahaya)" },
+        "warning": { "title": "Haba (Amaran)" }
+      }
     }
   },
   "nav": {
@@ -303,7 +325,24 @@
       "east": "Timur",
       "west": "Barat",
       "central": "Tengah"
-    }
+    },
+    "mock_disaster_title": "Bencana Simulasi",
+    "mock_disclaimer": "Apabila mana-mana simulasi dihidupkan, pengesanan sebenar akan dinyahaktifkan sementara sehingga semua simulasi dimatikan.",
+
+    "mock_flood_label": "Banjir Simulasi (Amaran)",
+    "mock_flood_desc": "Mensimulasikan Banjir Kilat (Bahaya) berhampiran lokasi semasa/demo anda.",
+
+    "mock_haze_label": "Jerebu Simulasi (Amaran)",
+    "mock_haze_desc": "Mensimulasikan jerebu (Amaran) di sesuatu kawasan.",
+
+    "mock_dengue_label": "Denggi Simulasi (Amaran)",
+    "mock_dengue_desc": "Mensimulasikan kluster denggi berhampiran (dalam lingkungan 5 km).",
+
+    "mock_wind_label": "Angin Simulasi (Amaran)",
+    "mock_wind_desc": "Mensimulasikan angin kencang (Amaran) di sesuatu kawasan.",
+
+    "mock_heat_label": "Haba Simulasi (Bahaya)",
+    "mock_heat_desc": "Mensimulasikan haba (Bahaya) di sesuatu kawasan."
   },
   "emergency_contacts": {
     "title": "Kenalan Kecemasan",

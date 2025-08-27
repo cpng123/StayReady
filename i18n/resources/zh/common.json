@@ -81,6 +81,28 @@
       "hum": "湿度",
       "dengue": "登革热",
       "clinics": "诊所"
+    },
+    "warning": {
+      "flood": {
+        "danger": { "title": "突发性洪水（危险）" },
+        "warning": { "title": "突发性洪水（警示）" }
+      },
+      "haze": {
+        "danger": { "title": "烟霾（危险）" },
+        "warning": { "title": "烟霾（警示）" }
+      },
+      "dengue": {
+        "danger": { "title": "附近登革热聚集区" },
+        "warning": { "title": "附近登革热注意" }
+      },
+      "wind": {
+        "danger": { "title": "破坏性强风（危险）" },
+        "warning": { "title": "强风（警示）" }
+      },
+      "heat": {
+        "danger": { "title": "高温（危险）" },
+        "warning": { "title": "高温（警示）" }
+      }
     }
   },
   "nav": {
@@ -281,7 +303,24 @@
       "east": "东部",
       "west": "西部",
       "central": "中部"
-    }
+    },
+    "mock_disaster_title": "模拟灾害",
+    "mock_disclaimer": "当任一模拟开启时，将暂时停用真实检测，直到关闭所有模拟为止。",
+
+    "mock_flood_label": "模拟洪水（危险）",
+    "mock_flood_desc": "在你当前/演示位置附近模拟“突发性洪水”（危险级）。",
+
+    "mock_haze_label": "模拟烟霾（警示）",
+    "mock_haze_desc": "在某个区域模拟“烟霾”（警示级）状况。",
+
+    "mock_dengue_label": "模拟登革热（警示）",
+    "mock_dengue_desc": "模拟附近 5 公里范围内的登革热聚集区。",
+
+    "mock_wind_label": "模拟强风（警示）",
+    "mock_wind_desc": "在某个区域模拟“强风”（警示级）状况。",
+
+    "mock_heat_label": "模拟高温（危险）",
+    "mock_heat_desc": "在某个区域模拟“高温”（危险级）状况。"
   },
   "emergency_contacts": {
     "title": "紧急联系人",

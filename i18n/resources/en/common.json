@@ -95,6 +95,28 @@
       "hum": "Humidity",
       "dengue": "Dengue",
       "clinics": "Clinics"
+    },
+    "warning": {
+      "flood": {
+        "danger": { "title": "Flash Flood (Danger)" },
+        "warning": { "title": "Flash Flood (Warning)" }
+      },
+      "haze": {
+        "danger": { "title": "Haze (Danger)" },
+        "warning": { "title": "Haze (Warning)" }
+      },
+      "dengue": {
+        "danger": { "title": "Dengue Cluster Nearby" },
+        "warning": { "title": "Dengue Caution Nearby" }
+      },
+      "wind": {
+        "danger": { "title": "Damaging Winds (Danger)" },
+        "warning": { "title": "Strong Winds (Warning)" }
+      },
+      "heat": {
+        "danger": { "title": "Heat (Danger)" },
+        "warning": { "title": "Heat (Warning)" }
+      }
     }
   },
   "nav": {
@@ -297,7 +319,24 @@
       "east": "East",
       "west": "West",
       "central": "Central"
-    }
+    },
+    "mock_disaster_title": "Mock Disaster",
+    "mock_disclaimer": "When any mock is ON, real detections are temporarily disabled until all mocks are turned OFF.",
+
+    "mock_flood_label": "Mock Flood (Demo)",
+    "mock_flood_desc": "Simulates a Flash Flood (Danger) near your current/demo location.",
+
+    "mock_haze_label": "Mock Haze (Warning)",
+    "mock_haze_desc": "Simulates Haze (Warning) over a region.",
+
+    "mock_dengue_label": "Mock Dengue (Warning)",
+    "mock_dengue_desc": "Simulates a nearby dengue cluster (within 5 km).",
+
+    "mock_wind_label": "Mock Wind (Warning)",
+    "mock_wind_desc": "Simulates Strong Winds (Warning) over a region.",
+
+    "mock_heat_label": "Mock Heat (Danger)",
+    "mock_heat_desc": "Simulates Heat (Danger) over a region."
   },
   "emergency_contacts": {
     "title": "Emergency Contacts",

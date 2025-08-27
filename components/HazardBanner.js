@@ -5,6 +5,29 @@ import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
+const TITLE_KEYS = {
+  flood: {
+    danger: "home.warning.flood.danger.title",
+    warning: "home.warning.flood.warning.title",
+  },
+  haze: {
+    danger: "home.warning.haze.danger.title",
+    warning: "home.warning.haze.warning.title",
+  },
+  dengue: {
+    danger: "home.warning.dengue.danger.title",
+    warning: "home.warning.dengue.warning.title",
+  },
+  wind: {
+    danger: "home.warning.wind.danger.title",
+    warning: "home.warning.wind.warning.title",
+  },
+  heat: {
+    danger: "home.warning.heat.danger.title",
+    warning: "home.warning.heat.warning.title",
+  },
+};
+
 /**
  * Props:
  *  - hazard: { kind: 'none'|'flood'|..., title?, severity?, locationName? }
@@ -26,14 +49,25 @@ export default function HazardBanner({
   const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(theme, compact), [theme, compact]);
 
+  const kind = String(hazard?.kind || "none");
   const sev = String(hazard?.severity || "safe");
-  const isNone = (hazard?.kind ?? "none") === "none" || sev === "safe";
+  const isNone = kind === "none" || sev === "safe";
   const bg = isNone
     ? theme.colors.success
     : sev === "danger"
     ? "#DC2626"
     : "#F59E0B";
   const iconName = isNone ? "shield-checkmark" : "warning";
+
+  const titleKey = TITLE_KEYS[kind]?.[sev];
+  const title = isNone
+    ? t("home.hazard.none", "No Hazards Detected")
+    : titleKey
+    ? t(titleKey)
+    : hazard?.title || t("home.hazard.none", "No Hazards Detected");
+
+  // Prefer explicit locLabel prop, else use hazard.locationName if available
+  const finalLoc = locLabel ?? hazard?.locationName ?? null;
 
   return (
     <View style={[styles.banner, { backgroundColor: bg }, style]}>
@@ -46,10 +80,7 @@ export default function HazardBanner({
         importantForAccessibility="no"
       />
       <View style={{ flex: 1 }}>
-        <Text style={styles.title}>
-          {isNone
-            ? t("home.hazard.none", "No Hazard Detected")
-            : (hazard?.title || t("home.hazard.alert", "Hazard Alert"))}        </Text>
+        <Text style={styles.title}>{title}</Text>
 
         {!isNone ? (
           <>
@@ -64,10 +95,10 @@ export default function HazardBanner({
               />
               <Text style={[styles.meta, { marginLeft: 4 }]}>{timeAgoStr}</Text>
             </View>
-            {!!locLabel && (
+            {!!finalLoc && (
               <View style={styles.metaRow}>
                 <Ionicons name="location-outline" size={14} color="#fff" />
-                <Text style={[styles.meta, { marginLeft: 4 }]}>{locLabel}</Text>
+                <Text style={[styles.meta, { marginLeft: 4 }]}>{finalLoc}</Text>
               </View>
             )}
           </>
