@@ -86,7 +86,16 @@
     "confirm_call_title": "Call {{title}}?",
     "confirm_call_body": "Open your phone app with {{number}} pre-filled?",
     "call_manual": "Please call {{num}} manually.",
-    "dial_error": "Could not open the phone dialer."
+    "dial_error": "Could not open the phone dialer.",
+
+    "metric": {
+      "rain": "Rainfall",
+      "wind": "Wind",
+      "temp": "Temp",
+      "hum": "Humidity",
+      "dengue": "Dengue",
+      "clinics": "Clinics"
+    }
   },
   "nav": {
     "sos": "SOS",

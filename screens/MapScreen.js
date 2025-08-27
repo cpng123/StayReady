@@ -21,12 +21,14 @@ import {
   getRelativeHumidityLatest,
   getPM25Latest,
   getDengueClustersGeoJSON,
+  getClinicsGeoJSON,
 } from "../utils/api";
 import { decideHazard } from "../utils/hazard";
 import { getMockFloodEnabled } from "../utils/mockFlags";
 import HazardBanner from "../components/HazardBanner";
 
 const DENGUE_ICON = require("../assets/General/dengue.png");
+const CLINIC_ICON = require("../assets/General/clinic.png");
 
 export default function MapScreen({ route, navigation }) {
   const mapRef = useRef(null);
@@ -50,6 +52,7 @@ export default function MapScreen({ route, navigation }) {
   const [humPoints, setHumPoints] = useState([]);
   const [pmPoints, setPmPoints] = useState([]);
   const [dengueGeoJSON, setDengueGeoJSON] = useState(null);
+  const [clinicsGeoJSON, setClinicsGeoJSON] = useState(null);
 
   // active overlay
   const [overlay, setOverlay] = useState("rain");
@@ -86,6 +89,7 @@ export default function MapScreen({ route, navigation }) {
           { points: hp },
           { points: pp },
           dengueJSON,
+          clinicsJSON,
         ] = await Promise.all([
           getRainfallLatest(),
           getWindLatest(),
@@ -93,6 +97,7 @@ export default function MapScreen({ route, navigation }) {
           getRelativeHumidityLatest(),
           getPM25Latest(),
           getDengueClustersGeoJSON().catch(() => null),
+          getClinicsGeoJSON().catch(() => null),
         ]);
         if (!alive) return;
 
@@ -102,6 +107,7 @@ export default function MapScreen({ route, navigation }) {
         setHumPoints(hp);
         setPmPoints(pp);
         setDengueGeoJSON(dengueJSON);
+        setClinicsGeoJSON(clinicsJSON);
 
         // push into webview if mounted
         mapRef.current?.setRainfall(rp);
@@ -110,6 +116,7 @@ export default function MapScreen({ route, navigation }) {
         mapRef.current?.setHum(hp);
         mapRef.current?.setPM(pp);
         if (dengueJSON) mapRef.current?.setDengue(dengueJSON);
+        if (clinicsJSON) mapRef.current?.setClinics(clinicsJSON);
       } catch (e) {
         // optionally log
       }
@@ -248,6 +255,11 @@ export default function MapScreen({ route, navigation }) {
         img: DENGUE_ICON,
         label: t("home.metric.dengue", "Dengue"),
       },
+      {
+        key: "clinics",
+        img: CLINIC_ICON,
+        label: t("home.metric.clinics", "Clinics"),
+      },
     ],
     [t]
   );
@@ -301,6 +313,7 @@ export default function MapScreen({ route, navigation }) {
         humPoints={humPoints}
         pmPoints={pmPoints}
         dengueGeoJSON={dengueGeoJSON}
+        clinicsGeoJSON={clinicsGeoJSON}
         overlay={overlay}
         showLegend
         legendBottom={sheetHeight + 12}

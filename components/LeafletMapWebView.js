@@ -24,6 +24,7 @@ const LeafletMapWebView = (
     humPoints = [],
     pmPoints = [],
     dengueGeoJSON = null,
+    clinicsGeoJSON = null,
     overlay = "rain",
     legendBottom = 172,
     showLegend = true,
@@ -40,6 +41,7 @@ const LeafletMapWebView = (
   const latestHumRef = useRef("[]");
   const latestPMRef = useRef("[]");
   const latestDengueRef = useRef("null");
+  const latestClinicsRef = useRef("null");
 
   latestRainRef.current = JSON.stringify(rainfallPoints || []);
   latestWindRef.current = JSON.stringify(windPoints || []);
@@ -47,6 +49,7 @@ const LeafletMapWebView = (
   latestHumRef.current = JSON.stringify(humPoints || []);
   latestPMRef.current = JSON.stringify(pmPoints || []);
   latestDengueRef.current = JSON.stringify(dengueGeoJSON || null);
+  latestClinicsRef.current = JSON.stringify(clinicsGeoJSON || null);
 
   const html = useMemo(() => {
     const extraPins = (pins || [])
@@ -60,8 +63,8 @@ const LeafletMapWebView = (
 
     // tile sources + styles for themes
     const tileUrl = dark
-  ? "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png"
-  : "https://www.onemap.gov.sg/maps/tiles/Original/{z}/{x}/{y}.png";
+      ? "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png"
+      : "https://www.onemap.gov.sg/maps/tiles/Original/{z}/{x}/{y}.png";
 
     const pageBg = dark ? "#0b1220" : "#e6eef9";
     const legendBg = dark ? "rgba(20,24,33,0.92)" : "rgba(255,255,255,0.95)";
@@ -82,6 +85,7 @@ const LeafletMapWebView = (
     const humJSON = JSON.stringify(humPoints ?? []);
     const pmJSON = JSON.stringify(pmPoints ?? []);
     const dengueJSON = JSON.stringify(dengueGeoJSON ?? null);
+    const clinicsJSON = JSON.stringify(clinicsGeoJSON ?? null);
     const overlayJSON = JSON.stringify(overlay || "rain");
 
     return `
@@ -382,6 +386,54 @@ function renderDengue(geojson){
     }
   } catch(e){}
 }
+
+const clinicSvg = (color="#e11d48") => (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">' +
+    '<path fill="'+color+'" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>'
+  );
+  function clinicIcon() {
+    return L.divIcon({
+      className: 'sr-marker', // reuse halo
+      html: clinicSvg('${dark ? "#fb7185" : "#e11d48"}'),
+      iconSize: [20,20],
+      iconAnchor: [10,10]
+    });
+  }
+
+  window.clinicsLayer = L.layerGroup();
+  function renderClinics(geojson){
+  try{
+    window.clinicsLayer.clearLayers();
+    if(!geojson || geojson.type!=='FeatureCollection') return;
+
+    geojson.features.forEach(f=>{
+      if(!f || !f.geometry || f.geometry.type!=='Point') return;
+      const c = f.geometry.coordinates; // [lon, lat]
+      if(!Array.isArray(c) || c.length<2) return;
+      const lat = +c[1], lon = +c[0];
+      if(!isFinite(lat) || !isFinite(lon)) return;
+
+      const name = f.properties?.name || 'Clinic';
+      const addr = f.properties?.address || '';
+      const phone = f.properties?.phone || '';
+      const html = '<b>'+name+'</b>' + (addr?'<br/>'+addr:'') + (phone?'<br/>☎ '+phone:'');
+
+      L.circleMarker([lat,lon],{
+        radius: 7,
+        className: 'sr-marker',
+        stroke: true,
+        color: '#FFFFFF',
+        opacity: 0.95,
+        weight: 2,
+        fillColor: '${dark ? "#fb7185" : "#e11d48"}',
+        fillOpacity: 0.92
+      })
+      .addTo(window.clinicsLayer)
+      .bindPopup(html);
+    });
+  }catch(e){}
+}
+
   
   function ensureLegend(){ var el=document.querySelector('.legend'); if(el) return el; el=document.createElement('div'); el.className='legend'; document.body.appendChild(el); return el; }
   function renderLegend(kind){
@@ -427,6 +479,13 @@ function renderDengue(geojson){
       <div class="legend-row"><span class="legend-swatch" style="background:#3B82F6"></span>5–10</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#2563EB"></span>10–20</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#1D4ED8"></span>20+</div>'; }
+    if (kind === 'clinics') {
+      el.style.display = 'none';
+      el.innerHTML = '';
+      return;
+    } else {
+      el.style.display = 'block';
+    }
   }
 
   window.rainLayer.addTo(window.map); // default present
@@ -435,6 +494,7 @@ function renderDengue(geojson){
   window.humLayer.addTo(window.map);  window.map.removeLayer(window.humLayer);
   window.pmLayer.addTo(window.map);   window.map.removeLayer(window.pmLayer);
   window.dengueLayer.addTo(window.map); window.map.removeLayer(window.dengueLayer);
+  window.clinicsLayer.addTo(window.map); window.map.removeLayer(window.clinicsLayer);
 
   window.showOverlay = function(kind){
     try{
@@ -446,6 +506,7 @@ function renderDengue(geojson){
       else if(kind==='hum') window.map.addLayer(window.humLayer);
       else if(kind==='pm') window.map.addLayer(window.pmLayer);
       else if(kind==='dengue') window.map.addLayer(window.dengueLayer);
+      else if(kind==='clinics') window.map.addLayer(window.clinicsLayer);
       else window.map.addLayer(window.rainLayer);
       renderLegend(kind);
       window.__overlay__ = kind;
@@ -458,6 +519,7 @@ function renderDengue(geojson){
   window.updateHum      = function(pointsJson){ try{ renderHum(JSON.parse(pointsJson)); }catch(e){} };
   window.updatePM       = function(pointsJson){ try{ renderPM(JSON.parse(pointsJson)); }catch(e){} };
   window.updateDengue   = function(geojsonJson){ try{ renderDengue(JSON.parse(geojsonJson)); }catch(e){} };
+  window.updateClinics  = function(geojsonJson){ try{ renderClinics(JSON.parse(geojsonJson)); }catch(e){} };
 
   try { renderRainfall(${rainJSON}); } catch(e){}
   try { renderWind(${windJSON}); } catch(e){}
@@ -465,6 +527,7 @@ function renderDengue(geojson){
   try { renderHum(${humJSON}); } catch(e){}
   try { renderPM(${pmJSON}); } catch(e){}
   try { renderDengue(${dengueJSON}); } catch(e){}
+  try { renderClinics(${clinicsJSON}); } catch(e){}
   try { window.showOverlay(${overlayJSON}); } catch(e){}
 </script>
 </body>
@@ -482,6 +545,7 @@ function renderDengue(geojson){
     humPoints,
     pmPoints,
     dengueGeoJSON,
+    clinicsGeoJSON,
     overlay,
     legendBottom,
     showLegend,
@@ -559,6 +623,16 @@ function renderDengue(geojson){
         true;
       `);
       },
+      setClinics: (geojson) => {
+        if (!webRef.current) return;
+        const payload = JSON.stringify(geojson || null);
+        webRef.current.injectJavaScript(`
+       try { if (window.updateClinics) { window.updateClinics(${JSON.stringify(
+         payload
+       )}); } } catch (e) {}
+       true;
+     `);
+      },
       setOverlay: (kind) => {
         if (!webRef.current) return;
         webRef.current.injectJavaScript(`
@@ -620,6 +694,14 @@ function renderDengue(geojson){
       true;
     `);
   }, [dengueGeoJSON]);
+
+  useEffect(() => {
+    if (!webRef.current || !webReadyRef.current) return;
+    webRef.current.injectJavaScript(`
+     try { if (window.updateClinics) { window.updateClinics(${latestClinicsRef.current}); } } catch (e) {}
+     true;
+   `);
+  }, [clinicsGeoJSON]);
 
   useEffect(() => {
     if (!webRef.current || !webReadyRef.current) return;

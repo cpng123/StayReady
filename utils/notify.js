@@ -80,6 +80,6 @@ export async function maybeNotifyFlood(hazard) {
 
   await Notifications.scheduleNotificationAsync({
     content: { title, body, sound: true },
-    trigger: null, // immediate
+    trigger: null,
   });
 }

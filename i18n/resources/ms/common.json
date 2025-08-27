@@ -92,7 +92,16 @@
     "confirm_call_title": "Hubungi {{title}}?",
     "confirm_call_body": "Buka aplikasi telefon dengan {{number}} siap diisi?",
     "call_manual": "Sila dail {{num}} secara manual.",
-    "dial_error": "Tidak dapat membuka dail telefon."
+    "dial_error": "Tidak dapat membuka dail telefon.",
+
+    "metric": {
+      "rain": "Hujan",
+      "wind": "Angin",
+      "temp": "Temp",
+      "hum": "Kelembapan",
+      "dengue": "Denggi",
+      "clinics": "Klinik"
+    }
   },
   "nav": {
     "sos": "SOS",

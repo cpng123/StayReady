@@ -154,7 +154,11 @@ export async function getWindAt(dateStr, { apiKey } = {}) {
  * AIR TEMPERATURE (°C)
  * GET /air-temperature
  * --------------------------*/
-export async function fetchAirTemperature({ date, paginationToken, apiKey } = {}) {
+export async function fetchAirTemperature({
+  date,
+  paginationToken,
+  apiKey,
+} = {}) {
   const url = buildRealTimeUrl("/air-temperature", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
@@ -162,7 +166,9 @@ export async function fetchAirTemperature({ date, paginationToken, apiKey } = {}
   const res = await fetch(url, { headers });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    const err = new Error(`Air temperature fetch failed (${res.status}) ${text}`);
+    const err = new Error(
+      `Air temperature fetch failed (${res.status}) ${text}`
+    );
     err.status = res.status;
     throw err;
   }
@@ -209,7 +215,11 @@ export async function getAirTemperatureAt(dateStr, { apiKey } = {}) {
  * RELATIVE HUMIDITY (%)
  * GET /relative-humidity
  * --------------------------*/
-export async function fetchRelativeHumidity({ date, paginationToken, apiKey } = {}) {
+export async function fetchRelativeHumidity({
+  date,
+  paginationToken,
+  apiKey,
+} = {}) {
   const url = buildRealTimeUrl("/relative-humidity", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
@@ -331,7 +341,9 @@ export async function getPM25At(dateStr, { apiKey } = {}) {
  * --------------------------*/
 const DENGUE_DATASET_ID = "d_dbfabf16158d1b0e1c420627c0819168";
 
-export async function fetchDengueClustersGeoJSON(datasetId = DENGUE_DATASET_ID) {
+export async function fetchDengueClustersGeoJSON(
+  datasetId = DENGUE_DATASET_ID
+) {
   const metaUrl = buildUrl(
     DATASET_API_BASE,
     `/datasets/${datasetId}/poll-download`
@@ -350,7 +362,9 @@ export async function fetchDengueClustersGeoJSON(datasetId = DENGUE_DATASET_ID) 
   const fileRes = await fetch(fileUrl);
   if (!fileRes.ok) {
     const text = await fileRes.text().catch(() => "");
-    const err = new Error(`Dengue GEOJSON fetch failed (${fileRes.status}) ${text}`);
+    const err = new Error(
+      `Dengue GEOJSON fetch failed (${fileRes.status}) ${text}`
+    );
     err.status = fileRes.status;
     throw err;
   }
@@ -361,4 +375,53 @@ export async function getDengueClustersGeoJSON() {
   // Return raw GeoJSON, suitable for L.geoJSON
   const geojson = await fetchDengueClustersGeoJSON();
   return geojson;
+}
+
+export async function getClinicsGeoJSON() {
+  const datasetId = "d_548c33ea2d99e29ec63a7cc9edcccedc"; // CHAS Clinics (MOH)
+  const pollUrl = `https://api-open.data.gov.sg/v1/public/api/datasets/${datasetId}/poll-download`;
+
+  const pollRes = await fetch(pollUrl, {
+    headers: { "Cache-Control": "no-cache" },
+  });
+  if (!pollRes.ok) throw new Error("clinics poll failed");
+  const pollJson = await pollRes.json();
+
+  // The API returns { code: 0, data: { url: "<temp signed url>" } } on success
+  if (pollJson.code !== 0 || !pollJson?.data?.url) {
+    throw new Error("clinics poll returned no url");
+  }
+
+  const res = await fetch(pollJson.data.url, {
+    headers: { "Cache-Control": "no-cache" },
+  });
+  if (!res.ok) throw new Error("clinics fetch failed");
+
+  const geojson = await res.json();
+  if (!geojson || geojson.type !== "FeatureCollection") return null;
+
+  // OPTIONAL: normalize some friendly fields from the HTML "Description"
+  const normFeatures = (geojson.features || []).map((f) => {
+    const props = f.properties || {};
+    const html = props.Description || "";
+
+    const rx = (label) =>
+      new RegExp(`<th>${label}<\\/th>\\s*<td>(.*?)<\\/td>`, "i").exec(
+        html
+      )?.[1] || props[label];
+
+    const name = rx("HCI_NAME") || props.Name || "Clinic";
+    const tel = rx("HCI_TEL") || "";
+    const blk = rx("BLK_HSE_NO") || "";
+    const street = rx("STREET_NAME") || "";
+    const bldg = rx("BUILDING_NAME") || "";
+    const postal = rx("POSTAL_CD") || "";
+    const address = [blk, street, bldg, postal && `S(${postal})`]
+      .filter(Boolean)
+      .join(", ");
+
+    return { ...f, properties: { name, address, phone: tel } };
+  });
+
+  return { ...geojson, features: normFeatures };
 }

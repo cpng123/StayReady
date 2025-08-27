@@ -72,7 +72,16 @@
     "confirm_call_title": "拨打 {{title}}？",
     "confirm_call_body": "是否打开电话并预填 {{number}}？",
     "call_manual": "请手动拨打 {{num}}。",
-    "dial_error": "无法打开电话拨号器。"
+    "dial_error": "无法打开电话拨号器。",
+
+    "metric": {
+      "rain": "降雨量",
+      "wind": "风力",
+      "temp": "温度",
+      "hum": "湿度",
+      "dengue": "登革热",
+      "clinics": "诊所"
+    }
   },
   "nav": {
     "sos": "SOS",
