@@ -13,16 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import WarningCard from "../components/WarningCard";
-import { evaluateAllHazards } from "../utils/hazard";
-import {
-  getRainfallLatest,
-  getWindLatest,
-  getAirTemperatureLatest,
-  getRelativeHumidityLatest,
-  getPM25Latest,
-  getDengueClustersGeoJSON,
-} from "../utils/api";
-import { getMockFlags } from "../utils/mockFlags";
+import useHazards from "../utils/useHazards";
 import { useTranslation } from "react-i18next";
 
 const SCREEN_PADDING = 16;
@@ -39,21 +30,21 @@ export default function EarlyWarningScreen({ navigation }) {
 
   // ---- Carousel state ----
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [cards, setCards] = useState([]);
+  const { cards: ewCards } = useHazards(undefined, 5);
   const carouselRef = useRef(null);
 
   // Auto-advance every 5s, loop
   useEffect(() => {
-    if (!cards.length) return;
+    if (!ewCards.length) return;
     const id = setInterval(() => {
-      const next = (currentIndex + 1) % cards.length;
+      const next = (currentIndex + 1) % ewCards.length;
       if (carouselRef.current) {
         carouselRef.current.scrollToIndex({ index: next, animated: true });
       }
       setCurrentIndex(next);
     }, 5000);
     return () => clearInterval(id);
-  }, [currentIndex, cards.length]);
+  }, [currentIndex, ewCards.length]);
 
   const onMomentumEnd = (e) => {
     const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -90,7 +81,7 @@ export default function EarlyWarningScreen({ navigation }) {
     indices: dotIndices,
     hasLeft,
     hasRight,
-  } = getDotWindow(cards.length || 0, currentIndex, MAX_DOTS);
+  } = getDotWindow(ewCards.length || 0, currentIndex, MAX_DOTS);
 
   // ---- List header (title + paragraph) becomes part of FlatList ----
   const ListHeader = (
@@ -102,187 +93,13 @@ export default function EarlyWarningScreen({ navigation }) {
     </View>
   );
 
-  // Fetch all datasets once and build 5 hazard cards
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const [rain, wind, temp, hum, pm, dengue, mockFlags] =
-          await Promise.all([
-            getRainfallLatest().catch(() => ({ points: [] })),
-            getWindLatest().catch(() => ({ points: [] })),
-            getAirTemperatureLatest().catch(() => ({ points: [] })),
-            getRelativeHumidityLatest().catch(() => ({ points: [] })),
-            getPM25Latest().catch(() => ({ points: [] })),
-            getDengueClustersGeoJSON().catch(() => null),
-            getMockFlags().catch(() => ({})),
-          ]);
-
-        if (!alive) return;
-
-        // Evaluate the five hazards (mock overrides real)
-        const hazards = evaluateAllHazards({
-          center: { lat: 1.3521, lon: 103.8198 }, // or user center if you want
-          rainfallPoints: rain.points || [],
-          windPoints: wind.points || [],
-          tempPoints: temp.points || [],
-          humPoints: hum.points || [],
-          pmPoints: pm.points || [],
-          dengueGeoJSON: dengue,
-          mockFlags,
-        });
-
-        // Map hazards → UI cards
-        const severityBadge = {
-          safe: t("early.severity.safe", "Safe"),
-          warning: t("early.severity.med", "Med"),
-          danger: t("early.severity.high", "High"),
-        };
-        const severityColor = {
-          safe: "#03A55A",
-          warning: "#F29F3D",
-          danger: "#F25555",
-        };
-        const images = {
-          flood: require("../assets/General/flash-flood2.jpg"),
-          haze: require("../assets/General/pm-haze2.jpg"),
-          dengue: require("../assets/General/dengue-cluster2.jpg"),
-          wind: require("../assets/General/strong-wind2.jpg"),
-          heat: require("../assets/General/heat.jpg"),
-        };
-
-        const titleFor = (k) =>
-          ({
-            flood: t("early.cards.flood.title", "Flash Flood"),
-            haze: t("early.cards.haze.title", "Haze (PM2.5)"),
-            dengue: t("early.cards.dengue.title", "Dengue Clusters"),
-            wind: t("early.cards.wind.title", "Strong Winds"),
-            heat: t("early.cards.heat.title", "Heat Advisory"),
-          }[k] || t("home.early.title"));
-
-        const descFor = (h) => {
-          const sev = h.severity || "safe";
-          const loc = h.locationName;
-          const m = h.metrics || {};
-          switch (h.kind) {
-            case "flood":
-              return sev === "danger"
-                ? t(
-                    "early.cards.flood.desc.danger",
-                    "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements.",
-                    { place: loc || "your area" }
-                  )
-                : sev === "warning"
-                ? t(
-                    "early.cards.flood.desc.warning",
-                    "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.",
-                    { place: loc || "your area" }
-                  )
-                : t(
-                    "early.cards.flood.desc.safe",
-                    "No significant rain detected. Drains and canals at normal levels."
-                  );
-            case "haze":
-              return sev === "danger"
-                ? t(
-                    "early.cards.haze.desc.danger",
-                    "Unhealthy PM2.5 in the {{region}}. Stay indoors; use purifier; wear N95 if going out.",
-                    { region: loc || "region" }
-                  )
-                : sev === "warning"
-                ? t(
-                    "early.cards.haze.desc.warning",
-                    "Elevated PM2.5 in the {{region}}. Limit outdoor activity; consider a mask.",
-                    { region: loc || "region" }
-                  )
-                : t(
-                    "early.cards.haze.desc.safe",
-                    "Air quality is within normal range across Singapore."
-                  );
-            case "dengue":
-              return sev === "danger"
-                ? t(
-                    "early.cards.dengue.desc.danger",
-                    "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists.",
-                    { place: loc || "nearby", cases: m.cases ?? "10" }
-                  )
-                : sev === "warning"
-                ? t(
-                    "early.cards.dengue.desc.warning",
-                    "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.",
-                    { place: loc || "nearby", km: m.km ? m.km.toFixed(1) : "—" }
-                  )
-                : t(
-                    "early.cards.dengue.desc.safe",
-                    "No active cluster within 5 km of your location."
-                  );
-            case "wind":
-              return sev === "danger"
-                ? t(
-                    "early.cards.wind.desc.danger",
-                    "Damaging winds in the {{region}}. Stay indoors; avoid coastal or open areas.",
-                    { region: loc || "region" }
-                  )
-                : sev === "warning"
-                ? t(
-                    "early.cards.wind.desc.warning",
-                    "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.",
-                    { region: loc || "region" }
-                  )
-                : t(
-                    "early.cards.wind.desc.safe",
-                    "Winds are light to moderate."
-                  );
-            case "heat":
-              return sev === "danger"
-                ? t(
-                    "early.cards.heat.desc.danger",
-                    "Extreme heat in the {{region}}. Heat illness possible. Stay in shade/AC; check the vulnerable.",
-                    { region: loc || "region" }
-                  )
-                : sev === "warning"
-                ? t(
-                    "early.cards.heat.desc.warning",
-                    "High heat in the {{region}}. Reduce strenuous activity; drink water often.",
-                    { region: loc || "region" }
-                  )
-                : t(
-                    "early.cards.heat.desc.safe",
-                    "Heat risk is low. Keep hydrated."
-                  );
-            default:
-              return "";
-          }
-        };
-
-        const ui = hazards.map((h) => ({
-          id: h.kind,
-          title: titleFor(h.kind),
-          level: severityBadge[h.severity || "safe"],
-          color: severityColor[h.severity || "safe"],
-          img: images[h.kind],
-          desc: descFor(h),
-          hazard: h,
-        }));
-
-        setCards(ui);
-        setCurrentIndex(0);
-      } catch {
-        setCards([]); // could also keep old cards
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   return (
     <SafeAreaView style={styles.safe}>
       {/* ===== Top Carousel ===== */}
       <View style={styles.hero}>
         <FlatList
           ref={carouselRef}
-          data={cards}
+          data={ewCards}
           keyExtractor={(i) => i.id}
           horizontal
           pagingEnabled
@@ -322,7 +139,7 @@ export default function EarlyWarningScreen({ navigation }) {
 
       {/* ===== Grid list with header inside FlatList ===== */}
       <FlatList
-        data={cards}
+        data={ewCards}
         keyExtractor={(i) => i.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}
