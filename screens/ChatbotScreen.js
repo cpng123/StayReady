@@ -43,6 +43,18 @@ export default function ChatbotScreen() {
     const text = input.trim();
     if (!text || loading) return;
 
+    if (!OPENROUTER_API_KEY) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Chatbot is disabled (missing API key). Add it to .env or use a server proxy.",
+        },
+      ]);
+      return;
+    }
+    
     const userMessage = { role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
