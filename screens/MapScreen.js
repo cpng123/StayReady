@@ -62,6 +62,11 @@ export default function MapScreen({ route, navigation }) {
     []
   );
 
+  useEffect(() => {
+    const ov = route?.params?.overlay;
+    if (ov) setOverlay(ov);
+  }, [route?.params?.overlay]);
+
   // get user location once
   useEffect(() => {
     let alive = true;

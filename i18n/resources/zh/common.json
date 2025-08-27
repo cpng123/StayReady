@@ -642,5 +642,12 @@
       "delete": "删除",
       "cancel": "取消"
     }
+  },
+  "hazardDetail": {
+    "description": "描述",
+    "affected_area": "受影响区域",
+    "safety_tips": "安全提示",
+    "view_on_map": "在地图上查看",
+    "open_map": "打开地图"
   }
 }

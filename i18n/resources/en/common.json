@@ -656,5 +656,12 @@
       "delete": "Delete",
       "cancel": "Cancel"
     }
+  },
+    "hazardDetail": {
+    "description": "Description",
+    "affected_area": "Affected Area",
+    "safety_tips": "Safety Tips",
+    "view_on_map": "View on Map",
+    "open_map": "Open map"
   }
 }

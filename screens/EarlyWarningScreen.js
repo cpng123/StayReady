@@ -157,21 +157,9 @@ export default function EarlyWarningScreen({ navigation }) {
             width={CARD_WIDTH}
             imageHeight={90}
             style={{ marginBottom: GAP }}
-            onPress={() => {
-              // Route to your per-topic page (reuse PreparednessGuide with IDs you already have)
-              const mapId = {
-                flood: "flood",
-                haze: "haze",
-                dengue: "dengue",
-                wind: "wind",
-                heat: "heat",
-              };
-              const guideId = mapId[item.id] || "flood";
-              navigation.navigate("PreparednessGuide", {
-                id: guideId,
-                hazard: item.hazard,
-              });
-            }}
+            onPress={() =>
+              navigation.navigate("HazardDetail", { hazard: item.hazard })
+            }
           />
         )}
       />

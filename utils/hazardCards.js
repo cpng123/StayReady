@@ -106,7 +106,7 @@ export const toCardItem = (h, t) => ({
   color: sevColor(h.severity),
   img: CARD_IMG[h.kind],
   desc: cardDesc(h, t),
-  hazard: h, // pass-through for deep pages
+  hazard: h,
 });
 
 export const buildCardItems = (hazards = [], t, limit) => {

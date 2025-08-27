@@ -669,5 +669,12 @@
       "delete": "Padam",
       "cancel": "Batal"
     }
+  },
+  "hazardDetail": {
+    "description": "Penerangan",
+    "affected_area": "Kawasan Terjejas",
+    "safety_tips": "Petua Keselamatan",
+    "view_on_map": "Lihat pada Peta",
+    "open_map": "Buka peta"
   }
 }

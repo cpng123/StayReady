@@ -11,6 +11,7 @@ import { initNotifications } from "./utils/notify";
 
 import SplashScreen from "./screens/SplashScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
+import HazardDetailScreen from "./screens/HazardDetailScreen";
 import ResourceHubScreen from "./screens/ResourceHubScreen";
 import AppNavigator from "./navigation/AppNavigator";
 import PreparednessGuideScreen from "./screens/PreparednessGuideScreen";
@@ -47,6 +48,7 @@ function RootNav() {
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Main" component={AppNavigator} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
+          <Stack.Screen name="HazardDetail" component={HazardDetailScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />
           <Stack.Screen
             name="PreparednessGuide"

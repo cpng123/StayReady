@@ -25,16 +25,7 @@ import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
 
-import {
-  getRainfallLatest,
-  getRelativeHumidityLatest,
-  getPM25Latest,
-  getWindLatest,
-  getAirTemperatureLatest,
-  getDengueClustersGeoJSON,
-} from "../utils/api";
 import useHazards from "../utils/useHazards";
-import { getMockFlags } from "../utils/mockFlags";
 import useNotifyOnHazard from "../utils/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
 
@@ -363,6 +354,7 @@ export default function HomeScreen() {
               width={200}
               imageHeight={120}
               showUpdated={false}
+              onPress={() => navigation.navigate("HazardDetail", { hazard: item.hazard })}
             />
           )}
         />
