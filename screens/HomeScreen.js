@@ -13,7 +13,7 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { CONTACTS, getHomeWarnings } from "../data/homeData";
+import { CONTACTS } from "../data/homeData";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import WarningCard from "../components/WarningCard";
 import ImageOverlayCard from "../components/ImageOverlayCard";
@@ -33,13 +33,13 @@ import {
   getAirTemperatureLatest,
   getDengueClustersGeoJSON,
 } from "../utils/api";
-import { decideGlobalHazard } from "../utils/hazard";
+import { decideGlobalHazard, evaluateAllHazards } from "../utils/hazard";
 import { getMockFlags } from "../utils/mockFlags";
 import useNotifyOnHazard from "../utils/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
-const HOME_WARNINGS = getHomeWarnings(4);
+
 const UNICEF_URL =
   "https://help.unicef.org/?country=SG&&campaignid=20648257412&gad_source=1&gad_campaignid=20642170995&gbraid=0AAAAADCOMi5mkgs50IleVtR5hH2KuG99d&gclid=Cj0KCQjwwZDFBhCpARIsAB95qO1fDQ_3Zci8KlH2BnokWscSyGWcXPp0eIsVwbqGRySaNc0yEdvi0pEaAjXdEALw_wcB&gclsrc=aw.ds";
 
@@ -53,6 +53,7 @@ export default function HomeScreen() {
     kind: "none",
     title: t("home.hazard.none", "No Hazard Detected"),
   });
+  const [earlyCards, setEarlyCards] = useState([]);
   useNotifyOnHazard(hazard);
 
   const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
@@ -98,6 +99,18 @@ export default function HomeScreen() {
         });
 
         setHazard(result);
+        // Build Early Warning cards (take first 4)
+        const allHaz = evaluateAllHazards({
+          center,
+          rainfallPoints: rain.points || [],
+          humPoints: hum.points || [],
+          pmPoints: pm.points || [],
+          windPoints: wind.points || [],
+          tempPoints: temp.points || [],
+          dengueGeoJSON: dengueJSON,
+          mockFlags,
+        });
+        setEarlyCards(allHaz.slice(0, 4).map((h) => toCardItem(h, t)));
       } catch {
         if (!alive)
           setHazard({
@@ -164,6 +177,17 @@ export default function HomeScreen() {
           mockFlags,
         });
         setHazard(result);
+        const allHaz = evaluateAllHazards({
+          center,
+          rainfallPoints: rain.points || [],
+          humPoints: hum.points || [],
+          pmPoints: pm.points || [],
+          windPoints: wind.points || [],
+          tempPoints: temp.points || [],
+          dengueGeoJSON: dengueJSON,
+          mockFlags,
+        });
+        setEarlyCards(allHaz.slice(0, 4).map((h) => toCardItem(h, t)));
       })();
       return () => {
         alive = false;
@@ -292,6 +316,119 @@ export default function HomeScreen() {
   timeStr = timeStr.replace(/am|pm/, (m) => m.toUpperCase());
 
   const locLabel = hazard.locationName || null;
+
+  // Map severity -> pill label + colour
+  const sevLabel = (sev, t) =>
+    sev === "danger"
+      ? t("early.severity.high", "High")
+      : sev === "warning"
+      ? t("early.severity.med", "Med")
+      : t("early.severity.safe", "Safe");
+
+  const sevColor = (sev) =>
+    sev === "danger" ? "#F25555" : sev === "warning" ? "#F29F3D" : "#03A55A";
+
+  // Card images per hazard
+  const CARD_IMG = {
+    flood: require("../assets/General/flash-flood2.jpg"),
+    haze: require("../assets/General/pm-haze2.jpg"),
+    dengue: require("../assets/General/dengue-cluster2.jpg"),
+    wind: require("../assets/General/strong-wind2.jpg"),
+  };
+
+  // Localized static titles per hazard
+  const cardTitle = (kind, t) =>
+    ({
+      flood: t("early.cards.flood.title", "Flash Flood"),
+      haze: t("early.cards.haze.title", "Haze (PM2.5)"),
+      dengue: t("early.cards.dengue.title", "Dengue Clusters"),
+      wind: t("early.cards.wind.title", "Strong Winds"),
+      heat: t("early.cards.heat.title", "Heat Advisory"),
+    }[kind] || t("home.hazard.alert", "Hazard Alert"));
+
+  // Localized description per hazard/severity (uses metrics/location if present)
+  const cardDesc = (h, t) => {
+    const sev = h.severity || "safe";
+    const m = h.metrics || {};
+    const place =
+      h.locationName || m.locality || t("settings.country_sg", "Singapore");
+    const region =
+      m.region || h.locationName || t("settings.country_sg", "Singapore");
+    const hi = m.hi != null ? m.hi.toFixed(1) : undefined;
+    const km = m.km != null ? m.km.toFixed(1) : undefined;
+    const cases = m.cases != null ? m.cases : undefined;
+
+    const key = (k) => `early.cards.${k}.desc.${sev}`;
+
+    switch (h.kind) {
+      case "flood":
+        return t(key("flood"), {
+          defaultValue:
+            sev === "danger"
+              ? `Flash flooding around ${place}. Do not drive through floodwater.`
+              : sev === "warning"
+              ? `Heavy showers near ${place}. Ponding possible. Avoid low-lying roads.`
+              : "No significant rain detected.",
+          place,
+        });
+      case "haze":
+        return t(key("haze"), {
+          defaultValue:
+            sev === "danger"
+              ? `Unhealthy PM2.5 in the ${region}. Stay indoors; use purifier; wear N95 if going out.`
+              : sev === "warning"
+              ? `Elevated PM2.5 in the ${region}. Limit prolonged outdoor activity; consider a mask.`
+              : "Air quality is within normal range.",
+          region,
+        });
+      case "dengue":
+        return t(key("dengue"), {
+          defaultValue:
+            sev === "danger"
+              ? `High-risk cluster near ${place} (${cases}+ cases). Avoid dawn/dusk bites; see a doctor if fever persists.`
+              : sev === "warning"
+              ? `Active cluster near ${place} (~${km} km). Remove stagnant water; use repellent.`
+              : "No active cluster within 5 km.",
+          place,
+          km,
+          cases,
+        });
+      case "wind":
+        return t(key("wind"), {
+          defaultValue:
+            sev === "danger"
+              ? `Damaging winds in the ${region}. Stay indoors; avoid coastal and open areas.`
+              : sev === "warning"
+              ? `Strong winds in the ${region}. Secure loose items; caution for riders and high vehicles.`
+              : "Winds are light to moderate.",
+          region,
+        });
+      case "heat":
+        return t(key("heat"), {
+          defaultValue:
+            sev === "danger"
+              ? `Extreme heat in the ${region} (HI ≈ ${hi}°C). Stay in shade/AC; check on the vulnerable.`
+              : sev === "warning"
+              ? `High heat in the ${region} (HI ≈ ${hi}°C). Reduce strenuous activity; drink water often.`
+              : "Heat risk is low.",
+          region,
+          hi,
+        });
+      default:
+        return t("home.hazard.slogan", "Stay Alert, Stay Safe");
+    }
+  };
+
+  // Convert a hazard -> WarningCard item shape
+  const toCardItem = (h, t) => ({
+    id: h.kind,
+    title: cardTitle(h.kind, t),
+    level: sevLabel(h.severity, t),
+    color: sevColor(h.severity),
+    img: CARD_IMG[h.kind],
+    desc: cardDesc(h, t),
+  });
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
@@ -413,7 +550,7 @@ export default function HomeScreen() {
           <View style={styles.ewHeaderLeft}>
             <Text style={styles.sectionTitle2}>{t("home.early.title")}</Text>
             <Text style={styles.sectionSubtitle}>
-              {t("home.early.subtitle")}
+              {t("home.early.subtitle2")}
             </Text>
           </View>
           <TouchableOpacity
@@ -425,7 +562,7 @@ export default function HomeScreen() {
         </View>
 
         <FlatList
-          data={HOME_WARNINGS}
+          data={earlyCards}
           keyExtractor={(i) => i.id}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -433,7 +570,12 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingVertical: 5, paddingHorizontal: 15 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
-            <WarningCard item={item} width={200} imageHeight={120} />
+            <WarningCard
+              item={item}
+              width={200}
+              imageHeight={120}
+              showUpdated={false}
+            />
           )}
         />
 

@@ -32,7 +32,8 @@
 
     "hazard": {
       "none": "Tiada Bahaya Dikesan",
-      "slogan": "Berjaga-jaga, Kekal Selamat"
+      "slogan": "Berjaga-jaga, Kekal Selamat",
+      "alert": "Amaran Bahaya"
     },
 
     "contacts": {
@@ -57,7 +58,8 @@
 
     "early": {
       "title": "Amaran Awal",
-      "subtitle": "Memantau bahaya biasa"
+      "subtitle": "Kekal dimaklumkan tentang bahaya lazim di Singapura dengan data masa nyata daripada sumber rasmi. Kemas kini ini memberi gambaran jelas tentang keadaan keselamatan semasa supaya anda boleh bertindak melindungi diri dan keluarga.",
+      "subtitle2": "Memantau bahaya biasa"
     },
 
     "see_more": "Lihat Lagi",
@@ -122,6 +124,55 @@
       "heat": {
         "danger": { "title": "Haba (Bahaya)" },
         "warning": { "title": "Haba (Amaran)" }
+      }
+    }
+  },
+  "early": {
+    "severity": {
+      "safe": "Selamat",
+      "med": "Sederhana",
+      "high": "Tinggi"
+    },
+    "cards": {
+      "flood": {
+        "title": "Banjir Kilat",
+        "desc": {
+          "safe": "Tiada hujan ketara dikesan. Paras longkang dan terusan adalah normal.",
+          "warning": "Hujan lebat berhampiran {{place}}. Air bertakung mungkin berlaku. Elakkan jalan rendah dan lorong tepi.",
+          "danger": "Banjir kilat di sekitar {{place}}. Jangan pandu merentasi air banjir; elakkan terowong dan ruang bawah tanah."
+        }
+      },
+      "haze": {
+        "title": "Jerebu (PM2.5)",
+        "desc": {
+          "safe": "Kualiti udara dalam julat normal di seluruh Singapura.",
+          "warning": "PM2.5 meningkat di {{region}}. Hadkan aktiviti luar yang berpanjangan; pertimbangkan pemakaian pelitup.",
+          "danger": "PM2.5 tidak sihat di {{region}}. Kekal di dalam rumah dengan tingkap tertutup; guna penapis udara; pakai N95 jika keluar."
+        }
+      },
+      "dengue": {
+        "title": "Kluster Denggi",
+        "desc": {
+          "safe": "Tiada kluster aktif dalam radius 5 km dari lokasi anda.",
+          "warning": "Kluster aktif berhampiran {{place}} (~{{km}} km). Hapuskan air bertakung; guna penghalau nyamuk.",
+          "danger": "Kluster berisiko tinggi berhampiran {{place}} ({{cases}}+ kes). Elak gigitan waktu subuh/senja; periksa rumah setiap hari; jumpa doktor jika demam berterusan."
+        }
+      },
+      "wind": {
+        "title": "Angin Kencang",
+        "desc": {
+          "safe": "Kelajuan angin ringan ke sederhana.",
+          "warning": "Angin kencang di {{region}}. Amankan barang mudah ditiup; berhati-hati untuk penunggang dan kenderaan tinggi.",
+          "danger": "Angin merosakkan di {{region}}. Kekal di dalam rumah; elakkan kawasan pantai dan terbuka."
+        }
+      },
+      "heat": {
+        "title": "Amaran Haba",
+        "desc": {
+          "safe": "Risiko haba rendah. Kekal terhidrat.",
+          "warning": "Haba tinggi di {{region}} (HI ≈ {{hi}}°C). Kurangkan aktiviti berat; minum air dengan kerap.",
+          "danger": "Haba melampau di {{region}} (HI ≈ {{hi}}°C). Risiko strok haba; berteduh/ruang berhawa dingin; pantau golongan rentan."
+        }
       }
     }
   },

@@ -4,10 +4,11 @@ import { useThemeContext } from "../theme/ThemeProvider";
 
 export default function WarningCard({
   item,
-  width = 200,      // default for horizontal list
+  width = 200, // default for horizontal list
   imageHeight = 120, // default for horizontal list
   style,
   onPress,
+  showUpdated = false,
 }) {
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -30,9 +31,11 @@ export default function WarningCard({
         <Text style={styles.desc} numberOfLines={3}>
           {item.desc}
         </Text>
-        <Text style={styles.meta} numberOfLines={1}>
-          Updated {item.updated}
-        </Text>
+        {showUpdated && (
+          <Text style={styles.meta} numberOfLines={1}>
+            Updated {item.updated}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -61,7 +64,12 @@ const makeStyles = (theme) =>
     },
     badgeText: { color: "#fff", fontWeight: "800", fontSize: 12 },
     body: { padding: 12 },
-    title: { fontSize: 16, fontWeight: "800", color: theme.colors.text, marginBottom: 6 },
+    title: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: theme.colors.text,
+      marginBottom: 6,
+    },
     desc: { color: theme.colors.subtext, fontSize: 12, lineHeight: 16 },
     meta: {
       marginTop: 8,

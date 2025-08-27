@@ -32,7 +32,8 @@
 
     "hazard": {
       "none": "No Hazards Detected",
-      "slogan": "Stay Alert, Stay Safe"
+      "slogan": "Stay Alert, Stay Safe",
+      "alert": "Hazard Alert"
     },
 
     "contacts": {
@@ -51,7 +52,8 @@
 
     "early": {
       "title": "Early Warning",
-      "subtitle": "Monitoring common hazards"
+      "subtitle": "Stay informed about Singapore’s common hazards with real-time data from official sources. These updates give you a clear picture of the current safety situation so you can take action to protect yourself and your loved ones.",
+      "subtitle2": "Monitoring common risks"
     },
 
     "see_more": "See More",
@@ -116,6 +118,55 @@
       "heat": {
         "danger": { "title": "Heat (Danger)" },
         "warning": { "title": "Heat (Warning)" }
+      }
+    }
+  },
+  "early": {
+    "severity": {
+      "safe": "Safe",
+      "med": "Med",
+      "high": "High"
+    },
+    "cards": {
+      "flood": {
+        "title": "Flash Flood",
+        "desc": {
+          "safe":    "No significant rain detected. Drains and canals at normal levels.",
+          "warning": "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.",
+          "danger":  "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements."
+        }
+      },
+      "haze": {
+        "title": "Haze (PM2.5)",
+        "desc": {
+          "safe":    "Air quality is within normal range across Singapore.",
+          "warning": "Elevated PM2.5 in the {{region}}. Limit prolonged outdoor activity; consider a mask.",
+          "danger":  "Unhealthy PM2.5 in the {{region}}. Stay indoors with windows closed; use a purifier; wear an N95 if going out."
+        }
+      },
+      "dengue": {
+        "title": "Dengue Clusters",
+        "desc": {
+          "safe":    "No active cluster within 5 km of your location.",
+          "warning": "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.",
+          "danger":  "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists."
+        }
+      },
+      "wind": {
+        "title": "Strong Winds",
+        "desc": {
+          "safe":    "Winds are light to moderate.",
+          "warning": "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.",
+          "danger":  "Damaging winds in the {{region}}. Stay indoors; avoid coastal and open areas."
+        }
+      },
+      "heat": {
+        "title": "Heat Advisory",
+        "desc": {
+          "safe":    "Heat risk is low. Keep hydrated.",
+          "warning": "High heat in the {{region}} (HI ≈ {{hi}}°C). Reduce strenuous activity; drink water often.",
+          "danger":  "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Heat illness possible — stay in shade/AC; check on the vulnerable."
+        }
       }
     }
   },

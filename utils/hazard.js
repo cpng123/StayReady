@@ -27,6 +27,7 @@ export function mockedHazardsFromFlags(flags = {}, center) {
       title: "Flash Flood (Danger)",
       locationName: LOC.flood,
       reason: "Mock: very heavy rain ~25 mm/5min",
+      metrics: { mm: 25, rh: 92 },
     });
   }
 
@@ -37,6 +38,7 @@ export function mockedHazardsFromFlags(flags = {}, center) {
       title: "Haze (Warning)",
       locationName: LOC.haze,
       reason: "Mock: PM2.5 ~45 µg/m³",
+      metrics: { pm25: 45, region: LOC.haze },
     });
   }
 
@@ -47,6 +49,7 @@ export function mockedHazardsFromFlags(flags = {}, center) {
       title: "Dengue Caution Nearby",
       locationName: LOC.dengue,
       reason: "Mock: 12 cases, ~2.1 km",
+      metrics: { cases: 12, km: 2.1, locality: LOC.dengue },
     });
   }
 
@@ -57,6 +60,7 @@ export function mockedHazardsFromFlags(flags = {}, center) {
       title: "Strong Winds (Warning)",
       locationName: LOC.wind,
       reason: "Mock: 18 kt sustained",
+      metrics: { kt: 18, region: LOC.wind },
     });
   }
 
@@ -67,6 +71,7 @@ export function mockedHazardsFromFlags(flags = {}, center) {
       title: "Heat (Danger)",
       locationName: LOC.heat,
       reason: "Mock: Heat Index ~42.0 °C",
+      metrics: { hi: 42.0, region: LOC.heat },
     });
   }
 
@@ -217,7 +222,7 @@ function pickTop(hazards) {
 // ---------- per-hazard classifiers ----------
 
 // A) Rainfall/Flash flood potential (5-min mm, optional RH for extra caution)
-function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
+export function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
   const nearRain = nearestPointTo(center || {}, rainfallPoints);
   const nearHum = nearestPointTo(center || {}, humPoints);
   const mm = toNum(nearRain?.value);
@@ -233,27 +238,29 @@ function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
     return {
       kind: HAZARD_FLOOD,
       severity: "danger",
-      title: "Flash Flood (Warning)",
+      title: "Flash Flood (Danger)",
       locationName: nearRain?.name || nearRain?.id || null,
       reason: `Very heavy rain ${mm.toFixed(1)} mm/5min`,
+      metrics: { mm, rh },
     };
   }
   if (mm >= 10 && rh != null && rh >= 85) {
     return {
       kind: HAZARD_FLOOD,
       severity: "warning",
-      title: "Flash Flood Watch (Danger)",
+      title: "Flash Flood Watch (Warning)",
       locationName: nearRain?.name || nearRain?.id || null,
       reason: `Heavy rain ${mm.toFixed(1)} mm/5min with high RH ${Math.round(
         rh
       )}%`,
+      metrics: { mm, rh },
     };
   }
   return { kind: HAZARD_FLOOD, severity: "safe", title: "No Flood Risk" };
 }
 
 // B) Haze from PM2.5 (1-hr). Take worst region value.
-function classifyHaze({ pmPoints = [] }) {
+export function classifyHaze({ pmPoints = [] }) {
   if (!pmPoints.length)
     return { kind: HAZARD_HAZE, severity: "safe", title: "Air Quality Normal" };
   const worst = pmPoints.reduce((a, b) =>
@@ -271,6 +278,7 @@ function classifyHaze({ pmPoints = [] }) {
       title: "Haze (Warning)",
       reason: `${worst.name}: ${v.toFixed(0)} µg/m³`,
       locationName: `${worst.name} Region`,
+      metrics: { pm25: v, region: worst.name },
     };
   return {
     kind: HAZARD_HAZE,
@@ -278,11 +286,12 @@ function classifyHaze({ pmPoints = [] }) {
     title: "Haze (Danger)",
     reason: `${worst.name}: ${v.toFixed(0)} µg/m³`,
     locationName: `${worst.name} Region`,
+    metrics: { pm25: v, region: worst.name },
   };
 }
 
 // C) Dengue proximity (only user-location based). 5 km to cluster centroid.
-function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
+export function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
   if (!center || !dengueGeoJSON || dengueGeoJSON.type !== "FeatureCollection")
     return {
       kind: HAZARD_DENGUE,
@@ -339,11 +348,16 @@ function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
     reason: `${
       nearestCases != null ? nearestCases : "—"
     } cases, ~${nearestKm.toFixed(1)} km`,
+    metrics: {
+      cases: nearestCases ?? null,
+      km: nearestKm,
+      locality: nearestName,
+    },
   };
 }
 
 // D) Wind (knots). Use worst (max) sustained; if you have gusts, escalate based on gusts too.
-function classifyWind({ windPoints = [], pmPoints = [] }) {
+export function classifyWind({ windPoints = [], pmPoints = [] }) {
   if (!windPoints.length)
     return { kind: HAZARD_WIND, severity: "safe", title: "Winds Normal" };
   const worst = windPoints.reduce((a, b) =>
@@ -369,6 +383,7 @@ function classifyWind({ windPoints = [], pmPoints = [] }) {
       title: "Strong Winds (Warning)",
       reason: `${worst.name}: ${kt.toFixed(1)} kt`,
       locationName,
+      metrics: { kt, region: locationName },
     };
   return {
     kind: HAZARD_WIND,
@@ -376,11 +391,16 @@ function classifyWind({ windPoints = [], pmPoints = [] }) {
     title: "Damaging Winds (Danger)",
     reason: `${worst.name}: ${kt.toFixed(1)} kt`,
     locationName,
+    metrics: { kt, region: locationName },
   };
 }
 
 // E) Heat (Heat Index from temp+RH). Use worst computed value across stations.
-function classifyHeat({ tempPoints = [], humPoints = [], pmPoints = [] }) {
+export function classifyHeat({
+  tempPoints = [],
+  humPoints = [],
+  pmPoints = [],
+}) {
   if (!tempPoints.length || !humPoints.length)
     return { kind: HAZARD_HEAT, severity: "safe", title: "Heat Risk Low" };
 
@@ -413,6 +433,7 @@ function classifyHeat({ tempPoints = [], humPoints = [], pmPoints = [] }) {
       title: "Heat (Warning)",
       reason: `HI ${v.toFixed(1)} °C`,
       locationName,
+      metrics: { hi: v, region: locationName },
     };
   return {
     kind: HAZARD_HEAT,
@@ -420,6 +441,7 @@ function classifyHeat({ tempPoints = [], humPoints = [], pmPoints = [] }) {
     title: "Heat (Danger)",
     reason: `HI ${v.toFixed(1)} °C`,
     locationName,
+    metrics: { hi: v, region: locationName },
   };
 }
 
@@ -450,17 +472,53 @@ export function decideGlobalHazard(args = {}) {
   }
 
   // === REAL DETECTION ===
-  const flood  = classifyFlood(args);
-  const haze   = classifyHaze(args);
+  const flood = classifyFlood(args);
+  const haze = classifyHaze(args);
   const dengue = classifyDengue(args);
-  const wind   = classifyWind(args);
-  const heat   = classifyHeat(args);
+  const wind = classifyWind(args);
+  const heat = classifyHeat(args);
   const all = [flood, haze, dengue, wind, heat];
-  
+
   const anyNonSafe = all.some((h) => (h.severity || "safe") !== "safe");
   if (!anyNonSafe)
     return { kind: HAZARD_NONE, severity: "safe", title: "No Hazard Detected" };
 
   // Otherwise pick worst → then by priority
   return pickTop(all);
+}
+
+// Return one hazard per type (for Early Warning screen).
+export function evaluateAllHazards(args = {}) {
+  const flags = args.mockFlags || {};
+  const anyMock = !!(
+    flags.flood ||
+    flags.haze ||
+    flags.dengue ||
+    flags.wind ||
+    flags.heat
+  );
+
+  // Real evaluations
+  const real = {
+    flood: classifyFlood(args),
+    haze: classifyHaze(args),
+    dengue: classifyDengue(args),
+    wind: classifyWind(args),
+    heat: classifyHeat(args),
+  };
+
+  if (!anyMock)
+    return [real.flood, real.haze, real.dengue, real.wind, real.heat];
+
+  // When mocking, only mocked hazards show; others appear as safe
+  const mockList = mockedHazardsFromFlags(flags, args.center);
+  const byKind = Object.fromEntries(mockList.map((h) => [h.kind, h]));
+  const safe = (kind) => ({ kind, severity: "safe", title: "Safe" });
+  return [
+    byKind.flood || safe(HAZARD_FLOOD),
+    byKind.haze || safe(HAZARD_HAZE),
+    byKind.dengue || safe(HAZARD_DENGUE),
+    byKind.wind || safe(HAZARD_WIND),
+    byKind.heat || safe(HAZARD_HEAT),
+  ];
 }

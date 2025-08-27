@@ -1,4 +1,4 @@
-// Put this at <root>/data/homeData.js
+// data/homeData.js
 export const CONTACTS = [
   {
     id: "sos",
@@ -29,66 +29,6 @@ export const CONTACTS = [
     img: require("../assets/Contact/non-emergency-call.png"),
   },
 ];
-
-// Keep the full list here (>= 6). Home will slice to 4.
-export const WARNINGS = [
-  {
-    id: "flood",
-    title: "Flash-Flood Risk",
-    level: "High",
-    color: "#F25555",
-    img: require("../assets/General/flash-flood2.jpg"),
-    desc: "Flood risk near Balestier — drains at high level; avoid low-lying roads.",
-    updated: "12:15 PM",
-  },
-  {
-    id: "pm",
-    title: "PM2.5 Levels",
-    level: "Med",
-    color: "#F29F3D",
-    img: require("../assets/General/pm-haze2.jpg"),
-    desc: "Air quality in Central at unhealthy range; limit outdoor activities.",
-    updated: "1:45 PM",
-  },
-  {
-    id: "dengue",
-    title: "Dengue Clusters",
-    level: "Safe",
-    color: "#03A55A",
-    img: require("../assets/General/dengue-cluster2.jpg"),
-    desc: "Active cluster in Bedok South; clear stagnant water and use repellent.",
-    updated: "2:05 PM",
-  },
-  {
-    id: "thunderstorm",
-    title: "Thunderstorm",
-    level: "Safe",
-    color: "#03A55A",
-    img: require("../assets/General/thunder-storm2.jpg"),
-    desc: "Heavy rain forecast in Ang Mo Kio and Hougang — lightning risk; seek shelter indoors.",
-    updated: "2:05 PM",
-  },
-  {
-    id: "covid",
-    title: "Covid-19",
-    level: "Safe",
-    color: "#03A55A",
-    img: require("../assets/General/disease-outbreak2.jpg"),
-    desc: "COVID-19 cases rising in Singapore; follow MOH guidelines and practise good hygiene.",
-    updated: "2:05 PM",
-  },
-  {
-    id: "wind",
-    title: "Strong Wind",
-    level: "Safe",
-    color: "#03A55A",
-    img: require("../assets/General/strong-wind2.jpg"),
-    desc: "Strong winds expected in coastal and open areas; secure loose items and stay indoors if possible.",
-    updated: "2:05 PM",
-  },
-];
-
-export const getHomeWarnings = (n = 4) => WARNINGS.slice(0, n);
 
 // --- Disaster Preparedness topics (full list of 10) ---
 export const PREPAREDNESS = [
