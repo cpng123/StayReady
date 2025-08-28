@@ -2099,6 +2099,216 @@
           ]
         }
       ]
+    },
+    {
+      "id": "heatstroke",
+      "title": "Heat Stroke",
+      "sets": [
+        {
+          "id": "heat-prevent",
+          "title": "Heatstroke Prevention",
+          "description": "Learn how to prevent heat-related illnesses before they happen.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-p-1",
+              "prompt": "What is the best way to prevent heatstroke during hot weather?",
+              "options": [
+                "Drink plenty of water and stay hydrated",
+                "Wear dark, tight clothing",
+                "Skip meals to stay cool",
+                "Take hot showers frequently"
+              ],
+              "correctIndex": 0,
+              "hint": "Hydration is key — drink enough water even if you're not thirsty."
+            },
+            {
+              "id": "heat-p-2",
+              "prompt": "Which clothing is recommended to reduce heat stress?",
+              "options": [
+                "Tight black clothing",
+                "Lightweight, light-colored, loose-fitting clothing",
+                "Heavy jackets to block heat",
+                "Plastic raincoats"
+              ],
+              "correctIndex": 1,
+              "hint": "Lightweight, breathable fabrics help regulate body temperature."
+            },
+            {
+              "id": "heat-p-3",
+              "prompt": "The best time to schedule outdoor activities during hot weather is:",
+              "options": [
+                "Afternoon between 12pm and 3pm",
+                "Early morning or late evening",
+                "Whenever it feels humid",
+                "All day without restrictions"
+              ],
+              "correctIndex": 1,
+              "hint": "Avoid peak heat hours and stay cool during extreme temperatures."
+            },
+            {
+              "id": "heat-p-4",
+              "prompt": "What type of drinks should you avoid in hot weather?",
+              "options": [
+                "Alcohol and sugary drinks",
+                "Water and isotonic drinks",
+                "Fresh juices",
+                "Herbal tea"
+              ],
+              "correctIndex": 0,
+              "hint": "Alcohol and high-sugar beverages can increase dehydration."
+            },
+            {
+              "id": "heat-p-5",
+              "prompt": "Which of these is a reliable early symptom of heat exhaustion?",
+              "options": [
+                "Cold and clammy skin",
+                "Sudden chills in a cold room",
+                "Sneezing repeatedly",
+                "Shortness of breath only at night"
+              ],
+              "correctIndex": 0,
+              "hint": "Clammy skin, dizziness, and fatigue indicate early heat stress."
+            }
+          ]
+        },
+        {
+          "id": "heat-during",
+          "title": "During Extreme Heat",
+          "description": "Stay safe when temperatures rise sharply.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-d-1",
+              "prompt": "If you feel dizzy or weak while outdoors in extreme heat, you should:",
+              "options": [
+                "Lie down on the pavement",
+                "Move to a shaded or air-conditioned place and rest",
+                "Drink alcohol to cool down",
+                "Ignore it and continue working"
+              ],
+              "correctIndex": 1,
+              "hint": "Rest in a cooler area to prevent heatstroke."
+            },
+            {
+              "id": "heat-d-2",
+              "prompt": "Which is the safest location during extreme heat?",
+              "options": [
+                "Inside an air-conditioned room",
+                "Under direct sunlight",
+                "Inside a parked car with windows up",
+                "On a rooftop"
+              ],
+              "correctIndex": 0,
+              "hint": "Air-conditioned or shaded places help regulate your body temperature."
+            },
+            {
+              "id": "heat-d-3",
+              "prompt": "What should you do if someone faints from heat?",
+              "options": [
+                "Call emergency services and move them to a cool place",
+                "Splash very hot water on them",
+                "Force them to walk it off",
+                "Wrap them in a blanket"
+              ],
+              "correctIndex": 0,
+              "hint": "Call for help and cool the body while waiting for assistance."
+            },
+            {
+              "id": "heat-d-4",
+              "prompt": "Children and elderly are at higher risk because:",
+              "options": [
+                "They are weaker and less able to regulate body temperature",
+                "They dislike water",
+                "They prefer warm clothing",
+                "They are immune to dehydration"
+              ],
+              "correctIndex": 0,
+              "hint": "Both groups need extra protection during heatwaves."
+            },
+            {
+              "id": "heat-d-5",
+              "prompt": "What is the immediate danger of staying in a parked car during heatwaves?",
+              "options": [
+                "Suffocation and rapid heat buildup",
+                "Wi-Fi signal loss",
+                "Exposure to dust",
+                "Back pain"
+              ],
+              "correctIndex": 0,
+              "hint": "Temperatures inside parked cars can rise dangerously fast."
+            }
+          ]
+        },
+        {
+          "id": "heat-after",
+          "title": "After Heatstroke / Recovery",
+          "description": "First-aid, monitoring, and recovery steps after heat-related illness.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-a-1",
+              "prompt": "After heatstroke, you should immediately:",
+              "options": [
+                "Ignore the episode if you feel better",
+                "Seek medical attention even if symptoms fade",
+                "Return to heavy exercise",
+                "Consume strong alcohol for faster recovery"
+              ],
+              "correctIndex": 1,
+              "hint": "Complications may occur later — get medical evaluation."
+            },
+            {
+              "id": "heat-a-2",
+              "prompt": "Which cooling method is NOT recommended?",
+              "options": [
+                "Wet towels on neck and armpits",
+                "Ice packs on head and groin",
+                "Immersing the person in ice-cold water abruptly",
+                "Using a fan to increase airflow"
+              ],
+              "correctIndex": 2,
+              "hint": "Abrupt ice immersion can cause shock in heatstroke victims."
+            },
+            {
+              "id": "heat-a-3",
+              "prompt": "After recovery, what’s important to prevent future episodes?",
+              "options": [
+                "Stay hydrated, plan breaks, and monitor heat advisories",
+                "Avoid water completely",
+                "Wear thick clothing during summer",
+                "Exercise only at noon"
+              ],
+              "correctIndex": 0,
+              "hint": "Hydration and preparation are the best prevention strategies."
+            },
+            {
+              "id": "heat-a-4",
+              "prompt": "One sign of severe heatstroke is:",
+              "options": [
+                "Confusion and unconsciousness",
+                "Mild shivering",
+                "Red itchy eyes",
+                "Slight stomach rumbling"
+              ],
+              "correctIndex": 0,
+              "hint": "Confusion and fainting indicate medical emergency."
+            },
+            {
+              "id": "heat-a-5",
+              "prompt": "Which group should be monitored closely after heatstroke?",
+              "options": [
+                "Children and elderly",
+                "Only professional athletes",
+                "Pets only",
+                "People living near beaches"
+              ],
+              "correctIndex": 0,
+              "hint": "These groups face higher complications; extra monitoring is vital."
+            }
+          ]
+        }
+      ]
     }
   ]
 }

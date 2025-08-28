@@ -77,7 +77,8 @@
         "fire": "Keselamatan Kebakaran",
         "kit": "Kit Kecemasan",
         "disease": "Wabak Penyakit",
-        "earthquake": "Gempa Bumi"
+        "earthquake": "Gempa Bumi",
+        "heatstroke": "Strok Haba"
       }
     },
 
@@ -250,7 +251,8 @@
       "fire": "Keselamatan Kebakaran",
       "kit": "Kit Kecemasan",
       "disease": "Wabak Penyakit",
-      "earthquake": "Gempa Bumi"
+      "earthquake": "Gempa Bumi",
+      "heatstroke": "Strok Haba"
     }
   },
   "games": {

@@ -26,6 +26,7 @@ const QUIZ_IMAGES = {
   kit: require("../assets/General/quiz-kit.jpg"),
   disease: require("../assets/General/quiz-disease.jpg"),
   earthquake: require("../assets/General/quiz-earthquake.jpg"),
+  heatstroke: require("../assets/General/quiz-heatstroke.jpg"),
 };
 
 const SCREEN_PADDING = 16;

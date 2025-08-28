@@ -45,7 +45,7 @@ const GUIDE_ID_FOR = {
   haze: "haze",
   dengue: "dengue",
   wind: "wind",
-  heat: "fire", // heat -> fire guide as requested
+  heat: "heatstroke", // make sure this matches your i18n & guide IDs
 };
 
 // Localized titles (reuse your i18n keys)
@@ -162,7 +162,17 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
   const firstSection = guide?.sections?.[0];
   if (!firstSection) return null;
 
-  const sectionKey = firstSection.id || firstSection.key || "section";
+  const SECTION_KEY_MAP = {
+    wind: {
+      "wind-prep": "prepareBefore",
+      "wind-during": "protectDuring",
+      "wind-after": "recoverAfter",
+    },
+  };
+  const normalizeKey = (gid, k) => SECTION_KEY_MAP[gid]?.[k] || k;
+
+  const rawKey = firstSection.id || firstSection.key || "section";
+  const sectionKey = normalizeKey(guideId, rawKey);
   const items = (firstSection.items || []).slice(0, 4);
   const lastRowStart = items.length - (items.length % 2 === 0 ? 2 : 1);
 
@@ -174,7 +184,9 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
         </Text>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => navigation.navigate("PreparednessGuide", { id: guideId })}
+          onPress={() =>
+            navigation.navigate("PreparednessGuide", { id: guideId })
+          }
         >
           <Text style={[styles.seeMore, { color: theme.colors.primary }]}>
             {t("common.see_more", "See More")}
@@ -204,10 +216,10 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
             >
               <Image source={item.img} style={styles.tileImg} />
               <Text style={[styles.tileCaption, { color: theme.colors.text }]}>
-                {t(
-                  `${guideId}.sections.${sectionKey}.items.${item.id}`,
-                  item.text || ""
-                )}
+                {t(`${guideId}.sections.${sectionKey}.items.${item.id}`, {
+                  ns: "preparedness",
+                  defaultValue: item.text || "",
+                })}
               </Text>
             </View>
           );
@@ -285,7 +297,9 @@ export default function HazardDetailScreen({ navigation, route }) {
         </Text>
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => navigation.navigate("MapView", { overlay: overlayKey })}
+          onPress={() =>
+            navigation.navigate("MapView", { overlay: overlayKey })
+          }
           accessibilityRole="button"
           accessibilityLabel={t("hazardDetail.open_map", "Open map")}
           style={styles.mapCard}
@@ -390,6 +404,7 @@ const makeStyles = (theme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      marginBottom: 10,
     },
     seeMore: { fontWeight: "700" },
     tileCard: {

@@ -1453,6 +1453,139 @@ export const PREPAREDNESS_GUIDES = {
       },
     ],
   },
+
+  heatstroke: {
+    id: "heatstroke",
+    title: "Heat Stroke",
+    hero: require("../assets/General/heat2.jpg"),
+    description:
+      "Prolonged exposure to high temperatures can lead to heat-related illnesses, including heat stroke, which is a life-threatening condition. Learn how to stay safe and protect yourself during extreme heat events.",
+    reasons: [
+      {
+        id: "heat1",
+        label: "High Ambient Temperature",
+        icon: require("../assets/Reason/heat1.png"),
+        text: "Extreme environmental heat increases the body's core temperature beyond safe levels.",
+      },
+      {
+        id: "heat2",
+        label: "High Humidity",
+        icon: require("../assets/Reason/heat2.png"),
+        text: "Excessive humidity reduces the body's ability to cool down through sweating.",
+      },
+      {
+        id: "heat3",
+        label: "Prolonged Sun Exposure",
+        icon: require("../assets/Reason/heat3.png"),
+        text: "Spending extended periods under direct sunlight without shade increases the risk of heat exhaustion.",
+      },
+      {
+        id: "heat4",
+        label: "Dehydration",
+        icon: require("../assets/Reason/heat4.png"),
+        text: "Insufficient fluid intake limits the body's cooling mechanisms and accelerates overheating.",
+      },
+      {
+        id: "heat5",
+        label: "Poor Ventilation",
+        icon: require("../assets/Reason/heat5.png"),
+        text: "Lack of airflow in hot environments traps heat and makes cooling difficult.",
+      },
+    ],
+    sections: [
+      {
+        id: "prepareBefore",
+        title: "Prepare Before",
+        items: [
+          {
+            id: "heat-01",
+            img: require("../assets/General/heat1.jpg"),
+            text: "Check daily weather forecasts and heat advisories from NEA.",
+          },
+          {
+            id: "heat-02",
+            img: require("../assets/General/heat2.jpg"),
+            text: "Stay hydrated by drinking plenty of water, even if you're not thirsty.",
+          },
+          {
+            id: "heat-03",
+            img: require("../assets/General/heat3.jpg"),
+            text: "Wear lightweight, light-colored, and loose-fitting clothing.",
+          },
+          {
+            id: "heat-04",
+            img: require("../assets/General/heat4.jpg"),
+            text: "Plan outdoor activities in the early morning or late evening when temperatures are lower.",
+          },
+        ],
+      },
+      {
+        id: "protectDuring",
+        title: "Protect Yourself During",
+        items: [
+          {
+            id: "heat-05",
+            img: require("../assets/General/heat5.jpg"),
+            text: "Stay indoors in cool or air-conditioned environments whenever possible.",
+          },
+          {
+            id: "heat-06",
+            img: require("../assets/General/heat6.jpg"),
+            text: "Use hats, umbrellas, and sunscreen when outdoors to reduce heat exposure.",
+          },
+          {
+            id: "heat-07",
+            img: require("../assets/General/heat7.jpg"),
+            text: "Take frequent breaks and rest in shaded areas when outdoors.",
+          },
+          {
+            id: "heat-08",
+            img: require("../assets/General/heat8.jpg"),
+            text: "Avoid strenuous physical activity during peak heat hours.",
+          },
+        ],
+      },
+      {
+        id: "recoverAfter",
+        title: "Recover After",
+        items: [
+          {
+            id: "heat-09",
+            img: require("../assets/General/heat9.jpg"),
+            text: "Watch for symptoms like dizziness, rapid heartbeat, nausea, or confusion — seek medical help immediately if present.",
+          },
+          {
+            id: "heat-10",
+            img: require("../assets/General/heat10.jpg"),
+            text: "Cool the body using wet towels, fans, or ice packs while waiting for medical attention.",
+          },
+        ],
+      },
+    ],
+    externalResources: [
+      {
+        id: "wsh",
+        title: "Heat Stress Management",
+        desc: "Heat stress must not be overlooked, and you should take the necessary measures to protect yourself from heat-related risks.",
+        url: "https://www.tal.sg/wshc/topics/heat-stress/heat-stress-management",
+        logo: require("../assets/External/EX-WSH.jpg"),
+      },
+      {
+        id: "mom",
+        title: "Heat Stress in the Workplace",
+        desc: "Learn about heat stroke symptoms, first-aid response, and prevention strategies in workplace.",
+        url: "https://www.nea.gov.sg/weather",
+        logo: require("../assets/External/EX-MOM.jpg"),
+      },
+      {
+        id: "health",
+        title: "Types and Symptoms",
+        desc: "The weather’s getting hotter but it’s not marathoners or extreme sports enthusiasts who are catching the attention of doctors.",
+        url: "https://www.healthxchange.sg/how-to-manage/fluid-electrolytes/heat-stroke-types-symptoms",
+        logo: require("../assets/External/EX-Singhealth.jpg"),
+      },
+    ],
+  },
 };
 
 // Helper to fetch a single guide by id

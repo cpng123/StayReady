@@ -71,7 +71,8 @@
         "fire": "Fire Safety",
         "kit": "Emergency Kits",
         "disease": "Disease Outbreak",
-        "earthquake": "Earthquake"
+        "earthquake": "Earthquake",
+        "heatstroke": "HeatStroke"
       }
     },
 
@@ -246,7 +247,8 @@
       "fire": "Fire Safety",
       "kit": "Emergency Kits",
       "disease": "Disease Outbreak",
-      "earthquake": "Earthquake"
+      "earthquake": "Earthquake",
+      "heatstroke": "HeatStroke"
     }
   },
   "games": {

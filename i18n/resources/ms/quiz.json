@@ -2099,6 +2099,216 @@
           ]
         }
       ]
+    },
+    {
+      "id": "heatstroke",
+      "title": "Strok Haba",
+      "sets": [
+        {
+          "id": "heat-prevent",
+          "title": "Pencegahan Strok Haba",
+          "description": "Ketahui cara mencegah penyakit berkaitan haba sebelum ia berlaku.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-p-1",
+              "prompt": "Apakah cara terbaik untuk mencegah strok haba semasa cuaca panas?",
+              "options": [
+                "Minum banyak air dan kekal hidrasi",
+                "Pakai pakaian gelap dan ketat",
+                "Berpuasa untuk kekal sejuk",
+                "Mandi air panas dengan kerap"
+              ],
+              "correctIndex": 0,
+              "hint": "Hidrasi adalah penting — minum air secukupnya walaupun tidak berasa dahaga."
+            },
+            {
+              "id": "heat-p-2",
+              "prompt": "Pakaian manakah yang disyorkan untuk mengurangkan tekanan haba?",
+              "options": [
+                "Pakaian hitam dan ketat",
+                "Pakaian ringan, berwarna cerah dan longgar",
+                "Jaket tebal untuk menghalang haba",
+                "Baju hujan plastik"
+              ],
+              "correctIndex": 1,
+              "hint": "Pakaian ringan dan bernafas membantu menyejukkan badan."
+            },
+            {
+              "id": "heat-p-3",
+              "prompt": "Bilakah masa terbaik untuk melakukan aktiviti luar ketika cuaca panas?",
+              "options": [
+                "Tengah hari antara 12 tengah hari hingga 3 petang",
+                "Awal pagi atau lewat petang",
+                "Bila-bila masa cuaca terasa lembap",
+                "Sepanjang hari tanpa sekatan"
+              ],
+              "correctIndex": 1,
+              "hint": "Elakkan aktiviti pada waktu panas memuncak; pilih awal pagi atau lewat petang."
+            },
+            {
+              "id": "heat-p-4",
+              "prompt": "Jenis minuman manakah yang perlu dielakkan ketika cuaca panas?",
+              "options": [
+                "Minuman beralkohol dan bergula tinggi",
+                "Air kosong dan minuman elektrolit",
+                "Jus segar",
+                "Teh herba"
+              ],
+              "correctIndex": 0,
+              "hint": "Alkohol dan minuman bergula boleh meningkatkan risiko dehidrasi."
+            },
+            {
+              "id": "heat-p-5",
+              "prompt": "Yang manakah antara berikut adalah tanda awal strok haba?",
+              "options": [
+                "Kulit sejuk dan berpeluh",
+                "Menggigil dalam bilik berhawa dingin",
+                "Bersin tanpa henti",
+                "Sesak nafas hanya pada waktu malam"
+              ],
+              "correctIndex": 0,
+              "hint": "Kulit lembap, pening, dan keletihan adalah tanda awal strok haba."
+            }
+          ]
+        },
+        {
+          "id": "heat-during",
+          "title": "Semasa Cuaca Panas Melampau",
+          "description": "Ketahui cara melindungi diri apabila suhu meningkat dengan mendadak.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-d-1",
+              "prompt": "Jika anda rasa pening atau lemah semasa berada di luar ketika cuaca panas, anda harus:",
+              "options": [
+                "Baring di atas jalan berturap",
+                "Beralih ke tempat teduh atau berhawa dingin dan berehat",
+                "Minum alkohol untuk menyejukkan badan",
+                "Abaikan dan terus bekerja"
+              ],
+              "correctIndex": 1,
+              "hint": "Berlindung di tempat yang lebih sejuk untuk elakkan strok haba."
+            },
+            {
+              "id": "heat-d-2",
+              "prompt": "Di manakah tempat paling selamat semasa cuaca panas melampau?",
+              "options": [
+                "Di dalam bilik berhawa dingin",
+                "Di bawah cahaya matahari terus",
+                "Di dalam kereta berkunci dengan tingkap tertutup",
+                "Di atas bumbung rumah"
+              ],
+              "correctIndex": 0,
+              "hint": "Tempat berhawa dingin atau teduh membantu menyejukkan badan dengan lebih baik."
+            },
+            {
+              "id": "heat-d-3",
+              "prompt": "Apakah yang perlu dilakukan jika seseorang pengsan akibat strok haba?",
+              "options": [
+                "Hubungi kecemasan dan pindahkan mereka ke tempat sejuk",
+                "Percikkan air panas pada mereka",
+                "Paksa mereka berjalan untuk pulih",
+                "Balutkan mereka dengan selimut tebal"
+              ],
+              "correctIndex": 0,
+              "hint": "Pindahkan mereka ke tempat sejuk dan hubungi bantuan kecemasan segera."
+            },
+            {
+              "id": "heat-d-4",
+              "prompt": "Mengapa kanak-kanak dan warga emas lebih berisiko strok haba?",
+              "options": [
+                "Kerana mereka kurang berupaya mengawal suhu badan",
+                "Kerana mereka tidak suka minum air",
+                "Kerana mereka suka pakai pakaian tebal",
+                "Kerana mereka kebal daripada dehidrasi"
+              ],
+              "correctIndex": 0,
+              "hint": "Kanak-kanak dan warga emas lebih sensitif terhadap suhu panas."
+            },
+            {
+              "id": "heat-d-5",
+              "prompt": "Bahaya utama berada dalam kereta bertutup ketika gelombang haba ialah:",
+              "options": [
+                "Suhu meningkat dengan cepat dan risiko sesak nafas",
+                "Kehilangan isyarat Wi-Fi",
+                "Terhidu habuk berlebihan",
+                "Sakit belakang"
+              ],
+              "correctIndex": 0,
+              "hint": "Suhu dalam kereta boleh meningkat dengan cepat dan boleh membawa maut."
+            }
+          ]
+        },
+        {
+          "id": "heat-after",
+          "title": "Pemulihan Selepas Strok Haba",
+          "description": "Ketahui langkah pertolongan cemas dan pemulihan selepas strok haba.",
+          "image": "",
+          "questions": [
+            {
+              "id": "heat-a-1",
+              "prompt": "Selepas mengalami strok haba, anda harus segera:",
+              "options": [
+                "Abaikan jika anda berasa lebih baik",
+                "Dapatkan rawatan perubatan walaupun simptom hilang",
+                "Teruskan senaman berat",
+                "Minum alkohol untuk pemulihan pantas"
+              ],
+              "correctIndex": 1,
+              "hint": "Komplikasi boleh berlaku kemudian, dapatkan pemeriksaan doktor."
+            },
+            {
+              "id": "heat-a-2",
+              "prompt": "Kaedah penyejukan manakah yang TIDAK disyorkan?",
+              "options": [
+                "Letakkan tuala basah pada leher dan ketiak",
+                "Gunakan pek ais pada kepala dan pangkal paha",
+                "Terus merendam badan dalam air ais",
+                "Gunakan kipas untuk meningkatkan aliran udara"
+              ],
+              "correctIndex": 2,
+              "hint": "Merendam dalam air ais secara tiba-tiba boleh menyebabkan kejutan."
+            },
+            {
+              "id": "heat-a-3",
+              "prompt": "Selepas pulih, apakah cara terbaik untuk mengelakkan strok haba pada masa hadapan?",
+              "options": [
+                "Minum air secukupnya, berehat, dan ikut amaran cuaca",
+                "Elakkan minum air sepenuhnya",
+                "Pakai pakaian tebal ketika musim panas",
+                "Bersenam hanya pada waktu tengah hari"
+              ],
+              "correctIndex": 0,
+              "hint": "Hidrasi dan perancangan aktiviti adalah pencegahan terbaik."
+            },
+            {
+              "id": "heat-a-4",
+              "prompt": "Apakah tanda utama strok haba yang teruk?",
+              "options": [
+                "Kekeliruan dan pengsan",
+                "Menggigil ringan",
+                "Mata gatal",
+                "Perut berbunyi perlahan"
+              ],
+              "correctIndex": 0,
+              "hint": "Kekeliruan dan pengsan adalah tanda kecemasan strok haba."
+            },
+            {
+              "id": "heat-a-5",
+              "prompt": "Siapakah yang perlu dipantau dengan teliti selepas strok haba?",
+              "options": [
+                "Kanak-kanak dan warga emas",
+                "Hanya atlet profesional",
+                "Hanya haiwan peliharaan",
+                "Mereka yang tinggal berhampiran pantai"
+              ],
+              "correctIndex": 0,
+              "hint": "Kanak-kanak dan warga emas lebih berisiko, perlu pemantauan rapi."
+            }
+          ]
+        }
+      ]
     }
   ]
 }

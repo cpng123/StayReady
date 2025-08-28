@@ -42,9 +42,10 @@ export const PREPAREDNESS = [
   { id: "kit",        title: "Emergency Kits",   img: require("../assets/General/emergency-kits.jpg") },
   { id: "disease",    title: "Disease Outbreak", img: require("../assets/General/disease-outbreak.jpg") },
   { id: "earthquake", title: "Earthquake",       img: require("../assets/General/earthquake.jpg") },
+  { id: "heatstroke", title: "Heatstroke",       img: require("../assets/General/heat.jpg") },
 ];
 
-export const GUIDE_IDS = ["flood","haze","dengue","storm","wind","fire","aid","kit","disease","earthquake"];
+export const GUIDE_IDS = ["flood","haze","dengue","storm","wind","fire","aid","kit","disease","earthquake", "heatstroke"];
 export const isGuideId = (id) => GUIDE_IDS.includes(id);
 
 // Home only shows first N; “See More” can use full PREPAREDNESS later

@@ -26,6 +26,7 @@ function useFilters() {
     { id: "kit", label: t("home.prep.topic.kit", { ns: "common" }) },
     { id: "disease", label: t("home.prep.topic.disease", { ns: "common" }) },
     { id: "earthquake", label: t("home.prep.topic.earthquake", { ns: "common" }) },
+    { id: "heatstroke", label: t("home.prep.topic.heatstroke", { ns: "common" }) },
   ];
 }
 

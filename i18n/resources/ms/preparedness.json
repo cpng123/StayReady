@@ -568,5 +568,73 @@
         "desc": "Pelajari panduan asas tentang langkah yang perlu diambil jika anda terperangkap dalam gempa bumi walaupun berada di kawasan 'selamat'."
       }
     }
+  },
+  "heatstroke": {
+  "title": "Strok Haba",
+  "description": "Pendedahan berpanjangan kepada suhu tinggi boleh menyebabkan penyakit berkaitan haba, termasuk strok haba yang boleh mengancam nyawa. Ketahui cara melindungi diri dan kekal selamat semasa cuaca panas melampau.",
+  "reasons": {
+    "heat1": {
+      "label": "Suhu Persekitaran Tinggi",
+      "text": "Haba melampau meningkatkan suhu badan melebihi tahap selamat."
+    },
+    "heat2": {
+      "label": "Kelembapan Tinggi",
+      "text": "Kelembapan berlebihan mengurangkan keupayaan badan menyejuk melalui peluh."
+    },
+    "heat3": {
+      "label": "Pendedahan Matahari Berpanjangan",
+      "text": "Berada terlalu lama di bawah cahaya matahari secara langsung meningkatkan risiko keletihan haba."
+    },
+    "heat4": {
+      "label": "Dehidrasi",
+      "text": "Kekurangan pengambilan air menjejaskan mekanisme penyejukan badan dan mempercepatkan kepanasan badan."
+    },
+    "heat5": {
+      "label": "Pengudaraan Kurang Baik",
+      "text": "Aliran udara yang lemah memerangkap haba dan menyukarkan badan untuk menyejuk."
+    }
+  },
+  "sections": {
+    "prepareBefore": {
+      "title": "Persediaan Awal",
+      "items": {
+        "heat-01": "Semak ramalan cuaca harian dan amaran haba daripada NEA.",
+        "heat-02": "Minum air secukupnya walaupun tidak berasa dahaga.",
+        "heat-03": "Pakai pakaian ringan, berwarna cerah, dan longgar.",
+        "heat-04": "Rancang aktiviti luar pada awal pagi atau lewat petang apabila suhu lebih rendah."
+      }
+    },
+    "protectDuring": {
+      "title": "Lindungi Diri Semasa Cuaca Panas",
+      "items": {
+        "heat-05": "Kekal berada di dalam bangunan berhawa dingin atau kawasan sejuk.",
+        "heat-06": "Gunakan topi, payung, dan losen pelindung matahari semasa berada di luar.",
+        "heat-07": "Berehat di tempat teduh dengan kerap apabila berada di luar.",
+        "heat-08": "Elakkan aktiviti fizikal yang berat ketika waktu puncak panas."
+      }
+    },
+    "recoverAfter": {
+      "title": "Langkah Selepas Cuaca Panas",
+      "items": {
+        "heat-09": "Perhatikan tanda-tanda seperti pening, degupan jantung laju, loya, atau kekeliruan — dapatkan rawatan perubatan segera jika berlaku.",
+        "heat-10": "Sejukkan badan menggunakan tuala basah, kipas, atau pek ais sementara menunggu bantuan perubatan."
+      }
+    }
+  },
+  "externalResources": {
+    "wsh": {
+      "title": "Pengurusan Stres Haba",
+      "desc": "Jangan pandang ringan risiko strok haba. Ambil langkah berjaga-jaga untuk melindungi diri anda."
+    },
+    "mom": {
+      "title": "Langkah Pencegahan Strok Haba di Tempat Kerja",
+      "desc": "Ketahui simptom strok haba, langkah kecemasan, dan cara pencegahannya untuk keselamatan kerja."
+    },
+    "health": {
+      "title": "Jenis & Gejala",
+      "desc": "Suhu semakin meningkat, dan semakin ramai mendapatkan rawatan akibat strok haba — bukan hanya atlet atau pekerja luar sahaja yang berisiko."
+    }
   }
+}
+
 }

@@ -59,7 +59,8 @@
         "fire": "消防安全",
         "kit": "应急物品包",
         "disease": "传染病暴发",
-        "earthquake": "地震"
+        "earthquake": "地震",
+        "heatstroke": "中暑"
       }
     },
     "routine": {
@@ -230,7 +231,8 @@
       "fire": "消防安全",
       "kit": "应急物资包",
       "disease": "疾病暴发",
-      "earthquake": "地震"
+      "earthquake": "地震",
+      "heatstroke": "中暑"
     }
   },
   "games": {
