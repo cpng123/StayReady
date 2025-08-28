@@ -1,4 +1,3 @@
-// screens/EarlyWarningScreen.js
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   View,
@@ -9,8 +8,10 @@ import {
   SafeAreaView,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useThemeContext } from "../theme/ThemeProvider";
 import WarningCard from "../components/WarningCard";
 import useHazards from "../hooks/useHazards";
@@ -29,7 +30,7 @@ export default function EarlyWarningScreen({ navigation }) {
 
   // ---- Carousel state ----
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { cards: ewCards } = useHazards(undefined, 5);
+  const { loading, cards: ewCards = [] } = useHazards(undefined, 5);
   const carouselRef = useRef(null);
 
   // Auto-advance every 5s, loop
@@ -50,7 +51,7 @@ export default function EarlyWarningScreen({ navigation }) {
     setCurrentIndex(newIndex);
   };
 
-  // Compute a sliding "window" of dots so we never render too many
+  // Compute a sliding "window" of dots
   const getDotWindow = (total, current, max = MAX_DOTS) => {
     if (total <= max)
       return {
@@ -61,7 +62,6 @@ export default function EarlyWarningScreen({ navigation }) {
     const half = Math.floor(max / 2);
     let start = current - half;
     let end = current + (max - half - 1);
-
     if (start < 0) {
       end += -start;
       start = 0;
@@ -82,7 +82,9 @@ export default function EarlyWarningScreen({ navigation }) {
     hasRight,
   } = getDotWindow(ewCards.length || 0, currentIndex, MAX_DOTS);
 
-  // ---- List header (title + paragraph) becomes part of FlatList ----
+  const isEmpty = !ewCards.length;
+
+  // ---- List header (title + paragraph) ----
   const ListHeader = (
     <View style={styles.headerCopy}>
       <Text style={styles.h1}>{t("home.early.title", "Early Warning")}</Text>
@@ -94,27 +96,55 @@ export default function EarlyWarningScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* ===== Top Carousel ===== */}
+      {/* ===== Top Carousel (with loader placeholder) ===== */}
       <View style={styles.hero}>
-        <FlatList
-          ref={carouselRef}
-          data={ewCards}
-          keyExtractor={(i) => i.id}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={onMomentumEnd}
-          getItemLayout={(data, index) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
-            index,
-          })}
-          renderItem={({ item }) => (
-            <Image source={item.img} style={styles.heroImg} />
-          )}
-        />
+        {isEmpty ? (
+          <View style={styles.heroPlaceholder}>
+            <ActivityIndicator size="small" color="#ffffff" />
+          </View>
+        ) : (
+          <FlatList
+            ref={carouselRef}
+            data={ewCards}
+            keyExtractor={(i) => i.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={onMomentumEnd}
+            getItemLayout={(data, index) => ({
+              length: SCREEN_WIDTH,
+              offset: SCREEN_WIDTH * index,
+              index,
+            })}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() =>
+                  navigation.navigate("HazardDetail", { hazard: item.hazard })
+                }
+                style={{ width: SCREEN_WIDTH, height: "100%" }}
+              >
+                <Image source={item.img} style={styles.heroImg} />
+                <LinearGradient
+                  colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.55)"]}
+                  style={styles.heroGradient}
+                />
+                <View style={styles.heroOverlay}>
+                  <Text style={styles.heroTitle} numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.heroDesc} numberOfLines={2}>
+                    {item.desc ||
+                      item.hazard?.summary ||
+                      t("home.early.tap_to_view", "Tap to view details")}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        )}
 
-        {/* Back (rounded-corner square) */}
+        {/* Back button (always visible) */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
@@ -123,45 +153,64 @@ export default function EarlyWarningScreen({ navigation }) {
           <Ionicons name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
 
-        {/* Dots (windowed) */}
-        <View style={styles.dots}>
-          {hasLeft && <View style={[styles.dot, styles.dotFaded]} />}
-          {dotIndices.map((i) => (
-            <View
-              key={i}
-              style={[styles.dot, i === currentIndex ? styles.dotActive : null]}
-            />
-          ))}
-          {hasRight && <View style={[styles.dot, styles.dotFaded]} />}
-        </View>
+        {/* Dots (only when we have cards) */}
+        {!isEmpty && (
+          <View style={styles.dots}>
+            {hasLeft && <View style={[styles.dot, styles.dotFaded]} />}
+            {dotIndices.map((i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  i === currentIndex ? styles.dotActive : null,
+                ]}
+              />
+            ))}
+            {hasRight && <View style={[styles.dot, styles.dotFaded]} />}
+          </View>
+        )}
       </View>
 
-      {/* ===== Grid list with header inside FlatList ===== */}
-      <FlatList
-        data={ewCards}
-        keyExtractor={(i) => i.id}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={ListHeader}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-          marginBottom: 5,
-        }}
-        contentContainerStyle={{
-          paddingHorizontal: SCREEN_PADDING,
-        }}
-        renderItem={({ item }) => (
-          <WarningCard
-            item={item}
-            width={CARD_WIDTH}
-            imageHeight={90}
-            style={{ marginBottom: GAP }}
-            onPress={() =>
-              navigation.navigate("HazardDetail", { hazard: item.hazard })
-            }
-          />
-        )}
-      />
+      {/* ===== Grid list (with loader/empty fallback) ===== */}
+      {loading && isEmpty ? (
+        <View style={styles.listLoaderWrap}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loaderText}>
+            {t("common.loading", "Loading…")}
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={ewCards}
+          keyExtractor={(i) => i.id}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={ListHeader}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+            marginBottom: 5,
+          }}
+          contentContainerStyle={{
+            paddingHorizontal: SCREEN_PADDING,
+          }}
+          ListEmptyComponent={
+            <Text style={[styles.p, { textAlign: "center", marginTop: 16 }]}>
+              {t("home.early.none", "No hazards right now.")}
+            </Text>
+          }
+          renderItem={({ item }) => (
+            <WarningCard
+              item={item}
+              width={CARD_WIDTH}
+              imageHeight={90}
+              style={{ marginBottom: GAP }}
+              onPress={() =>
+                navigation.navigate("HazardDetail", { hazard: item.hazard })
+              }
+            />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -175,7 +224,39 @@ const makeStyles = (theme) =>
       height: 180,
       backgroundColor: theme.key === "dark" ? "#1F2937" : "#e7eef8",
     },
-    heroImg: { width: SCREEN_WIDTH, height: "100%", resizeMode: "cover" },
+    heroPlaceholder: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    heroImg: { width: "100%", height: "100%", resizeMode: "cover" },
+    heroGradient: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: 90,
+    },
+    heroOverlay: {
+      position: "absolute",
+      left: 12,
+      right: 12,
+      bottom: 10,
+    },
+    heroTitle: {
+      color: "#fff",
+      fontWeight: "800",
+      fontSize: 16,
+      marginBottom: 4,
+      textShadowColor: "rgba(0,0,0,0.35)",
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
+    },
+    heroDesc: {
+      color: "#F3F4F6",
+      fontSize: 12,
+      lineHeight: 16,
+    },
 
     backBtn: {
       position: "absolute",
@@ -202,7 +283,6 @@ const makeStyles = (theme) =>
       paddingVertical: 6,
       borderRadius: 12,
     },
-    // Use white-ish dots so they work on both themes
     dot: {
       width: 6,
       height: 6,
@@ -212,7 +292,7 @@ const makeStyles = (theme) =>
     dotActive: { backgroundColor: "#ffffff" },
     dotFaded: { opacity: 0.45 },
 
-    // Header (now part of the FlatList via ListHeaderComponent)
+    // Header inside FlatList
     headerCopy: { paddingTop: 14, paddingBottom: 6 },
     h1: {
       fontSize: 22,
@@ -221,4 +301,16 @@ const makeStyles = (theme) =>
       marginBottom: 6,
     },
     p: { color: theme.colors.subtext, lineHeight: 20, marginBottom: 8 },
+
+    // List loader
+    listLoaderWrap: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 24,
+    },
+    loaderText: {
+      marginTop: 8,
+      color: theme.colors.subtext,
+    },
   });

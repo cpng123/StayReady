@@ -116,7 +116,6 @@ function ReasonModal({ visible, onClose, reason, theme, t }) {
 
 /* -------- Grid section (2 columns, image on top, caption below) ------------ */
 function SectionGrid({ section, sectionKey, guideId, theme, t }) {
-  // Support both shapes: { id: 'prepareBefore', items: [...] } or { key: 'prepareBefore', items: [...] }
   const effectiveKey = sectionKey || section?.id || section?.key;
   const items = section?.items ?? [];
   if (!items.length || !effectiveKey) return null;
@@ -252,19 +251,15 @@ export default function PreparednessGuideScreen({ navigation, route }) {
   const { t } = useTranslation();
 
   const guideId = route?.params?.id;
-  // Fallback to "flood" if no id passed
   const guide = getGuideById(guideId) || getGuideById("flood");
 
-  // Images/structure come from data; strings come from i18n
   const { hero, reasons = [], sections = [] } = guide;
 
-  // Localized header strings
   const translatedTitle = t(`${guideId}.title`, { ns: "preparedness" });
   const translatedDescription = t(`${guideId}.description`, {
     ns: "preparedness",
   });
 
-  // Map guide IDs to quiz category IDs if any differ
   const QUIZ_ID_MAP = {
     thunderstorm: "storm",
     firstaid: "aid",
@@ -276,7 +271,6 @@ export default function PreparednessGuideScreen({ navigation, route }) {
   const [activeReason, setActiveReason] = useState(null);
 
   const openReason = (r) => {
-    // Fill modal with localized label/text for this reason
     const label = t(`${guideId}.reasons.${r.id}.label`, { ns: "preparedness" });
     const text = t(`${guideId}.reasons.${r.id}.text`, { ns: "preparedness" });
     setActiveReason({ ...r, label, text });
@@ -304,9 +298,9 @@ export default function PreparednessGuideScreen({ navigation, route }) {
 
   const normalizeKey = (gid, k) => SECTION_KEY_MAP[gid]?.[k] || k;
 
-  // Build main FlatList sections
+  // Build main FlatList sections (removed 'stats')
   const SECTIONS = useMemo(() => {
-    const head = [{ type: "reasons" }, { type: "stats" }];
+    const head = [{ type: "reasons" }];
     const grids = sections.map((s, idx) => ({
       type: "grid",
       section: s,
@@ -380,25 +374,6 @@ export default function PreparednessGuideScreen({ navigation, route }) {
               />
             )}
           />
-        </View>
-      );
-    }
-    if (item.type === "stats") {
-      return (
-        <View style={styles.bodyWrap}>
-          <Text style={[styles.h2, { color: theme.colors.text }]}>
-            {t("preparedness_screen.quick_facts", { ns: "common" })}
-          </Text>
-          <View
-            style={[styles.statsCard, { backgroundColor: theme.colors.card }]}
-          >
-            {/* Placeholder image; replace later with a real chart */}
-            <Image
-              source={require("../assets/icon.png")}
-              style={{ width: "100%", height: 140, borderRadius: 12 }}
-              resizeMode="cover"
-            />
-          </View>
         </View>
       );
     }
@@ -511,16 +486,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-  statsCard: {
-    borderRadius: CARD_RADIUS,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
+  // (Removed statsCard since Quick Stats section is gone)
 
   tileCard: {
     borderRadius: CARD_RADIUS,

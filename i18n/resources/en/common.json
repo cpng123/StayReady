@@ -53,7 +53,8 @@
     "early": {
       "title": "Early Warning",
       "subtitle": "Stay informed about Singapore’s common hazards with real-time data from official sources. These updates give you a clear picture of the current safety situation so you can take action to protect yourself and your loved ones.",
-      "subtitle2": "Monitoring common risks"
+      "subtitle2": "Monitoring common risks",
+      "tap_to_view": "Tap to view details"
     },
 
     "see_more": "See More",
