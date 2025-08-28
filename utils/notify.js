@@ -5,12 +5,23 @@ import { Platform } from "react-native";
 
 const KEY_NOTIFY_ENABLED = "notify:enabled";
 const KEY_NOTIFY_LOG = "notify:log";
+const KEY_NOTIFY_ALL = "notify:all";
 
 let _notifyEnabledCache = null;
+let _notifyAllCache = null;
+
+async function _ensureLegacyEnabledTrue() {
+  try {
+    const raw = await AsyncStorage.getItem(KEY_NOTIFY_ENABLED);
+    if (raw === "false") {
+      await AsyncStorage.setItem(KEY_NOTIFY_ENABLED, "true");
+    }
+  } catch {}
+}
 
 Notifications.setNotificationHandler({
   handleNotification: async () => {
-    const enabled = _notifyEnabledCache ?? (await getNotificationsEnabled());
+    const enabled = true;
     return {
       shouldShowAlert: !!enabled,
       shouldPlaySound: !!enabled,
@@ -20,8 +31,7 @@ Notifications.setNotificationHandler({
 });
 
 export async function initNotifications() {
-  const enabled = await getNotificationsEnabled();
-
+  await _ensureLegacyEnabledTrue();
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "Default",
@@ -32,27 +42,25 @@ export async function initNotifications() {
     });
   }
 
-  if (enabled) {
-    const perm = await Notifications.getPermissionsAsync();
-    if (!perm.granted) await Notifications.requestPermissionsAsync();
-  } else {
-    try { await Notifications.cancelAllScheduledNotificationsAsync(); } catch {}
-  }
-}
-
-export async function setNotificationsEnabled(enabled) {
-  _notifyEnabledCache = !!enabled;
-  await AsyncStorage.setItem(KEY_NOTIFY_ENABLED, JSON.stringify(_notifyEnabledCache));
-  if (!enabled) {
-    try { await Notifications.cancelAllScheduledNotificationsAsync(); } catch {}
-  }
+  const perm = await Notifications.getPermissionsAsync();
+  if (!perm.granted) await Notifications.requestPermissionsAsync();
 }
 
 export async function getNotificationsEnabled() {
-  if (_notifyEnabledCache !== null) return _notifyEnabledCache;
-  const raw = await AsyncStorage.getItem(KEY_NOTIFY_ENABLED);
-  _notifyEnabledCache = raw == null ? true : JSON.parse(raw);
-  return _notifyEnabledCache;
+  await _ensureLegacyEnabledTrue();
+  _notifyEnabledCache = true;
+  return true;
+}
+
+export async function getNotifyAll() {
+  if (_notifyAllCache !== null) return _notifyAllCache;
+  const raw = await AsyncStorage.getItem(KEY_NOTIFY_ALL);
+  _notifyAllCache = raw == null ? true : JSON.parse(raw); // default ON
+  return _notifyAllCache;
+}
+export async function setNotifyAll(v) {
+  _notifyAllCache = !!v;
+  await AsyncStorage.setItem(KEY_NOTIFY_ALL, JSON.stringify(_notifyAllCache));
 }
 
 export async function getNotificationLog() {
@@ -118,8 +126,12 @@ function buildBody(hazard) {
         : `Strong winds in ${loc}. Secure loose items; ride/drive with care.`;
     case "heat":
       return severity === "danger"
-        ? `Extreme heat in ${loc}${hi ? ` (HI ≈ ${hi}°C)` : ""}. Stay in shade/AC; check on the vulnerable.`
-        : `High heat in ${loc}${hi ? ` (HI ≈ ${hi}°C)` : ""}. Reduce strenuous activity; hydrate.`;
+        ? `Extreme heat in ${loc}${
+            hi ? ` (HI ≈ ${hi}°C)` : ""
+          }. Stay in shade/AC; check on the vulnerable.`
+        : `High heat in ${loc}${
+            hi ? ` (HI ≈ ${hi}°C)` : ""
+          }. Reduce strenuous activity; hydrate.`;
     default:
       return "Stay alert and stay safe.";
   }
@@ -147,6 +159,10 @@ export async function maybeNotifyHazard(hazard) {
 
   const enabled = _notifyEnabledCache ?? (await getNotificationsEnabled());
   if (!enabled) return;
+
+  const notifyAll = _notifyAllCache ?? (await getNotifyAll());
+  const sev = hazard.severity || "safe";
+  if (!notifyAll && sev !== "danger") return;
 
   const kind = hazard.kind;
   const ALLOWED = new Set(["flood", "haze", "dengue", "wind", "heat"]);

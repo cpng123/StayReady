@@ -10,9 +10,12 @@ import {
   Pressable,
   ScrollView,
   FlatList,
+  Linking,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getNotificationsEnabled, setNotificationsEnabled, initNotifications } from "../utils/notify";
+import * as Notifications from "expo-notifications";
+import { initNotifications, getNotifyAll, setNotifyAll } from "../utils/notify";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
@@ -45,16 +48,17 @@ export default function SettingsScreen() {
   const [language, setLanguage] = useState(
     i18n.language?.split("-")[0] || "en"
   );
-  const [notif, setNotif] = useState(true);
+  const [notifyAll, setNotifyAllState] = useState(true); // ON=Warning+Danger, OFF=Danger-only
+  const [osPerm, setOsPerm] = useState("undetermined"); // granted | denied | undetermined
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
 
   // modals
   const [langOpen, setLangOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
-  const [tempLanguage, setTempLanguage] = useState(language); // for the modal "Done" flow
+  const [tempLanguage, setTempLanguage] = useState(language);
 
-  // new confirm modals for data actions
+  // confirm modals
   const [clearOpen, setClearOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
 
@@ -62,11 +66,11 @@ export default function SettingsScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const [l, sfx, hap, notifEnabled] = await Promise.all([
+        const [l, sfx, hap, notifyAllPref] = await Promise.all([
           AsyncStorage.getItem(K_LANG),
           AsyncStorage.getItem(K_SFX),
           AsyncStorage.getItem(K_HAPTIC),
-          getNotificationsEnabled(),
+          getNotifyAll(), // ✅ call the getter (bug fix)
         ]);
 
         // language
@@ -77,26 +81,67 @@ export default function SettingsScreen() {
           await setAppLanguage(savedLang);
         }
 
-        setNotif(!!notifEnabled);
+        setNotifyAllState(notifyAllPref ?? true);
+
+        const perm = await Notifications.getPermissionsAsync();
+        setOsPerm(perm.status);
+
         if (sfx != null) setSound(sfx === "1");
         if (hap != null) setVibration(hap === "1");
       } catch {}
     })();
   }, [i18n]);
 
+  // toggle for “All hazard notifications”
+  const toggleNotifyAll = async (value) => {
+    try {
+      if (value) {
+        // Enabling → ensure OS permission
+        const cur = await Notifications.getPermissionsAsync();
+        let status = cur.status;
+        if (status !== "granted") {
+          const req = await Notifications.requestPermissionsAsync();
+          status = req.status;
+        }
+        setOsPerm(status);
+
+        if (status !== "granted") {
+          Alert.alert(
+            t("settings.permission_needed", "Permission needed"),
+            t(
+              "settings.enable_notifications_in_system",
+              "Please enable notifications for this app in System Settings."
+            ),
+            [
+              { text: t("common.cancel", "Cancel"), style: "cancel" },
+              {
+                text: t("settings.open_system_settings", "Open Settings"),
+                onPress: () => Linking.openSettings(),
+              },
+            ]
+          );
+          // keep switch OFF if system blocks
+          setNotifyAllState(false);
+          await setNotifyAll(false);
+          return;
+        }
+
+        // System allowed → turn ON “all alerts”
+        setNotifyAllState(true);
+        await setNotifyAll(true);
+        await initNotifications(); // ensure Android channel
+      } else {
+        // Turning OFF → just persist (no OS dialog)
+        setNotifyAllState(false);
+        await setNotifyAll(false);
+      }
+    } catch {}
+  };
+
   /* persist on change */
   useEffect(() => {
     AsyncStorage.setItem(K_LANG, language).catch(() => {});
   }, [language]);
-  useEffect(() => {
-    (async () => {
-      await setNotificationsEnabled(notif); // writes notify:enabled & cancels scheduled when OFF
-      if (notif) {
-        // make sure channel/permission exists when turning ON
-        await initNotifications();
-      }
-    })();
-  }, [notif]);
   useEffect(() => {
     AsyncStorage.setItem(K_SFX, sound ? "1" : "0").catch(() => {});
   }, [sound]);
@@ -126,6 +171,8 @@ export default function SettingsScreen() {
     </Text>
   );
 
+  const permDenied = osPerm === "denied";
+
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
       <TopBar
@@ -133,12 +180,12 @@ export default function SettingsScreen() {
         onBack={() => nav.goBack()}
       />
 
-      {/* SCROLLABLE PAGE CONTENT */}
       <ScrollView contentContainerStyle={s.content}>
         <SectionTitle>
           {t("settings.pref_controls", "Preferences & Controls")}
         </SectionTitle>
 
+        {/* Language */}
         <Row
           icon={
             <Ionicons name="language" size={18} color={theme.colors.text} />
@@ -162,6 +209,7 @@ export default function SettingsScreen() {
           }
         />
 
+        {/* Theme */}
         <Row
           icon={
             <Ionicons
@@ -181,6 +229,7 @@ export default function SettingsScreen() {
           }
         />
 
+        {/* Notifications (single toggle) */}
         <Row
           icon={
             <Ionicons
@@ -189,10 +238,46 @@ export default function SettingsScreen() {
               color={theme.colors.text}
             />
           }
-          label={t("settings.notifications", "Notifications")}
-          right={<Switch value={notif} onValueChange={setNotif} />}
+          label={t("settings.notifications", "All hazard notifications")}
+          right={<Switch value={notifyAll} onValueChange={toggleNotifyAll} />}
         />
+        <Text style={[s.helperLine, { color: theme.colors.subtext }]}>
+          {notifyAll
+            ? t(
+                "settings.notify_all_desc",
+                "On: you’ll receive Warning & Danger alerts."
+              )
+            : t(
+                "settings.notify_danger_only_desc",
+                "Off: only Danger (critical) alerts will be sent."
+              )}
+        </Text>
 
+        {/* System permission helper */}
+        {permDenied && (
+          <TouchableOpacity
+            style={[
+              s.helperBar,
+              { backgroundColor: theme.key === "dark" ? "#231f20" : "#F3F4F6" },
+            ]}
+            onPress={() => Linking.openSettings()}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name="information-circle-outline"
+              size={16}
+              color={theme.colors.primary}
+            />
+            <Text style={[s.helperText, { color: theme.colors.subtext }]}>
+              {t(
+                "settings.notifications_denied",
+                "Notifications are disabled in system settings. Tap to open settings."
+              )}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Sound & Haptics */}
         <Row
           icon={
             <Ionicons
@@ -204,7 +289,6 @@ export default function SettingsScreen() {
           label={t("settings.sound", "Sound effects")}
           right={<Switch value={sound} onValueChange={setSound} />}
         />
-
         <Row
           icon={
             <MaterialCommunityIcons
@@ -217,7 +301,7 @@ export default function SettingsScreen() {
           right={<Switch value={vibration} onValueChange={setVibration} />}
         />
 
-        {/* ---------------- Preparedness-specific settings ---------------- */}
+        {/* Preparedness-specific */}
         <SectionTitle>
           {t(
             "settings.preparedness_settings",
@@ -264,7 +348,7 @@ export default function SettingsScreen() {
           }
         />
 
-        {/* ---------------- Data management (replaces account settings) ---------------- */}
+        {/* Data management */}
         <SectionTitle>
           {t("settings.data_management", "Data Management")}
         </SectionTitle>
@@ -287,7 +371,6 @@ export default function SettingsScreen() {
             />
           }
         />
-
         <Row
           icon={
             <Ionicons
@@ -310,7 +393,7 @@ export default function SettingsScreen() {
         <View style={{ height: 24 }} />
       </ScrollView>
 
-      {/* Language modal (unchanged except Done flow) */}
+      {/* Language modal */}
       <Modal
         visible={langOpen}
         transparent
@@ -415,7 +498,7 @@ export default function SettingsScreen() {
         </View>
       </Modal>
 
-      {/* ✅ Confirm clear cache */}
+      {/* Confirm clear cache */}
       <ConfirmModal
         visible={clearOpen}
         title={t("settings.clear_cache_title", "Clear cache?")}
@@ -434,7 +517,7 @@ export default function SettingsScreen() {
         onCancel={() => setClearOpen(false)}
       />
 
-      {/* ✅ Confirm reset all */}
+      {/* Confirm reset all */}
       <ConfirmModal
         visible={resetOpen}
         title={t("settings.reset_all_title", "Reset all data?")}
@@ -457,13 +540,11 @@ export default function SettingsScreen() {
 }
 
 /* ----------------------------- styles ----------------------------- */
-
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 14, gap: 10, marginTop: -10 },
 
-    /* sections */
     sectionTitle: {
       marginTop: 8,
       marginBottom: 2,
@@ -472,7 +553,6 @@ const makeStyles = (theme) =>
       letterSpacing: 0.2,
     },
 
-    /* rows */
     row: {
       minHeight: 52,
       borderRadius: 12,
@@ -492,7 +572,19 @@ const makeStyles = (theme) =>
     rightInline: { flexDirection: "row", alignItems: "center", gap: 6 },
     rightText: { fontSize: 12, fontWeight: "800" },
 
-    /* modals */
+    // helper bar under notifications
+    helperBar: {
+      marginTop: -6,
+      marginBottom: 8,
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    helperText: { fontSize: 12, fontWeight: "700" },
+
     modalBackdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.35)",
@@ -529,7 +621,6 @@ const makeStyles = (theme) =>
     },
     modalBtnText: { color: "#fff", fontWeight: "900", fontSize: 15 },
 
-    /* language list rows */
     langRow: {
       borderRadius: 10,
       paddingVertical: 10,
@@ -540,4 +631,10 @@ const makeStyles = (theme) =>
       alignItems: "center",
     },
     langLabel: { fontWeight: "800" },
+    helperLine: {
+      marginTop: -6,
+      marginBottom: 6,
+      fontSize: 12,
+      fontWeight: "700",
+    },
   });

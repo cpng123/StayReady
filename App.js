@@ -37,7 +37,9 @@ const Stack = createNativeStackNavigator();
 
 function RootNav() {
   const { theme } = useThemeContext();
-
+  useEffect(() => {
+    initNotifications().catch(() => {});
+  }, []);
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: theme.colors.appBg }}

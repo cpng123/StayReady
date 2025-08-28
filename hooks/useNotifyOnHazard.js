@@ -8,18 +8,27 @@ import { maybeNotifyHazard } from "../utils/notify";
  */
 export default function useNotifyOnHazard(hazard) {
   const prevKindRef = useRef(hazard?.kind);
+  const prevSevRef = useRef(hazard?.severity);
 
   useEffect(() => {
     const prev = prevKindRef.current;
     const kind = hazard?.kind;
+    const prevSev = prevSevRef.current;
+    const sev = hazard?.severity;
 
     // Only notify on transition into a real hazard (not "none")
     // to avoid spamming while values update
     const REAL_KINDS = new Set(["flood", "haze", "dengue", "wind", "heat"]);
-    if (REAL_KINDS.has(kind) && prev !== kind) {
+    const kindChanged = REAL_KINDS.has(kind) && prev !== kind;
+    const escalated =
+      REAL_KINDS.has(kind) &&
+      (prevSev === "warning" || prevSev === "safe") &&
+      sev === "danger";
+    if (kindChanged || escalated) {
       maybeNotifyHazard(hazard);
     }
 
     prevKindRef.current = kind;
+    prevSevRef.current = sev;
   }, [hazard?.kind, hazard?.severity, hazard?.locationName, hazard?.title]);
 }
