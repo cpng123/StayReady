@@ -2,9 +2,89 @@
 // Open Government Products, data.gov.sg — Real-time weather
 // Base: https://api-open.data.gov.sg/v2/real-time/api
 // Dengue dataset (GEOJSON) via public datasets API v1
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+async function setCache(key, data) {
+  try { await AsyncStorage.setItem(key, JSON.stringify({ _ts: Date.now(), data })); }
+  catch {}
+}
+async function getCache(key) {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+/**
+ * Wrap a fetcher with cache + stale-if-error.
+ * - fetcher: () => Promise<any>
+ * - opts: { cacheKey, softTtlMs, hardTtlMs }
+ *   softTtlMs: if cached && age <= softTtlMs → use cache to render fast (optional)
+ *   hardTtlMs: max age allowed when using cache on error; beyond this, throw
+ */
+async function withCache(fetcher, { cacheKey, softTtlMs = 0, hardTtlMs }) {
+  const cached = await getCache(cacheKey);
+  const ageMs = cached ? (Date.now() - cached._ts) : Infinity;
+
+  // Optional: serve quickly if cache is fresh (SWR pattern)
+  if (softTtlMs && cached && ageMs <= softTtlMs) {
+    // kick off a background refresh (fire-and-forget)
+    fetcher().then((fresh) => setCache(cacheKey, fresh)).catch(() => {});
+    return { data: cached.data, _stale: false, _ageMs: ageMs };
+  }
+
+  try {
+    const fresh = await fetcher();
+    setCache(cacheKey, fresh);
+    return { data: fresh, _stale: false, _ageMs: 0 };
+  } catch (err) {
+    // stale-if-error: only use cache if it’s not older than hardTtlMs
+    if (cached && ageMs <= hardTtlMs) {
+      return { data: cached.data, _stale: true, _ageMs: ageMs, _error: err };
+    }
+    throw err;
+  }
+}
 
 const API_BASE = "https://api-open.data.gov.sg/v2/real-time/api";
 const DATASET_API_BASE = "https://api-open.data.gov.sg/v1/public/api";
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function requestJSON(
+  url,
+  { headers = {}, timeoutMs = 8000, retries = 1 } = {}
+) {
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { headers, signal: ctrl.signal });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      const err = new Error(
+        `HTTP ${res.status} ${res.statusText} at ${url}\n${text}`
+      );
+      err.status = res.status;
+      throw err;
+    }
+    return await res.json();
+  } catch (err) {
+    // Retry on transient errors
+    const transient =
+      err.name === "AbortError" ||
+      err.status === 429 ||
+      (err.status >= 500 && err.status <= 599);
+    if (retries > 0 && transient) {
+      await sleep(500);
+      return requestJSON(url, { headers, timeoutMs, retries: retries - 1 });
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 function buildUrl(base, path, params = {}) {
   const url = new URL(`${base}${path}`);
@@ -28,15 +108,7 @@ export async function fetchRainfall({ date, paginationToken, apiKey } = {}) {
   const url = buildRealTimeUrl("/rainfall", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
-
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err = new Error(`Rainfall fetch failed (${res.status}) ${text}`);
-    err.status = res.status;
-    throw err;
-  }
-  return res.json();
+  return requestJSON(url, { headers, timeoutMs: 8000, retries: 1 });
 }
 
 export function mapRainfallToPoints(json) {
@@ -81,8 +153,14 @@ export function mapRainfallToPoints(json) {
 }
 
 export async function getRainfallLatest({ apiKey } = {}) {
-  const json = await fetchRainfall({ apiKey });
-  return mapRainfallToPoints(json);
+  const fetcher = () => fetchRainfall({ apiKey });
+  const { data, _stale, _ageMs } = await withCache(fetcher, {
+    cacheKey: "cache:rainfall:latest",
+    hardTtlMs: 15 * 60 * 1000,  // 15 min
+    softTtlMs: 0                // or 90*1000 if you want SWR
+  });
+  const mapped = mapRainfallToPoints(data);
+  return { ...mapped, _stale, _ageMs };
 }
 export async function getRainfallAt(dateStr, { apiKey } = {}) {
   const json = await fetchRainfall({ date: dateStr, apiKey });
@@ -97,15 +175,7 @@ export async function fetchWindSpeed({ date, paginationToken, apiKey } = {}) {
   const url = buildRealTimeUrl("/wind-speed", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
-
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err = new Error(`Wind fetch failed (${res.status}) ${text}`);
-    err.status = res.status;
-    throw err;
-  }
-  return res.json();
+  return requestJSON(url, { headers, timeoutMs: 8000, retries: 1 });
 }
 
 export function mapWindToPoints(json) {
@@ -162,17 +232,7 @@ export async function fetchAirTemperature({
   const url = buildRealTimeUrl("/air-temperature", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
-
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err = new Error(
-      `Air temperature fetch failed (${res.status}) ${text}`
-    );
-    err.status = res.status;
-    throw err;
-  }
-  return res.json();
+  return requestJSON(url, { headers, timeoutMs: 8000, retries: 1 });
 }
 
 export function mapTempToPoints(json) {
@@ -203,8 +263,12 @@ export function mapTempToPoints(json) {
 }
 
 export async function getAirTemperatureLatest({ apiKey } = {}) {
-  const json = await fetchAirTemperature({ apiKey });
-  return mapTempToPoints(json);
+  const fetcher = () => fetchAirTemperature({ apiKey });
+  const { data, _stale, _ageMs } = await withCache(fetcher, {
+    cacheKey: "cache:temp:latest",
+    hardTtlMs: 60 * 60 * 1000
+  });
+  return { ...mapTempToPoints(data), _stale, _ageMs };
 }
 export async function getAirTemperatureAt(dateStr, { apiKey } = {}) {
   const json = await fetchAirTemperature({ date: dateStr, apiKey });
@@ -215,23 +279,11 @@ export async function getAirTemperatureAt(dateStr, { apiKey } = {}) {
  * RELATIVE HUMIDITY (%)
  * GET /relative-humidity
  * --------------------------*/
-export async function fetchRelativeHumidity({
-  date,
-  paginationToken,
-  apiKey,
-} = {}) {
+export async function fetchRelativeHumidity({ date, paginationToken, apiKey } = {}) {
   const url = buildRealTimeUrl("/relative-humidity", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
-
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err = new Error(`Humidity fetch failed (${res.status}) ${text}`);
-    err.status = res.status;
-    throw err;
-  }
-  return res.json();
+  return requestJSON(url, { headers, timeoutMs: 8000, retries: 1 });
 }
 
 export function mapHumidityToPoints(json) {
@@ -262,8 +314,12 @@ export function mapHumidityToPoints(json) {
 }
 
 export async function getRelativeHumidityLatest({ apiKey } = {}) {
-  const json = await fetchRelativeHumidity({ apiKey });
-  return mapHumidityToPoints(json);
+  const fetcher = () => fetchRelativeHumidity({ apiKey });
+  const { data, _stale, _ageMs } = await withCache(fetcher, {
+    cacheKey: "cache:rh:latest",
+    hardTtlMs: 60 * 60 * 1000
+  });
+  return { ...mapHumidityToPoints(data), _stale, _ageMs };
 }
 export async function getRelativeHumidityAt(dateStr, { apiKey } = {}) {
   const json = await fetchRelativeHumidity({ date: dateStr, apiKey });
@@ -278,15 +334,7 @@ export async function fetchPM25({ date, paginationToken, apiKey } = {}) {
   const url = buildRealTimeUrl("/pm25", { date, paginationToken });
   const headers = { Accept: "application/json" };
   if (apiKey) headers["X-Api-Key"] = apiKey;
-
-  const res = await fetch(url, { headers });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err = new Error(`PM2.5 fetch failed (${res.status}) ${text}`);
-    err.status = res.status;
-    throw err;
-  }
-  return res.json();
+  return requestJSON(url, { headers, timeoutMs: 8000, retries: 1 });
 }
 
 export function mapPM25ToPoints(json) {
@@ -324,8 +372,12 @@ export function mapPM25ToPoints(json) {
 }
 
 export async function getPM25Latest({ apiKey } = {}) {
-  const json = await fetchPM25({ apiKey });
-  return mapPM25ToPoints(json);
+  const fetcher = () => fetchPM25({ apiKey });
+  const { data, _stale, _ageMs } = await withCache(fetcher, {
+    cacheKey: "cache:pm25:latest",
+    hardTtlMs: 60 * 60 * 1000
+  });
+  return { ...mapPM25ToPoints(data), _stale, _ageMs };
 }
 export async function getPM25At(dateStr, { apiKey } = {}) {
   const json = await fetchPM25({ date: dateStr, apiKey });
@@ -348,27 +400,15 @@ export async function fetchDengueClustersGeoJSON(
     DATASET_API_BASE,
     `/datasets/${datasetId}/poll-download`
   );
-  const metaRes = await fetch(metaUrl);
-  const metaJson = await metaRes.json();
-  if (!metaRes.ok || metaJson?.code !== 0) {
-    const err = new Error(
-      `Dengue meta fetch failed (${metaRes.status}) ${metaJson?.errMsg || ""}`
-    );
-    err.status = metaRes.status;
+  const metaJson = await requestJSON(metaUrl, { timeoutMs: 10000, retries: 1 });
+
+  if (metaJson?.code !== 0 || !metaJson?.data?.url) {
+    const err = new Error(`Dengue meta fetch returned bad payload`);
+    err.status = 502;
     throw err;
   }
-  const fileUrl = metaJson?.data?.url;
-  if (!fileUrl) throw new Error("Dengue download URL missing");
-  const fileRes = await fetch(fileUrl);
-  if (!fileRes.ok) {
-    const text = await fileRes.text().catch(() => "");
-    const err = new Error(
-      `Dengue GEOJSON fetch failed (${fileRes.status}) ${text}`
-    );
-    err.status = fileRes.status;
-    throw err;
-  }
-  return fileRes.json();
+
+  return requestJSON(metaJson.data.url, { timeoutMs: 10000, retries: 1 });
 }
 
 export async function getDengueClustersGeoJSON() {
@@ -379,36 +419,34 @@ export async function getDengueClustersGeoJSON() {
 
 export async function getClinicsGeoJSON() {
   const datasetId = "d_548c33ea2d99e29ec63a7cc9edcccedc"; // CHAS Clinics (MOH)
-  const pollUrl = `https://api-open.data.gov.sg/v1/public/api/datasets/${datasetId}/poll-download`;
+  const pollUrl = `${DATASET_API_BASE}/datasets/${datasetId}/poll-download`;
 
-  const pollRes = await fetch(pollUrl, {
+  const pollJson = await requestJSON(pollUrl, {
     headers: { "Cache-Control": "no-cache" },
+    timeoutMs: 10000,
+    retries: 1,
   });
-  if (!pollRes.ok) throw new Error("clinics poll failed");
-  const pollJson = await pollRes.json();
-
-  // The API returns { code: 0, data: { url: "<temp signed url>" } } on success
   if (pollJson.code !== 0 || !pollJson?.data?.url) {
-    throw new Error("clinics poll returned no url");
+    const err = new Error("clinics poll returned no url");
+    err.status = 502;
+    throw err;
   }
 
-  const res = await fetch(pollJson.data.url, {
+  const geojson = await requestJSON(pollJson.data.url, {
     headers: { "Cache-Control": "no-cache" },
+    timeoutMs: 10000,
+    retries: 1,
   });
-  if (!res.ok) throw new Error("clinics fetch failed");
-
-  const geojson = await res.json();
   if (!geojson || geojson.type !== "FeatureCollection") return null;
 
-  // OPTIONAL: normalize some friendly fields from the HTML "Description"
+  // NORMALIZE friendly fields from HTML "Description"
   const normFeatures = (geojson.features || []).map((f) => {
     const props = f.properties || {};
     const html = props.Description || "";
 
     const rx = (label) =>
-      new RegExp(`<th>${label}<\\/th>\\s*<td>(.*?)<\\/td>`, "i").exec(
-        html
-      )?.[1] || props[label];
+      new RegExp(`<th>${label}<\\/th>\\s*<td>(.*?)<\\/td>`, "i").exec(html)?.[1] ||
+      props[label];
 
     const name = rx("HCI_NAME") || props.Name || "Clinic";
     const tel = rx("HCI_TEL") || "";
