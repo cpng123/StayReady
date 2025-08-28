@@ -11,8 +11,9 @@ import {
   FlatList,
   Linking,
   Alert,
+  RefreshControl,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTACTS } from "../data/homeData";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import WarningCard from "../components/WarningCard";
@@ -28,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import useHazards from "../utils/useHazards";
 import useNotifyOnHazard from "../utils/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
+import { getUnreadCount } from "../utils/notify";
 
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 
@@ -39,11 +41,32 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
 
-  const { topHazard, cards: ewCards } = useHazards(center, 5);
+  const {
+    loading,
+    topHazard,
+    cards: ewCards,
+    refresh: refreshHazards,
+  } = useHazards(center, 5);
   useNotifyOnHazard(topHazard);
 
-  const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
+  // unread badge for bell
+  const [unread, setUnread] = useState(0);
+  const refreshUnread = async () => {
+    const n = await getUnreadCount();
+    setUnread(n);
+  };
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshUnread();
+    }, [])
+  );
+  // also refresh after topHazard changes (new notifications may be added)
+  useEffect(() => {
+    refreshUnread();
+  }, [topHazard?.kind]);
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -57,6 +80,18 @@ export default function HomeScreen() {
     })();
     return () => (alive = false);
   }, []);
+
+  // Pull-to-refresh state
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refreshHazards(); // force re-evaluate hazards (incl. mock/demo changes)
+      await refreshUnread(); // badge may change if a new alert came in
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // Dynamic header location label
   const [headerLoc, setHeaderLoc] = useState(
@@ -213,6 +248,13 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing || loading}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary}
+          />
+        }
       >
         {/* Top Bar */}
         <View style={styles.topBar}>
@@ -227,23 +269,57 @@ export default function HomeScreen() {
               <Text style={styles.locationText}>{headerLoc}</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.iconBtn,
-              { backgroundColor: theme.key === "dark" ? "#1F2937" : "#EAF2FF" },
-            ]}
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate("LocationSettings")}
-            accessibilityRole="button"
-            accessibilityLabel={t("settings.title", "Settings")}
-            testID="settings-button"
-          >
-            <Ionicons
-              name="settings-outline"
-              size={22}
-              color={theme.colors.primary}
-            />
-          </TouchableOpacity>
+
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            {/* Bell with badge */}
+            <TouchableOpacity
+              style={[
+                styles.iconBtn,
+                {
+                  backgroundColor: theme.key === "dark" ? "#1F2937" : "#EAF2FF",
+                },
+              ]}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("Notifications")}
+              accessibilityRole="button"
+              accessibilityLabel={t("notifications.title", "Notifications")}
+              testID="notifications-button"
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={theme.colors.primary}
+              />
+              {unread > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unread > 99 ? "99+" : String(unread)}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {/* Settings */}
+            <TouchableOpacity
+              style={[
+                styles.iconBtn,
+                {
+                  backgroundColor: theme.key === "dark" ? "#1F2937" : "#EAF2FF",
+                },
+              ]}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("LocationSettings")}
+              accessibilityRole="button"
+              accessibilityLabel={t("settings.title", "Settings")}
+              testID="settings-button"
+            >
+              <Ionicons
+                name="settings-outline"
+                size={22}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Donation */}
@@ -354,7 +430,9 @@ export default function HomeScreen() {
               width={200}
               imageHeight={120}
               showUpdated={false}
-              onPress={() => navigation.navigate("HazardDetail", { hazard: item.hazard })}
+              onPress={() =>
+                navigation.navigate("HazardDetail", { hazard: item.hazard })
+              }
             />
           )}
         />
@@ -488,6 +566,20 @@ const makeStyles = (theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
+    badge: {
+      position: "absolute",
+      top: -4,
+      right: -4,
+      minWidth: 16,
+      height: 16,
+      paddingHorizontal: 3,
+      borderRadius: 8,
+      backgroundColor: "#F25555",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    badgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
+
     donateCard: {
       borderRadius: 16,
       overflow: "hidden",

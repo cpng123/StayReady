@@ -10,6 +10,7 @@ import { I18nextProvider } from "react-i18next";
 import { initNotifications } from "./utils/notify";
 
 import SplashScreen from "./screens/SplashScreen";
+import NotificationsScreen from "./screens/NotificationsScreen";
 import EarlyWarningScreen from "./screens/EarlyWarningScreen";
 import HazardDetailScreen from "./screens/HazardDetailScreen";
 import ResourceHubScreen from "./screens/ResourceHubScreen";
@@ -47,6 +48,7 @@ function RootNav() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Main" component={AppNavigator} />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
           <Stack.Screen name="EarlyWarning" component={EarlyWarningScreen} />
           <Stack.Screen name="HazardDetail" component={HazardDetailScreen} />
           <Stack.Screen name="ResourceHub" component={ResourceHubScreen} />

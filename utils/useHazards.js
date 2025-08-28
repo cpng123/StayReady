@@ -1,4 +1,4 @@
-// hooks/useHazards.js
+// utils/useHazards.js
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,75 +8,116 @@ import {
   getWindLatest,
   getAirTemperatureLatest,
   getDengueClustersGeoJSON,
-} from "../utils/api";
-import { getMockFlags } from "../utils/mockFlags";
-import { decideGlobalHazard, evaluateAllHazards } from "../utils/hazard";
-import { buildCardItems } from "../utils/hazardCards";
+} from "./api";
+import { decideGlobalHazard, evaluateAllHazards } from "./hazard";
+import { getMockFlags } from "./mockFlags";
 
-export default function useHazards(center, cardLimit = 5) {
+const images = {
+  flood: require("../assets/General/flash-flood2.jpg"),
+  haze: require("../assets/General/pm-haze2.jpg"),
+  dengue: require("../assets/General/dengue-cluster2.jpg"),
+  wind: require("../assets/General/strong-wind2.jpg"),
+  heat: require("../assets/General/heat.jpg"),
+};
+
+export default function useHazards(center, limit = 5) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [topHazard, setTopHazard] = useState({
     kind: "none",
     title: t("home.hazard.none", "No Hazard Detected"),
+    severity: "safe",
   });
-  const [hazards, setHazards] = useState([]);
   const [cards, setCards] = useState([]);
-  const [error, setError] = useState(null);
-  const [nonce, setNonce] = useState(0);
 
-  const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  const toCardItem = useCallback(
+    (h) => {
+      const sev = h.severity || "safe";
+      const severityBadge = {
+        safe: t("early.severity.safe", "Safe"),
+        warning: t("early.severity.med", "Med"),
+        danger: t("early.severity.high", "High"),
+      };
+      const severityColor = { safe: "#03A55A", warning: "#F29F3D", danger: "#F25555" };
+      const titleFor = {
+        flood: t("early.cards.flood.title", "Flash Flood"),
+        haze: t("early.cards.haze.title", "Haze (PM2.5)"),
+        dengue: t("early.cards.dengue.title", "Dengue Clusters"),
+        wind: t("early.cards.wind.title", "Strong Winds"),
+        heat: t("early.cards.heat.title", "Heat Advisory"),
+      }[h.kind] || t("home.hazard.alert", "Hazard Alert");
 
-  useEffect(() => {
+      // short description reused from your previous logic if needed:
+      const desc = h.desc || ""; // (optional) keep empty if you already render desc elsewhere
+
+      return {
+        id: h.kind,
+        title: titleFor,
+        level: severityBadge[sev],
+        color: severityColor[sev],
+        img: images[h.kind],
+        desc,
+        hazard: h,
+      };
+    },
+    [t]
+  );
+
+  const load = useCallback(async () => {
+    setLoading(true);
     let alive = true;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] =
-          await Promise.all([
-            getRainfallLatest().catch(() => ({ points: [] })),
-            getRelativeHumidityLatest().catch(() => ({ points: [] })),
-            getPM25Latest().catch(() => ({ points: [] })),
-            getWindLatest().catch(() => ({ points: [] })),
-            getAirTemperatureLatest().catch(() => ({ points: [] })),
-            getDengueClustersGeoJSON().catch(() => null),
-            getMockFlags().catch(() => ({})),
-          ]);
+    try {
+      const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] = await Promise.all([
+        getRainfallLatest().catch(() => ({ points: [] })),
+        getRelativeHumidityLatest().catch(() => ({ points: [] })),
+        getPM25Latest().catch(() => ({ points: [] })),
+        getWindLatest().catch(() => ({ points: [] })),
+        getAirTemperatureLatest().catch(() => ({ points: [] })),
+        getDengueClustersGeoJSON().catch(() => null),
+        getMockFlags().catch(() => ({})),
+      ]);
 
-        if (!alive) return;
+      if (!alive) return;
 
-        const args = {
-          center: center || { lat: 1.3521, lon: 103.8198 },
-          rainfallPoints: rain.points || [],
-          humPoints: hum.points || [],
-          pmPoints: pm.points || [],
-          windPoints: wind.points || [],
-          tempPoints: temp.points || [],
-          dengueGeoJSON: dengueJSON,
-          mockFlags,
-        };
+      const hazard = decideGlobalHazard({
+        center,
+        rainfallPoints: rain.points || [],
+        humPoints: hum.points || [],
+        pmPoints: pm.points || [],
+        windPoints: wind.points || [],
+        tempPoints: temp.points || [],
+        dengueGeoJSON: dengueJSON,
+        mockFlags,
+      });
+      setTopHazard(hazard);
 
-        const top = decideGlobalHazard(args);
-        const all = evaluateAllHazards(args);
-        const uiCards = buildCardItems(all, t, cardLimit);
+      const all = evaluateAllHazards({
+        center,
+        rainfallPoints: rain.points || [],
+        humPoints: hum.points || [],
+        pmPoints: pm.points || [],
+        windPoints: wind.points || [],
+        tempPoints: temp.points || [],
+        dengueGeoJSON: dengueJSON,
+        mockFlags,
+      });
 
-        setTopHazard(top);
-        setHazards(all);
-        setCards(uiCards);
-      } catch (e) {
-        if (alive) setError(e);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
+      setCards(all.slice(0, limit).map(toCardItem));
+    } finally {
+      if (alive) setLoading(false);
+    }
     return () => {
       alive = false;
     };
-  }, [center?.lat, center?.lon, cardLimit, t, nonce]);
+  }, [center, limit, toCardItem]);
 
-  return useMemo(
-    () => ({ loading, error, topHazard, hazards, cards, refresh }),
-    [loading, error, topHazard, hazards, cards, refresh]
-  );
+  // initial + whenever center changes
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // expose explicit refresh (returns a Promise)
+  const refresh = useCallback(() => load(), [load]);
+
+  return { loading, topHazard, cards, refresh };
 }
