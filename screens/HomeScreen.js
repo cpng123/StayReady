@@ -18,7 +18,7 @@ import { CONTACTS } from "../data/homeData";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import WarningCard from "../components/WarningCard";
 import ImageOverlayCard from "../components/ImageOverlayCard";
-import { PREPAREDNESS, getHomePreparedness, ROUTINE } from "../data/homeData";
+import { getHomePreparedness, ROUTINE } from "../data/homeData";
 import ConfirmModal from "../components/ConfirmModal";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
