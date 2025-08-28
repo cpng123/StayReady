@@ -1,6 +1,6 @@
-// utils/useNotifyOnHazard.js
+// hooks/useNotifyOnHazard.js
 import { useEffect, useRef } from "react";
-import { maybeNotifyHazard } from "./notify";
+import { maybeNotifyHazard } from "../utils/notify";
 
 /**
  * Fires a local notification when the top hazard KIND changes

@@ -26,8 +26,8 @@ import LeafletMapWebView from "../components/LeafletMapWebView";
 import { resolveLocationLabel } from "../utils/locationService";
 import { useTranslation } from "react-i18next";
 
-import useHazards from "../utils/useHazards";
-import useNotifyOnHazard from "../utils/useNotifyOnHazard";
+import useHazards from "../hooks/useHazards";
+import useNotifyOnHazard from "../hooks/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
 import { getUnreadCount } from "../utils/notify";
 

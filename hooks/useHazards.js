@@ -1,4 +1,4 @@
-// utils/useHazards.js
+// hooks/useHazards.js
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,9 +8,9 @@ import {
   getWindLatest,
   getAirTemperatureLatest,
   getDengueClustersGeoJSON,
-} from "./api";
-import { decideGlobalHazard, evaluateAllHazards } from "./hazard";
-import { getMockFlags } from "./mockFlags";
+} from "../utils/api";
+import { decideGlobalHazard, evaluateAllHazards } from "../utils/hazard";
+import { getMockFlags } from "../utils/mockFlags";
 
 const images = {
   flood: require("../assets/General/flash-flood2.jpg"),
@@ -38,14 +38,19 @@ export default function useHazards(center, limit = 5) {
         warning: t("early.severity.med", "Med"),
         danger: t("early.severity.high", "High"),
       };
-      const severityColor = { safe: "#03A55A", warning: "#F29F3D", danger: "#F25555" };
-      const titleFor = {
-        flood: t("early.cards.flood.title", "Flash Flood"),
-        haze: t("early.cards.haze.title", "Haze (PM2.5)"),
-        dengue: t("early.cards.dengue.title", "Dengue Clusters"),
-        wind: t("early.cards.wind.title", "Strong Winds"),
-        heat: t("early.cards.heat.title", "Heat Advisory"),
-      }[h.kind] || t("home.hazard.alert", "Hazard Alert");
+      const severityColor = {
+        safe: "#03A55A",
+        warning: "#F29F3D",
+        danger: "#F25555",
+      };
+      const titleFor =
+        {
+          flood: t("early.cards.flood.title", "Flash Flood"),
+          haze: t("early.cards.haze.title", "Haze (PM2.5)"),
+          dengue: t("early.cards.dengue.title", "Dengue Clusters"),
+          wind: t("early.cards.wind.title", "Strong Winds"),
+          heat: t("early.cards.heat.title", "Heat Advisory"),
+        }[h.kind] || t("home.hazard.alert", "Hazard Alert");
 
       // short description reused from your previous logic if needed:
       const desc = h.desc || ""; // (optional) keep empty if you already render desc elsewhere
@@ -67,15 +72,16 @@ export default function useHazards(center, limit = 5) {
     setLoading(true);
     let alive = true;
     try {
-      const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] = await Promise.all([
-        getRainfallLatest().catch(() => ({ points: [] })),
-        getRelativeHumidityLatest().catch(() => ({ points: [] })),
-        getPM25Latest().catch(() => ({ points: [] })),
-        getWindLatest().catch(() => ({ points: [] })),
-        getAirTemperatureLatest().catch(() => ({ points: [] })),
-        getDengueClustersGeoJSON().catch(() => null),
-        getMockFlags().catch(() => ({})),
-      ]);
+      const [rain, hum, pm, wind, temp, dengueJSON, mockFlags] =
+        await Promise.all([
+          getRainfallLatest().catch(() => ({ points: [] })),
+          getRelativeHumidityLatest().catch(() => ({ points: [] })),
+          getPM25Latest().catch(() => ({ points: [] })),
+          getWindLatest().catch(() => ({ points: [] })),
+          getAirTemperatureLatest().catch(() => ({ points: [] })),
+          getDengueClustersGeoJSON().catch(() => null),
+          getMockFlags().catch(() => ({})),
+        ]);
 
       if (!alive) return;
 

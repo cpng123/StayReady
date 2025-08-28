@@ -13,15 +13,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import WarningCard from "../components/WarningCard";
-import useHazards from "../utils/useHazards";
+import useHazards from "../hooks/useHazards";
 import { useTranslation } from "react-i18next";
 
 const SCREEN_PADDING = 16;
 const GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
-
-const MAX_DOTS = 5; // cap the number of visible dots
+const MAX_DOTS = 5;
 
 export default function EarlyWarningScreen({ navigation }) {
   const { theme } = useThemeContext();
