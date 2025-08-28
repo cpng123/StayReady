@@ -197,6 +197,8 @@
     "choose_language": "Choose Language",
     "theme": "Theme",
     "notifications": "Notifications",
+    "notify_all_desc": "On: you’ll receive Warning & Danger alerts.",
+    "notify_danger_only_desc": "Off: only Danger (critical) alerts will be sent.",
     "sound": "Sound",
     "vibration": "Vibration",
     "preparedness_settings": "Preparedness-Specific Settings",

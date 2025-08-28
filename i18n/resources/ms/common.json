@@ -202,6 +202,8 @@
     "choose_language": "Pilih Bahasa",
     "theme": "Tema",
     "notifications": "Pemberitahuan",
+    "notify_all_desc": "Hidup: anda akan menerima makluman Amaran dan Bahaya.",
+    "notify_danger_only_desc": "Mati: hanya amaran Bahaya (kritikal) akan dihantar.",
     "sound": "Bunyi",
     "vibration": "Getaran",
     "preparedness_settings": "Tetapan Kesiapsiagaan Khusus",

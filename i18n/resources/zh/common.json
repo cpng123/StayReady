@@ -182,6 +182,8 @@
     "choose_language": "选择语言",
     "theme": "主题",
     "notifications": "通知",
+    "notify_all_desc": "开启：您将收到警告和危险警报。",
+    "notify_danger_only_desc": "关闭：仅发送危险（严重）警报。",
     "sound": "声音",
     "vibration": "震动",
     "preparedness_settings": "应急相关设置",
