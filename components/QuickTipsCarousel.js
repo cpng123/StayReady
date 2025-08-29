@@ -1,4 +1,21 @@
-// components/QuickTipsCarousel.js
+/**
+ * File: components/QuickTipsCarousel.js
+ * Purpose: Render a horizontally swipeable, auto-advancing carousel of short
+ *          preparedness tips with snap-to cards and an indicator dot row.
+ *
+ * Responsibilities:
+ *  - Size each card to the device width minus horizontal screen padding.
+ *  - Auto-advance every 3.5 seconds and keep the active index in sync.
+ *  - Merge optional per-key style overrides from the parent with base styles.
+ *  - Emit a press callback when a tip card is tapped.
+ *
+ * Props:
+ *  - tips: Array of tip objects (expects at least { id, categoryTitle, text }).
+ *  - theme: Current theme object (uses theme.colors and theme.key).
+ *  - styles: Optional partial style overrides (e.g. { tipCard, tipBar, ... }).
+ *  - onPressTip: Function invoked with the tip item when a card is pressed.
+ */
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ScrollView,
@@ -10,22 +27,24 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+// Layout constants derived from screen width
 const SCREEN_PADDING = 16;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function QuickTipsCarousel({
   tips = [],
   theme,
-  styles: externalStyles, // optional override from parent
+  styles: externalStyles, // optional parent overrides
   onPressTip,
 }) {
   const scrollRef = useRef(null);
   const [idx, setIdx] = useState(0);
 
+  // Width of a single card and spacing between cards
   const CARD_W = SCREEN_WIDTH - SCREEN_PADDING * 2;
   const ITEM_SPACING = 10;
 
-  // Build default styles + merge with parent (per-key merge)
+  // Build base styles and shallow-merge known keys with parent overrides
   const base = useMemo(() => defaultStyles(theme), [theme]);
   const s = useMemo(
     () => ({
@@ -43,7 +62,7 @@ export default function QuickTipsCarousel({
     [base, externalStyles]
   );
 
-  // Auto-advance every 3.5s
+  // Auto-advance every 3.5s (no-op if there are no tips)
   useEffect(() => {
     if (!tips.length) return;
     const t = setInterval(() => {
@@ -59,6 +78,7 @@ export default function QuickTipsCarousel({
     return () => clearInterval(t);
   }, [tips.length, CARD_W]);
 
+  // Sync active index when user swipes manually
   const onMomentumEnd = (e) => {
     const x = e.nativeEvent.contentOffset.x;
     const next = Math.round(x / (CARD_W + ITEM_SPACING));
@@ -67,6 +87,7 @@ export default function QuickTipsCarousel({
 
   return (
     <>
+      {/* Horizontal snapping list of tip cards */}
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -75,7 +96,10 @@ export default function QuickTipsCarousel({
         decelerationRate="fast"
         snapToAlignment="start"
         onMomentumScrollEnd={onMomentumEnd}
-        contentContainerStyle={{ paddingRight: SCREEN_PADDING, paddingHorizontal: SCREEN_PADDING - 1 }}
+        contentContainerStyle={{
+          paddingRight: SCREEN_PADDING,
+          paddingHorizontal: SCREEN_PADDING - 1,
+        }}
         style={{ marginHorizontal: -SCREEN_PADDING }}
       >
         {tips.map((item) => (
@@ -91,8 +115,10 @@ export default function QuickTipsCarousel({
                 { backgroundColor: theme.colors.card, width: CARD_W },
               ]}
             >
-              {/* Left color bar */}
-              <View style={[s.tipBar, { backgroundColor: theme.colors.primary }]} />
+              {/* Left accent bar (uses theme primary color) */}
+              <View
+                style={[s.tipBar, { backgroundColor: theme.colors.primary }]}
+              />
 
               {/* Text content */}
               <View style={{ flex: 1, paddingRight: 8 }}>
@@ -100,7 +126,7 @@ export default function QuickTipsCarousel({
                   {String(item.categoryTitle ?? "")}
                 </Text>
 
-                {/* Fixed-height 2-line description */}
+                {/* Fixed-height two-line description clamp */}
                 <View style={s.tipBodyWrap}>
                   <Text
                     numberOfLines={2}
@@ -112,7 +138,7 @@ export default function QuickTipsCarousel({
                 </View>
               </View>
 
-              {/* CTA column: icon on top, text below */}
+              {/* CTA column with forward icon */}
               <View
                 style={{
                   width: 66,
@@ -133,8 +159,10 @@ export default function QuickTipsCarousel({
         ))}
       </ScrollView>
 
-      {/* Dots */}
-      <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 8 }}>
+      {/* Pagination dots */}
+      <View
+        style={{ flexDirection: "row", justifyContent: "center", marginTop: 8 }}
+      >
         {tips.map((_, i) => (
           <View
             key={i}
@@ -157,6 +185,7 @@ export default function QuickTipsCarousel({
   );
 }
 
+// Base styles for the carousel’s visual elements
 function defaultStyles(theme) {
   return StyleSheet.create({
     tipCard: {
@@ -185,7 +214,7 @@ function defaultStyles(theme) {
       lineHeight: 18,
     },
     tipBodyWrap: {
-      height: 36, // slightly taller for consistent two-line clamp
+      height: 36, // consistent two-line clamp height
       justifyContent: "flex-start",
       overflow: "hidden",
     },

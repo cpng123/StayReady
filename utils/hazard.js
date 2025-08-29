@@ -1,7 +1,20 @@
-// utils/hazard.js
-// Unified hazard inference for SG conditions.
-// Inputs are the exact structures your utils/api.js returns.
+/**
+ * File: utils/hazard.js
+ * Purpose: Infer high-level “hazard states” (flood, haze, dengue, wind, heat)
+ *          for Singapore from normalized sensor/geo feeds returned by utils/api.js.
+ * Responsibilities:
+ *  - Provide small per-hazard classifiers that turn raw points/geojson into
+ *    { kind, severity, title, reason?, metrics?, locationName? } objects.
+ *  - Pick the single “top” hazard for the home banner, and the per-type list
+ *    for the Early Warning screen.
+ *  - Support mock flags for demos/tests without hitting live feeds.
+ * Notes:
+ *  - Thresholds are heuristic and tuned for clarity to end-users.
+ *  - Regional labeling reuses nearest PM2.5 region centroids for consistency.
+ *  - All classifiers return a safe default when inputs are missing.
+ */
 
+// -------------------- kinds --------------------
 export const HAZARD_NONE = "none";
 export const HAZARD_FLOOD = "flood";
 export const HAZARD_HAZE = "haze";
@@ -9,6 +22,8 @@ export const HAZARD_DENGUE = "dengue";
 export const HAZARD_WIND = "wind";
 export const HAZARD_HEAT = "heat";
 
+// -------------------- mock builder (for demo mode) --------------------
+// Turn feature flags into ready-made hazard objects (skips real detection).
 export function mockedHazardsFromFlags(flags = {}, center) {
   const list = [];
 
@@ -78,7 +93,8 @@ export function mockedHazardsFromFlags(flags = {}, center) {
   return list;
 }
 
-// Find nearest PM region centroid to a {lat, lon}; returns {name, km} or null
+// -------------------- region helper (PM centroid closest to point) --------------------
+// Return { name, km } of nearest PM region centroid, or null.
 function nearestRegionName(point, pmPoints = []) {
   if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon))
     return null;
@@ -95,11 +111,11 @@ function nearestRegionName(point, pmPoints = []) {
   return best ? { name: `${best.name} Region`, km: bestKm } : null;
 }
 
-// ---------- helpers ----------
+// -------------------- numeric/geo helpers --------------------
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const toNum = (v) => (v == null || isNaN(+v) ? null : +v);
 
-// Haversine distance in km
+// Haversine distance in km (lat/lon in degrees)
 export function kmBetween(a, b) {
   const R = 6371; // km
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
@@ -113,6 +129,7 @@ export function kmBetween(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
+// Nearest point (by squared Euclidean in lat/lon space)
 export function nearestPointTo({ lat, lon }, points = []) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   let best = null,
@@ -130,7 +147,7 @@ export function nearestPointTo({ lat, lon }, points = []) {
   return best;
 }
 
-// Very light polygon centroid (works for Polygon/MultiPolygon). Fallback to first coord.
+// Very light centroid for Polygon/MultiPolygon (fallback to first coord)
 function centroidOfGeometry(geom) {
   try {
     if (!geom) return null;
@@ -148,8 +165,7 @@ function centroidOfGeometry(geom) {
       sumLon = 0,
       count = 0;
     for (const poly of polys) {
-      // use outer ring
-      const ring = poly[0] || [];
+      const ring = poly[0] || []; // outer ring
       for (const c of ring) {
         if (Array.isArray(c) && c.length >= 2) {
           sumLon += +c[0];
@@ -170,6 +186,7 @@ function heatIndexC(tempC, rh) {
   if (tempC == null || rh == null) return null;
   const T = (tempC * 9) / 5 + 32; // to °F
   const R = rh;
+
   // Base HI in °F
   let HI =
     -42.379 +
@@ -182,7 +199,7 @@ function heatIndexC(tempC, rh) {
     0.00085282 * T * R * R -
     0.00000199 * T * T * R * R;
 
-  // Adjustments (low humidity & high humidity corrections)
+  // Low / high humidity corrections
   if (R < 13 && T >= 80 && T <= 112) {
     HI -= ((13 - R) / 4) * Math.sqrt((17 - Math.abs(T - 95)) / 17);
   } else if (R > 85 && T >= 80 && T <= 87) {
@@ -191,7 +208,7 @@ function heatIndexC(tempC, rh) {
   return ((HI - 32) * 5) / 9; // back to °C
 }
 
-// Severity ordering
+// -------------------- severity + prioritisation --------------------
 const SEV_ORDER = { danger: 3, warning: 2, safe: 1 };
 const HAZARD_PRIORITY = [
   HAZARD_FLOOD,
@@ -201,7 +218,7 @@ const HAZARD_PRIORITY = [
   HAZARD_WIND,
 ];
 
-// Pick the “worst” hazard (by severity, then by priority list)
+// Pick the “worst” hazard by severity, then by a fixed priority list
 function pickTop(hazards) {
   const withScore = hazards.filter(Boolean).map((h) => ({
     h,
@@ -219,9 +236,9 @@ function pickTop(hazards) {
   return withScore[0].h;
 }
 
-// ---------- per-hazard classifiers ----------
+// -------------------- per-hazard classifiers --------------------
 
-// A) Rainfall/Flash flood potential (5-min mm, optional RH for extra caution)
+// A) Rainfall / flash-flood potential from 5-min totals; RH adds confidence
 export function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
   const nearRain = nearestPointTo(center || {}, rainfallPoints);
   const nearHum = nearestPointTo(center || {}, humPoints);
@@ -231,9 +248,9 @@ export function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
   if (mm == null)
     return { kind: HAZARD_FLOOD, severity: "safe", title: "No Flood Risk" };
 
-  // Heuristic starters (tune with real events)
-  // - Danger: ≥ 20 mm in 5 min
-  // - Warning: ≥ 10 mm in 5 min AND RH ≥ 85%
+  // Heuristics:
+  // - Danger ≥ 20 mm / 5 min
+  // - Warning ≥ 10 mm / 5 min with RH ≥ 85%
   if (mm >= 20) {
     return {
       kind: HAZARD_FLOOD,
@@ -259,7 +276,7 @@ export function classifyFlood({ center, rainfallPoints = [], humPoints = [] }) {
   return { kind: HAZARD_FLOOD, severity: "safe", title: "No Flood Risk" };
 }
 
-// B) Haze from PM2.5 (1-hr). Take worst region value.
+// B) Haze from one-hour PM2.5; take worst region
 export function classifyHaze({ pmPoints = [] }) {
   if (!pmPoints.length)
     return { kind: HAZARD_HAZE, severity: "safe", title: "Air Quality Normal" };
@@ -267,7 +284,8 @@ export function classifyHaze({ pmPoints = [] }) {
     toNum(b.value) > toNum(a.value) ? b : a
   );
   const v = toNum(worst.value);
-  // Rough alignment with NEA one-hour PM2.5 guidance bands (tune if you prefer exact labels)
+
+  // Simple bands (public-friendly):
   // Safe < 36, Warning 36–55, Danger > 55 µg/m³
   if (v == null || v < 36)
     return { kind: HAZARD_HAZE, severity: "safe", title: "Air Quality Normal" };
@@ -290,7 +308,7 @@ export function classifyHaze({ pmPoints = [] }) {
   };
 }
 
-// C) Dengue proximity (only user-location based). 5 km to cluster centroid.
+// C) Dengue proximity from GeoJSON clusters; nearest centroid within radius
 export function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
   if (!center || !dengueGeoJSON || dengueGeoJSON.type !== "FeatureCollection")
     return {
@@ -338,7 +356,7 @@ export function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
       title: "No Nearby Dengue Cluster",
     };
 
-  // NEA style: Red ≥10 cases, Yellow <10
+  // NEA style: Red ≥ 10 cases (Danger), Yellow < 10 (Warning)
   const sev = nearestCases != null && nearestCases >= 10 ? "danger" : "warning";
   return {
     kind: HAZARD_DENGUE,
@@ -356,7 +374,7 @@ export function classifyDengue({ center, dengueGeoJSON, kmRadius = 5 }) {
   };
 }
 
-// D) Wind (knots). Use worst (max) sustained; if you have gusts, escalate based on gusts too.
+// D) Wind from sustained knots; worst station, coarse region label
 export function classifyWind({ windPoints = [], pmPoints = [] }) {
   if (!windPoints.length)
     return { kind: HAZARD_WIND, severity: "safe", title: "Winds Normal" };
@@ -370,6 +388,7 @@ export function classifyWind({ windPoints = [], pmPoints = [] }) {
   );
   const locationName = region?.name || worst.name || worst.id || null;
 
+  // Safe < 15 kt, Warning 15–24 kt, Danger ≥ 25 kt
   if (kt == null || kt < 15)
     return {
       kind: HAZARD_WIND,
@@ -395,7 +414,7 @@ export function classifyWind({ windPoints = [], pmPoints = [] }) {
   };
 }
 
-// E) Heat (Heat Index from temp+RH). Use worst computed value across stations.
+// E) Heat via Heat Index (temp + RH); worst station, coarse region label
 export function classifyHeat({
   tempPoints = [],
   humPoints = [],
@@ -404,7 +423,7 @@ export function classifyHeat({
   if (!tempPoints.length || !humPoints.length)
     return { kind: HAZARD_HEAT, severity: "safe", title: "Heat Risk Low" };
 
-  // join by nearest station (coarse but ok)
+  // Join by nearest humidity station (coarse approximation)
   const his = [];
   for (const t of tempPoints) {
     const h = nearestPointTo({ lat: t.lat, lon: t.lon }, humPoints);
@@ -422,8 +441,8 @@ export function classifyHeat({
     pmPoints
   );
   const locationName = region?.name || worst.name || null;
-  // Conservative bands (public-friendly):
-  // Safe < 32°C, Warning 32–41°C, Danger > 41°C (heat exhaustion/stroke possible)
+
+  // Conservative public bands: Safe < 32°C, Warning 32–41°C, Danger > 41°C
   if (v < 32)
     return { kind: HAZARD_HEAT, severity: "safe", title: "Heat Risk Low" };
   if (v <= 41)
@@ -445,33 +464,19 @@ export function classifyHeat({
   };
 }
 
-// ---------- global resolver ----------
-
-/**
- * Decide a single top hazard to display in the banner.
- * Only dengue is location-scoped (5 km). Others are Singapore-wide via worst values.
- *
- * @param {object} args
- * @param {object} args.center {lat, lon}
- * @param {array}  args.rainfallPoints
- * @param {array}  args.humPoints
- * @param {array}  args.pmPoints
- * @param {array}  args.windPoints
- * @param {array}  args.tempPoints
- * @param {object} args.dengueGeoJSON
- */
+// -------------------- global resolvers --------------------
+// Decide a single top hazard for the banner (mock flags take precedence)
 export function decideGlobalHazard(args = {}) {
   const mockFlags = args.mockFlags || {};
   const mocked = mockedHazardsFromFlags(mockFlags, args.center);
   const anyMocksOn = Object.values(mockFlags).some(Boolean);
 
-  // === MOCK MODE ===
-  // If any mock is enabled, ignore real feeds and return the worst mocked hazard.
+  // Mock mode → ignore real feeds
   if (anyMocksOn && mocked.length) {
     return pickTop(mocked);
   }
 
-  // === REAL DETECTION ===
+  // Real detection across all types
   const flood = classifyFlood(args);
   const haze = classifyHaze(args);
   const dengue = classifyDengue(args);
@@ -483,11 +488,10 @@ export function decideGlobalHazard(args = {}) {
   if (!anyNonSafe)
     return { kind: HAZARD_NONE, severity: "safe", title: "No Hazard Detected" };
 
-  // Otherwise pick worst → then by priority
   return pickTop(all);
 }
 
-// Return one hazard per type (for Early Warning screen).
+// Return one hazard per type for the Early Warning screen (respects mocks)
 export function evaluateAllHazards(args = {}) {
   const flags = args.mockFlags || {};
   const anyMock = !!(
@@ -510,7 +514,7 @@ export function evaluateAllHazards(args = {}) {
   if (!anyMock)
     return [real.flood, real.haze, real.dengue, real.wind, real.heat];
 
-  // When mocking, only mocked hazards show; others appear as safe
+  // Mocking on → only mocked hazards show; others appear as safe
   const mockList = mockedHazardsFromFlags(flags, args.center);
   const byKind = Object.fromEntries(mockList.map((h) => [h.kind, h]));
   const safe = (kind) => ({ kind, severity: "safe", title: "Safe" });

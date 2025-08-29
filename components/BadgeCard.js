@@ -1,8 +1,31 @@
+/**
+ * File: components/BadgeCard.js
+ * Purpose: Present a single badge item with icon, title, description, and a
+ * progress bar. Tap to open a detail/congrats view.
+ *
+ * Responsibilities:
+ *  - Visualize locked/unlocked state (icon dim + bar color).
+ *  - Show progress track + percentage text.
+ *  - Respect the active theme (colors passed in via `theme`).
+ *  - Expose an accessible button surface with a meaningful label.
+ *
+ * Props:
+ *  - item   : { id, title, desc, icon, progress (0–100), achieved (bool) }
+ *  - theme  : theme object from ThemeProvider (expects .colors + .key)
+ *  - onPress: function(item) → void (optional)
+ *
+ * Accessibility & Performance:
+ *  - Uses accessibilityRole="button" and a readable accessibilityLabel.
+ *  - Wrapped in React.memo to avoid unnecessary re-renders when props don't change.
+ */
+
 import React, { memo } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
 function BadgeCard({ item, theme, onPress }) {
+  // Locked badges appear visually dimmed
   const locked = !item.achieved;
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -14,19 +37,30 @@ function BadgeCard({ item, theme, onPress }) {
       accessibilityRole="button"
       accessibilityLabel={`${item.title} badge`}
     >
+      {/* Badge icon (dim if locked) */}
       <Image
         source={item.icon}
         style={[styles.icon, locked && styles.lockedImg]}
         resizeMode="contain"
       />
+
+      {/* Right content: title, desc, progress */}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.title, { color: theme.colors.text }]} numberOfLines={1}>
+        <Text
+          style={[styles.title, { color: theme.colors.text }]}
+          numberOfLines={1}
+        >
           {item.title}
         </Text>
-        <Text style={[styles.desc, { color: theme.colors.subtext }]} numberOfLines={2}>
+
+        <Text
+          style={[styles.desc, { color: theme.colors.subtext }]}
+          numberOfLines={2}
+        >
           {item.desc}
         </Text>
 
+        {/* Progress bar + percentage */}
         <View style={styles.progressRow}>
           <View
             style={[
@@ -38,16 +72,24 @@ function BadgeCard({ item, theme, onPress }) {
               style={[
                 styles.fill,
                 {
+                  // width as % string; callers should keep 0–100
                   width: `${item.progress}%`,
-                  backgroundColor: item.achieved ? theme.colors.primary : "#60A5FA",
+                  backgroundColor: item.achieved
+                    ? theme.colors.primary
+                    : "#60A5FA",
                 },
               ]}
             />
           </View>
+
           <Text
             style={[
               styles.pct,
-              { color: item.achieved ? theme.colors.primary : theme.colors.subtext },
+              {
+                color: item.achieved
+                  ? theme.colors.primary
+                  : theme.colors.subtext,
+              },
             ]}
           >
             {item.progress}%
@@ -59,6 +101,7 @@ function BadgeCard({ item, theme, onPress }) {
 }
 
 const styles = StyleSheet.create({
+  // Card container (elevated, rounded)
   card: {
     borderRadius: 14,
     padding: 8,
@@ -70,14 +113,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+
+  // Icon sizing; dim when locked
   icon: { width: 62, height: 62 },
   lockedImg: { opacity: 0.5 },
+
+  // Text styles
   title: { fontWeight: "800", fontSize: 16 },
   desc: { fontSize: 12, fontWeight: "600" },
-  progressRow: { marginTop: 4, flexDirection: "row", alignItems: "center", gap: 8 },
+
+  // Progress layout
+  progressRow: {
+    marginTop: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   track: { flex: 1, height: 6, borderRadius: 8, overflow: "hidden" },
   fill: { height: "100%", borderRadius: 8 },
-  pct: { width: 40, textAlign: "right", fontWeight: "800", fontSize: 12, paddingRight: 10 },
+  pct: {
+    width: 40,
+    textAlign: "right",
+    fontWeight: "800",
+    fontSize: 12,
+    paddingRight: 10,
+  },
 });
 
 export default memo(BadgeCard);

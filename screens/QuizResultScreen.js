@@ -1,3 +1,9 @@
+/**
+ * QuizResultScreen
+ * -----------------------------------------------------------------------------
+ * Final results screen for a quiz session.
+ */
+
 import React, { useState, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -16,22 +22,34 @@ import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
-// Build quotes from i18n so they translate
+// Build a localized set of motivational quotes for the results card.
 function useQuotes(t) {
   return useMemo(
     () => [
-      t("games.result.quotes.1", "Learning is a journey, and you just leveled up."),
+      t(
+        "games.result.quotes.1",
+        "Learning is a journey, and you just leveled up."
+      ),
       t("games.result.quotes.2", "Prepared today, confident tomorrow."),
       t("games.result.quotes.3", "Small steps build strong readiness."),
       t("games.result.quotes.4", "Knowledge now is safety later."),
       t("games.result.quotes.5", "Readiness is a habit, not a moment."),
       t("games.result.quotes.6", "Practice makes prepared."),
       t("games.result.quotes.7", "Stay calm, stay ready, stay safe."),
-      t("games.result.quotes.8", "Every question answered adds another layer of safety."),
+      t(
+        "games.result.quotes.8",
+        "Every question answered adds another layer of safety."
+      ),
       t("games.result.quotes.9", "Preparedness is the best plan B."),
-      t("games.result.quotes.10", "Your future self thanks you for training today."),
+      t(
+        "games.result.quotes.10",
+        "Your future self thanks you for training today."
+      ),
       t("games.result.quotes.11", "In an emergency, knowledge is power."),
-      t("games.result.quotes.12", "A little learning today can save a lot tomorrow."),
+      t(
+        "games.result.quotes.12",
+        "A little learning today can save a lot tomorrow."
+      ),
     ],
     [t]
   );
@@ -56,7 +74,8 @@ export default function QuizResultScreen() {
     meta = {},
   } = route.params || {};
 
-  const pct = total > 0 ? Math.round((Number(correct) / Number(total)) * 100) : 0;
+  const pct =
+    total > 0 ? Math.round((Number(correct) / Number(total)) * 100) : 0;
 
   const minutes = Math.floor(timeTakenSec / 60);
   const seconds = timeTakenSec % 60;
@@ -65,30 +84,44 @@ export default function QuizResultScreen() {
   const QUOTES = useQuotes(t);
   const [quote] = useState(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
 
+  // Map a percent score to a localized title for the result card.
   const getResultTitle = (p) => {
-    if (p >= 80) return t("games.result.titles.outstanding", "Outstanding! Preparedness Pro!");
-    if (p >= 60) return t("games.result.titles.great", "Great job—Ready Ranger!");
-    if (p >= 40) return t("games.result.titles.ok", "Nice effort—Keep training!");
+    if (p >= 80)
+      return t(
+        "games.result.titles.outstanding",
+        "Outstanding! Preparedness Pro!"
+      );
+    if (p >= 60)
+      return t("games.result.titles.great", "Great job—Ready Ranger!");
+    if (p >= 40)
+      return t("games.result.titles.ok", "Nice effort—Keep training!");
     return t("games.result.titles.start", "Good start—Let's level up!");
   };
 
+  // Share the current result using the native share sheet.
+  // Falls back silently if the share action fails/cancels.
   const onShare = async () => {
     try {
       const msg = t("games.result.share_message", {
         defaultValue:
-          "🎉 I scored {{pct}}% (+{{score}} XP) in \"{{title}}\" in {{time}}. Think you can beat me?",
+          '🎉 I scored {{pct}}% (+{{score}} XP) in "{{title}}" in {{time}}. Think you can beat me?',
         pct,
         score,
         title,
         time:
-          (minutes > 0
-            ? t("games.result.time_min_sec", "{{m}}m {{s}}s", { m: minutes, s: seconds })
-            : t("games.result.time_sec", "{{s}}s", { s: seconds })),
+          minutes > 0
+            ? t("games.result.time_min_sec", "{{m}}m {{s}}s", {
+                m: minutes,
+                s: seconds,
+              })
+            : t("games.result.time_sec", "{{s}}s", { s: seconds }),
       });
       await Share.share({ message: msg });
     } catch {}
   };
 
+  // Reset the navigation stack to the Games tab.
+  // Useful after finishing or sharing a result.
   const handleBackToGames = () => {
     navigation.reset({
       index: 0,
@@ -111,6 +144,8 @@ export default function QuizResultScreen() {
     });
   };
 
+  // Navigate to review the answered questions.
+  // Passes through both the `review` payload and any `meta` fields.
   const onReview = () => {
     navigation.navigate("ReviewAnswer", {
       title: t("games.result.review_title", "Review Questions"),
@@ -396,6 +431,11 @@ const makeStyles = (theme) =>
       justifyContent: "center",
     },
     halfBtnText: { fontWeight: "700" },
-    homeBtn: { width: "100%", borderRadius: 14, paddingVertical: 14, alignItems: "center" },
+    homeBtn: {
+      width: "100%",
+      borderRadius: 14,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
     homeBtnText: { color: "#fff", fontWeight: "900", fontSize: 16 },
   });

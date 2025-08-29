@@ -1,3 +1,26 @@
+/**
+ * File: components/ConfirmModal.js
+ * Purpose: Themed confirmation dialog with subtle fade/scale animations.
+ *
+ * Responsibilities:
+ *  - Show a title, optional message, and Confirm/Cancel actions.
+ *  - Animate in when opened and animate out before unmount to avoid flicker.
+ *  - Respect app theme (overlay, surfaces, text, primary color).
+ *
+ * Props:
+ *  - visible: boolean
+ *  - title?: string
+ *  - message?: string
+ *  - confirmLabel?: string
+ *  - cancelLabel?: string
+ *  - onConfirm?: () => void
+ *  - onCancel?: () => void
+ *
+ * Notes:
+ *  - Controlled component: parent owns `visible`; this component manages an
+ *    internal `showing` flag to allow the close animation to finish.
+ */
+
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Modal, View, Text, StyleSheet, Pressable, Animated } from "react-native";
 import { useThemeContext } from "../theme/ThemeProvider";
@@ -12,12 +35,18 @@ export default function ConfirmModal({
   onCancel,
 }) {
   const { theme } = useThemeContext();
+
+  // Memoize style sheet per theme
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
+  // Keep mounted while closing animation plays
   const [showing, setShowing] = useState(visible);
+
+  // Animated values
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.96)).current;
 
+  // Open/close animations
   useEffect(() => {
     if (visible) {
       setShowing(true);
@@ -37,15 +66,18 @@ export default function ConfirmModal({
 
   return (
     <Modal transparent visible={showing} animationType="none" onRequestClose={onCancel}>
+      {/* Dim backdrop (tap to cancel) */}
       <Animated.View style={[styles.backdrop, { opacity: fade }]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
       </Animated.View>
 
+      {/* Centered card */}
       <View style={styles.centerWrap} pointerEvents="box-none">
         <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
           <Text style={styles.title}>{title}</Text>
           {!!message && <Text style={styles.message}>{message}</Text>}
 
+          {/* Actions */}
           <View style={styles.row}>
             <Pressable style={[styles.btn, styles.btnGhost]} onPress={onCancel}>
               <Text style={[styles.btnText, styles.btnGhostText]}>{cancelLabel}</Text>
@@ -60,6 +92,7 @@ export default function ConfirmModal({
   );
 }
 
+// Theme-scoped styles
 const makeStyles = (theme) =>
   StyleSheet.create({
     backdrop: {
@@ -93,7 +126,7 @@ const makeStyles = (theme) =>
       borderRadius: 12,
       alignItems: "center",
     },
-    // Light uses a soft blue; dark uses a neutral dark chip
+    // Light uses a soft blue; dark uses a neutral chip
     btnGhost: {
       backgroundColor: theme.key === "dark" ? "#1F2430" : "#EEF5FF",
     },

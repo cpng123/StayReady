@@ -1,4 +1,36 @@
 // components/LeafletMapWebView.js
+/**
+ * LeafletMapWebView
+ * -----------------
+ * Renders a Leaflet map inside a WebView with overlay layers:
+ *  - Rainfall, Wind, Temperature, Humidity, PM2.5 (circle markers)
+ *  - Dengue clusters (polygons with an outline + badge labels)
+ *  - Clinics (point markers)
+ *
+ * Props
+ *  - lat, lon:            center position
+ *  - height, zoom:        map dimensions/zoom
+ *  - showMarker:          show a "You are here" marker
+ *  - pins:                extra lat/lon pins [{lat,lon,label?}]
+ *  - interactive:         enable gestures/zoom/keyboard
+ *  - rainfallPoints, windPoints, tempPoints, humPoints, pmPoints: arrays of {lat,lon,value,name?}
+ *  - dengueGeoJSON:       Feature/FeatureCollection
+ *  - clinicsGeoJSON:      FeatureCollection of { geometry: Point, properties: { name, address, phone } }
+ *  - overlay:             "rain" | "wind" | "temp" | "hum" | "pm" | "dengue" | "clinics"
+ *  - legendBottom:        px offset from bottom
+ *  - showLegend:          show/hide legend box
+ *  - dark:                dark map tiles + dark-styled legend
+ *
+ * Fixes in this version
+ *  - BUG: dengue badges failed because `latlng` was undefined.
+ *         We now compute a center using layer.getBounds().getCenter() or point coords.
+ *  - BUG: 'dengue-outline' pane is created and used properly (previously missing).
+ *  - BUG: showOverlay now removes *all* overlay layers (incl. clinics & dengue outline)
+ *         and clears dengue badges when switching away from dengue.
+ *  - Bootstrap includes `updateClinics(...)` on first load.
+ *  - Removed duplicated pane creation and cleaned up code/comments.
+ */
+
 import React, {
   useMemo,
   useRef,
@@ -35,6 +67,7 @@ const LeafletMapWebView = (
   const webRef = useRef(null);
   const webReadyRef = useRef(false);
 
+  // Keep latest payloads (stringified) to inject post-load and on prop changes
   const latestRainRef = useRef("[]");
   const latestWindRef = useRef("[]");
   const latestTempRef = useRef("[]");
@@ -61,7 +94,7 @@ const LeafletMapWebView = (
       )
       .join("\n");
 
-    // tile sources + styles for themes
+    // OneMap tiles per theme
     const tileUrl = dark
       ? "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png"
       : "https://www.onemap.gov.sg/maps/tiles/Original/{z}/{x}/{y}.png";
@@ -96,6 +129,7 @@ const LeafletMapWebView = (
 <style>
   html, body, #map { height: 100%; margin: 0; padding: 0; }
   .leaflet-container { background: ${pageBg}; }
+
   .legend {
     position: absolute; left: 10px;
     bottom: ${Number.isFinite(legendBottom) ? legendBottom : 150}px;
@@ -108,34 +142,30 @@ const LeafletMapWebView = (
   }
   .legend-title { font-weight: 700; margin-bottom: 4px; }
   .legend-row { display: flex; align-items: center; margin: 2px 0; }
- .legend-swatch {
-   width: 12px; height: 12px; margin-right: 6px; border-radius: 2px;
-   border: 1px solid ${dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"};
-   box-shadow:
-     0 0 0 2px ${dark ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.9)"},
-     0 1px 3px ${legendShadow};
- }
+  .legend-swatch {
+    width: 12px; height: 12px; margin-right: 6px; border-radius: 2px;
+    border: 1px solid ${dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"};
+    box-shadow:
+      0 0 0 2px ${dark ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.9)"},
+      0 1px 3px ${legendShadow};
+  }
 
- /* Give every data point a halo/glow for contrast */
- .sr-marker {
-   /* Two-layer glow: bright white + soft dark to separate from any tile */
-   filter:
-     drop-shadow(0 0 1.4px #ffffff)
-     drop-shadow(0 0 3.5px ${dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.55)"});
- }
-
- .sr-poly {
-    /* two drop-shadows: subtle white inner glow + soft dark outer */
+  /* Glow/contrast helpers */
+  .sr-marker {
+    filter:
+      drop-shadow(0 0 1.4px #ffffff)
+      drop-shadow(0 0 3.5px ${dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.55)"});
+  }
+  .sr-poly {
     filter:
       drop-shadow(0 0 1.2px #ffffff)
       drop-shadow(0 0 4px ${dark ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.55)"});
-    vector-effect: non-scaling-stroke; /* keeps stroke width readable while zooming */
+    vector-effect: non-scaling-stroke;
   }
-
   .sr-badge {
     font: 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
     color: ${dark ? "#0b1220" : "#111827"};
-    background: ${dark ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.95)"};
+    background: rgba(255,255,255,0.95);
     border: 1px solid ${dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)"};
     border-radius: 10px;
     padding: 3px 6px;
@@ -144,13 +174,14 @@ const LeafletMapWebView = (
       0 1px 3px ${dark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.15)"};
     white-space: nowrap;
   }
-     </style>
+</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+  // ---- Map init ----
   window.map = L.map('map', {
     center: [${lat}, ${lon}],
     zoom: ${zoom},
@@ -164,9 +195,8 @@ const LeafletMapWebView = (
     keyboard: ${keyboard}
   });
   window.map.setView([${lat}, ${lon}], ${zoom});
-
   window.map.attributionControl.setPrefix('');
-  
+
   const omAttribution =
     '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" ' +
     'style="height:16px;width:16px;vertical-align:middle;margin-right:6px" />' +
@@ -174,10 +204,7 @@ const LeafletMapWebView = (
     '&copy; contributors | ' +
     '<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>';
 
-  L.tileLayer('${tileUrl}', {
-    maxZoom: 19,
-    attribution: omAttribution
-  }).addTo(window.map);
+  L.tileLayer('${tileUrl}', { maxZoom: 19, attribution: omAttribution }).addTo(window.map);
 
   ${
     showMarker
@@ -194,247 +221,263 @@ const LeafletMapWebView = (
 
   ${extraPins}
 
-  // ----- (your layer functions unchanged below) -----
-  // Rain / Wind / Temp / Hum / PM / Dengue layers + renderers
+  // ---- Overlay render helpers ----
   function colorForRain(mm){ if (mm==null) return '#00ffe1ff'; if (mm===0) return '#00ffe1ff'; if (mm<=1) return '#93C5FD'; if (mm<=5) return '#60A5FA'; if (mm<=10) return '#3B82F6'; if (mm<=20) return '#2563EB'; return '#1D4ED8'; }
   function rForRain(mm){ return mm==null?5:Math.min(12,5+Math.sqrt(mm)*2); }
   window.rainLayer=L.layerGroup();
-  function renderRainfall(points){ 
-    if(!Array.isArray(points))return; 
-    window.rainLayer.clearLayers(); 
-    points.forEach(p=>{ 
-      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return; 
-      const mm=(p.value==null||isNaN(p.value))?null:Number(p.value); 
-      const c=colorForRain(mm); 
-      const r=rForRain(mm); 
+  function renderRainfall(points){
+    if(!Array.isArray(points))return;
+    window.rainLayer.clearLayers();
+    points.forEach(p=>{
+      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;
+      const mm=(p.value==null||isNaN(p.value))?null:Number(p.value);
+      const c=colorForRain(mm);
+      const r=rForRain(mm);
       L.circleMarker([p.lat,p.lon],{
-        radius:r,
-        className:'sr-marker',
-        stroke:true,
-        color:'#fff',
-        opacity:0.95,
-        weight:2,
-        fillColor:c,
-        fillOpacity:0.92
-      })      
-      .addTo(window.rainLayer).bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Rainfall: '+(mm==null?'—':(mm+' mm'))); }); }
+        radius:r, className:'sr-marker',
+        stroke:true, color:'#fff', opacity:0.95, weight:2,
+        fillColor:c, fillOpacity:0.92
+      })
+      .addTo(window.rainLayer)
+      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Rainfall: '+(mm==null?'—':(mm+' mm')));
+    });
+  }
 
   function colorForWind(kt){ if(kt==null)return'#9CA3AF'; if(kt<5)return'#BBF7D0'; if(kt<10)return'#86EFAC'; if(kt<15)return'#4ADE80'; if(kt<25)return'#22C55E'; return'#16A34A'; }
   function rForWind(kt){ return kt==null?6:Math.min(14,6+Math.sqrt(kt)*2); }
   window.windLayer=L.layerGroup();
-  function renderWind(points){ 
-    if(!Array.isArray(points))return; 
-    window.windLayer.clearLayers(); 
-    points.forEach(p=>{ 
-      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return; 
-      const kt=(p.value==null||isNaN(p.value))?null:Number(p.value); 
-      const c=colorForWind(kt); 
-      const r=rForWind(kt); 
+  function renderWind(points){
+    if(!Array.isArray(points))return;
+    window.windLayer.clearLayers();
+    points.forEach(p=>{
+      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;
+      const kt=(p.value==null||isNaN(p.value))?null:Number(p.value);
+      const c=colorForWind(kt);
+      const r=rForWind(kt);
       L.circleMarker([p.lat,p.lon],{
         radius:r, className:'sr-marker',
         stroke:true, color:'#FFFFFF', opacity:0.95, weight:2,
         fillColor:c, fillOpacity:0.92
       })
-
       .addTo(window.windLayer)
-      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Wind: '+(kt==null?'—':(kt.toFixed(1)+' kt'))); }); }
+      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Wind: '+(kt==null?'—':(kt.toFixed(1)+' kt')));
+    });
+  }
 
   function colorForTemp(c){ if(c==null)return'#9CA3AF'; if(c<24)return'#60A5FA'; if(c<27)return'#3B82F6'; if(c<30)return'#F59E0B'; if(c<33)return'#F97316'; return'#EF4444'; }
   function rForTemp(c){ return c==null?6:Math.min(14,6+(c-20)*0.6); }
   window.tempLayer=L.layerGroup();
-  function renderTemp(points){ 
-    if(!Array.isArray(points))return; 
-    window.tempLayer.clearLayers(); 
-    points.forEach(p=>{ 
-      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return; 
-      const v=(p.value==null||isNaN(p.value))?null:Number(p.value); 
-      const c=colorForTemp(v); 
-      const r=rForTemp(v); 
+  function renderTemp(points){
+    if(!Array.isArray(points))return;
+    window.tempLayer.clearLayers();
+    points.forEach(p=>{
+      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;
+      const v=(p.value==null||isNaN(p.value))?null:Number(p.value);
+      const c=colorForTemp(v);
+      const r=rForTemp(v);
       L.circleMarker([p.lat,p.lon],{
         radius:r, className:'sr-marker',
         stroke:true, color:'#FFFFFF', opacity:0.95, weight:2,
         fillColor:c, fillOpacity:0.92
       })
-
       .addTo(window.tempLayer)
-      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Temp: '+(v==null?'—':(v.toFixed(1)+' °C'))); }); }
+      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>Temp: '+(v==null?'—':(v.toFixed(1)+' °C')));
+    });
+  }
 
   function colorForHum(pct){ if(pct==null)return'#9CA3AF'; if(pct<60)return'#FDE68A'; if(pct<70)return'#A7F3D0'; if(pct<80)return'#34D399'; if(pct<90)return'#10B981'; return'#059669'; }
   function rForHum(pct){ return pct==null?6:Math.min(14,6+(pct-50)*0.12); }
   window.humLayer=L.layerGroup();
-  function renderHum(points){ 
-    if(!Array.isArray(points))return; 
-    window.humLayer.clearLayers(); 
-    points.forEach(p=>{ 
-      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return; 
-      const v=(p.value==null||isNaN(p.value))?null:Number(p.value); 
-      const c=colorForHum(v); 
-      const r=rForHum(v); 
+  function renderHum(points){
+    if(!Array.isArray(points))return;
+    window.humLayer.clearLayers();
+    points.forEach(p=>{
+      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;
+      const v=(p.value==null||isNaN(p.value))?null:Number(p.value);
+      const c=colorForHum(v);
+      const r=rForHum(v);
       L.circleMarker([p.lat,p.lon],{
         radius:r, className:'sr-marker',
         stroke:true, color:'#FFFFFF', opacity:0.95, weight:2,
         fillColor:c, fillOpacity:0.92
       })
-
       .addTo(window.humLayer)
-      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>RH: '+(v==null?'—':(v.toFixed(0)+' %'))); }); }
+      .bindPopup('<b>'+(p.name||p.id||'Station')+'</b><br/>RH: '+(v==null?'—':(v.toFixed(0)+' %')));
+    });
+  }
 
   function colorForPM(u){ if(u==null)return'#9CA3AF'; if(u<=12)return'#10B981'; if(u<=35)return'#84CC16'; if(u<=55)return'#F59E0B'; if(u<=150)return'#EF4444'; return'#7F1D1D'; }
   function rForPM(u){ return u==null?8:Math.min(18,8+Math.sqrt(u)); }
   window.pmLayer=L.layerGroup();
-  function renderPM(points){ 
-    if(!Array.isArray(points))return; 
-    window.pmLayer.clearLayers(); 
-    points.forEach(p=>{ 
-      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return; 
-      const v=(p.value==null||isNaN(p.value))?null:Number(p.value); 
-      const c=colorForPM(v); 
-      const r=rForPM(v); 
+  function renderPM(points){
+    if(!Array.isArray(points))return;
+    window.pmLayer.clearLayers();
+    points.forEach(p=>{
+      if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;
+      const v=(p.value==null||isNaN(p.value))?null:Number(p.value);
+      const c=colorForPM(v);
+      const r=rForPM(v);
       L.circleMarker([p.lat,p.lon],{
         radius:r, className:'sr-marker',
         stroke:true, color:'#FFFFFF', opacity:0.95, weight:2,
         fillColor:c, fillOpacity:0.92
       })
-
       .addTo(window.pmLayer)
-      .bindPopup('<b>'+(p.name||p.id||'Region')+'</b><br/>PM2.5: '+(v==null?'—':(v.toFixed(0)+' µg/m³'))); }); }
+      .bindPopup('<b>'+(p.name||p.id||'Region')+'</b><br/>PM2.5: '+(v==null?'—':(v.toFixed(0)+' µg/m³')));
+    });
+  }
 
-  function dengueCaseSize(props){ var k=['CASE_SIZE','case_size','CASE COUNT','CASECOUNT','caseCount']; for(var i=0;i<k.length;i++){ var v=props&&props[k[i]]; if(v!=null&&!isNaN(Number(v))) return Number(v);} return null; }
+  // ---- Dengue panes + layers ----
+  if (!window.map.getPane('dengue')) {
+    window.map.createPane('dengue');
+    window.map.getPane('dengue').style.zIndex = 650;
+  }
+  if (!window.map.getPane('dengue-outline')) {
+    window.map.createPane('dengue-outline');
+    window.map.getPane('dengue-outline').style.zIndex = 649;
+  }
+
+  function dengueCaseSize(props){
+    var k=['CASE_SIZE','case_size','CASE COUNT','CASECOUNT','caseCount'];
+    for(var i=0;i<k.length;i++){
+      var v=props&&props[k[i]];
+      if(v!=null&&!isNaN(Number(v))) return Number(v);
+    }
+    return null;
+  }
   function dengueLocality(props){ return (props&&(props.LOCALITY||props.locality||props.NAME||props.name))||'Dengue Cluster'; }
   function dengueLink(props){ return (props&&(props.HYPERLINK||props.hyperlink))||null; }
   function colorForDengue(size){ if(size==null)return'#9CA3AF'; if(size<10)return'#F59E0B'; if(size<40)return'#EF4444'; return'#7F1D1D'; }
-if (!window.map.getPane('dengue')) {
-  window.map.createPane('dengue');
-  window.map.getPane('dengue').style.zIndex = 650;
-}
-if (!window.map.getPane('dengue')) {
-  window.map.createPane('dengue');
-  window.map.getPane('dengue').style.zIndex = 650;
-}
+
   window.dengueOutlineLayer = L.geoJSON(null, {
-  pane: 'dengue-outline',
-  style: function(feature){
-    return {
-      className: 'sr-poly',
-      color: '#FFFFFF',      
-      weight: 4,            
-      opacity: 0.95,
-      fill: false            
-    };
+    pane: 'dengue-outline',
+    style: function(feature){
+      return {
+        className: 'sr-poly',
+        color: '#FFFFFF', // outer white rim
+        weight: 4,
+        opacity: 0.95,
+        fill: false
+      };
+    }
+  });
+
+  window.dengueLayer = L.geoJSON(null, {
+    pane: 'dengue',
+    style: function(feature){
+      var s = dengueCaseSize((feature && feature.properties) || {});
+      var c = colorForDengue(s);
+      return {
+        className: 'sr-poly',
+        color: c,
+        weight: 2,
+        opacity: 0.95,
+        fillColor: c,
+        fillOpacity: 0.35
+      };
+    },
+    onEachFeature: function(feature, layer){
+      try {
+        var props = feature.properties || {};
+        var size  = dengueCaseSize(props);
+        var loc   = dengueLocality(props);
+        var link  = dengueLink(props);
+
+        var html  = '<b>'+loc+'</b><br/>Cases: '+(size==null?'—':size);
+        if (link) html += '<br/><a href="'+link+'" target="_blank" rel="noopener noreferrer">More</a>';
+        layer.bindPopup(html);
+
+        // --- FIX: compute a sensible badge center ---
+        var latlng = null;
+        try {
+          if (layer.getBounds && layer.getBounds().isValid()) {
+            latlng = layer.getBounds().getCenter();
+          } else if (feature && feature.geometry && feature.geometry.type === 'Point') {
+            var c = feature.geometry.coordinates; // [lon, lat]
+            if (Array.isArray(c) && c.length >= 2) latlng = L.latLng(+c[1], +c[0]);
+          }
+        } catch(e){}
+
+        if (latlng) {
+          var badge = L.marker(latlng, {
+            pane: 'dengue',
+            interactive: false,
+            icon: L.divIcon({
+              className: '',
+              html: '<div class="sr-badge">'+(size==null?'—':size)+' cases</div>',
+              iconSize: null
+            })
+          });
+          badge.addTo(window.map);
+          if (!window._dengueBadges) window._dengueBadges = [];
+          window._dengueBadges.push(badge);
+        }
+      } catch(e){}
+    }
+  });
+
+  // Add dengue layers to map but keep them hidden by default
+  window.dengueOutlineLayer.addTo(window.map);
+  window.dengueLayer.addTo(window.map);
+  window.map.removeLayer(window.dengueOutlineLayer);
+  window.map.removeLayer(window.dengueLayer);
+
+  function clearDengueBadges(){
+    if (window._dengueBadges && window._dengueBadges.length) {
+      window._dengueBadges.forEach(m => { try { window.map.removeLayer(m); } catch(e){} });
+    }
+    window._dengueBadges = [];
   }
-});
-window.dengueLayer = L.geoJSON(null, {
-  pane: 'dengue',
-  style: function(feature){
-    var s = dengueCaseSize((feature && feature.properties) || {});
-    var c = colorForDengue(s);
-    return {
-      className: 'sr-poly',    // <- gets the glow/halo CSS
-      color: c,
-      weight: 2,
-      opacity: 0.95,
-      fillColor: c,
-      fillOpacity: 0.35        // a bit more solid than before
-    };
-  },
-  onEachFeature: function(feature, layer){
+
+  function renderDengue(geojson){
     try {
-      var props = feature.properties || {};
-      var size  = dengueCaseSize(props);
-      var loc   = dengueLocality(props);
-      var link  = dengueLink(props);
-      var html  = '<b>'+loc+'</b><br/>Cases: '+(size==null?'—':size);
-      if (link) html += '<br/><a href="'+link+'" target="_blank" rel="noopener noreferrer">More</a>';
-      layer.bindPopup(html);
-
-
-      if (latlng) {
-        var badge = L.marker(latlng, {
-          pane: 'dengue',
-          interactive: false,
-          icon: L.divIcon({
-            className: '',
-            html: '<div class="sr-badge">'+(size==null?'—':size)+' cases</div>',
-            iconSize: null
-          })
-        });
-        badge.addTo(window.map);
-        // keep a handle so we can clear them when updating
-        if (!window._dengueBadges) window._dengueBadges = [];
-        window._dengueBadges.push(badge);
+      clearDengueBadges();
+      window.dengueOutlineLayer.clearLayers();
+      window.dengueLayer.clearLayers();
+      if (geojson && (geojson.type==='FeatureCollection' || geojson.type==='Feature')) {
+        // Outline first, then fill
+        window.dengueOutlineLayer.addData(geojson);
+        window.dengueLayer.addData(geojson);
       }
     } catch(e){}
   }
-});
 
-function clearDengueBadges(){
-  if (window._dengueBadges && window._dengueBadges.length) {
-    window._dengueBadges.forEach(m => { try { window.map.removeLayer(m); } catch(e){} });
-  }
-  window._dengueBadges = [];
-}
-
-function renderDengue(geojson){
-  try {
-    clearDengueBadges();
-    window.dengueOutlineLayer.clearLayers();
-    window.dengueLayer.clearLayers();
-    if (geojson && (geojson.type==='FeatureCollection' || geojson.type==='Feature')) {
-      // Add outline first, then fill so the white rim peeks around it
-      window.dengueOutlineLayer.addData(geojson);
-      window.dengueLayer.addData(geojson);
-    }
-  } catch(e){}
-}
-
-const clinicSvg = (color="#e11d48") => (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">' +
-    '<path fill="'+color+'" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>'
-  );
-  function clinicIcon() {
-    return L.divIcon({
-      className: 'sr-marker', // reuse halo
-      html: clinicSvg('${dark ? "#fb7185" : "#e11d48"}'),
-      iconSize: [20,20],
-      iconAnchor: [10,10]
-    });
-  }
-
+  // ---- Clinics ----
   window.clinicsLayer = L.layerGroup();
   function renderClinics(geojson){
-  try{
-    window.clinicsLayer.clearLayers();
-    if(!geojson || geojson.type!=='FeatureCollection') return;
+    try{
+      window.clinicsLayer.clearLayers();
+      if(!geojson || geojson.type!=='FeatureCollection') return;
 
-    geojson.features.forEach(f=>{
-      if(!f || !f.geometry || f.geometry.type!=='Point') return;
-      const c = f.geometry.coordinates; // [lon, lat]
-      if(!Array.isArray(c) || c.length<2) return;
-      const lat = +c[1], lon = +c[0];
-      if(!isFinite(lat) || !isFinite(lon)) return;
+      geojson.features.forEach(f=>{
+        if(!f || !f.geometry || f.geometry.type!=='Point') return;
+        const c = f.geometry.coordinates; // [lon, lat]
+        if(!Array.isArray(c) || c.length<2) return;
+        const lat = +c[1], lon = +c[0];
+        if(!isFinite(lat) || !isFinite(lon)) return;
 
-      const name = f.properties?.name || 'Clinic';
-      const addr = f.properties?.address || '';
-      const phone = f.properties?.phone || '';
-      const html = '<b>'+name+'</b>' + (addr?'<br/>'+addr:'') + (phone?'<br/>☎ '+phone:'');
+        const name = f.properties?.name || 'Clinic';
+        const addr = f.properties?.address || '';
+        const phone = f.properties?.phone || '';
+        const html = '<b>'+name+'</b>' + (addr?'<br/>'+addr:'') + (phone?'<br/>☎ '+phone:'');
 
-      L.circleMarker([lat,lon],{
-        radius: 7,
-        className: 'sr-marker',
-        stroke: true,
-        color: '#FFFFFF',
-        opacity: 0.95,
-        weight: 2,
-        fillColor: '${dark ? "#fb7185" : "#e11d48"}',
-        fillOpacity: 0.92
-      })
-      .addTo(window.clinicsLayer)
-      .bindPopup(html);
-    });
-  }catch(e){}
-}
+        L.circleMarker([lat,lon],{
+          radius: 7,
+          className: 'sr-marker',
+          stroke: true,
+          color: '#FFFFFF',
+          opacity: 0.95,
+          weight: 2,
+          fillColor: '${dark ? "#fb7185" : "#e11d48"}',
+          fillOpacity: 0.92
+        })
+        .addTo(window.clinicsLayer)
+        .bindPopup(html);
+      });
+    }catch(e){}
+  }
 
-  
+  // ---- Legend ----
   function ensureLegend(){ var el=document.querySelector('.legend'); if(el) return el; el=document.createElement('div'); el.className='legend'; document.body.appendChild(el); return el; }
   function renderLegend(kind){
     var el = ${showLegend ? "ensureLegend()" : "null"}; if(!el) return;
@@ -447,14 +490,14 @@ const clinicSvg = (color="#e11d48") => (
       <div class="legend-row"><span class="legend-swatch" style="background:#16A34A"></span>25+</div>'; }
     else if(kind==='temp'){ el.innerHTML='\
       <div class="legend-title">Temp (°C)</div>\
-      <div class="legend-row"><span class="legend-swatch" style="background:#60A5FA"></span>< 24</div>\
+      <div class="legend-row"><span class="legend-swatch" style="background:#60A5FA"></span>&lt; 24</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#3B82F6"></span>24–27</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#F59E0B"></span>27–30</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#F97316"></span>30–33</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#EF4444"></span>≥ 33</div>'; }
     else if(kind==='hum'){ el.innerHTML='\
       <div class="legend-title">Humidity (%)</div>\
-      <div class="legend-row"><span class="legend-swatch" style="background:#FDE68A"></span>< 60</div>\
+      <div class="legend-row"><span class="legend-swatch" style="background:#FDE68A"></span>&lt; 60</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#A7F3D0"></span>60–70</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#34D399"></span>70–80</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#10B981"></span>80–90</div>\
@@ -468,7 +511,7 @@ const clinicSvg = (color="#e11d48") => (
       <div class="legend-row"><span class="legend-swatch" style="background:#7F1D1D"></span>150+</div>'; }
     else if(kind==='dengue'){ el.innerHTML='\
       <div class="legend-title">Dengue Clusters (cases)</div>\
-      <div class="legend-row"><span class="legend-swatch" style="background:#F59E0B"></span>< 10</div>\
+      <div class="legend-row"><span class="legend-swatch" style="background:#F59E0B"></span>&lt; 10</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#EF4444"></span>10–39</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#7F1D1D"></span>≥ 40</div>'; }
     else { el.innerHTML='\
@@ -479,6 +522,8 @@ const clinicSvg = (color="#e11d48") => (
       <div class="legend-row"><span class="legend-swatch" style="background:#3B82F6"></span>5–10</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#2563EB"></span>10–20</div>\
       <div class="legend-row"><span class="legend-swatch" style="background:#1D4ED8"></span>20+</div>'; }
+
+    // Clinics overlay: hide legend box
     if (kind === 'clinics') {
       el.style.display = 'none';
       el.innerHTML = '';
@@ -488,26 +533,38 @@ const clinicSvg = (color="#e11d48") => (
     }
   }
 
-  window.rainLayer.addTo(window.map); // default present
+  // ---- Add all layers (default: rain visible) ----
+  window.rainLayer.addTo(window.map);
   window.windLayer.addTo(window.map); window.map.removeLayer(window.windLayer);
   window.tempLayer.addTo(window.map); window.map.removeLayer(window.tempLayer);
   window.humLayer.addTo(window.map);  window.map.removeLayer(window.humLayer);
   window.pmLayer.addTo(window.map);   window.map.removeLayer(window.pmLayer);
-  window.dengueLayer.addTo(window.map); window.map.removeLayer(window.dengueLayer);
   window.clinicsLayer.addTo(window.map); window.map.removeLayer(window.clinicsLayer);
 
+  // ---- Overlay API + updates ----
   window.showOverlay = function(kind){
     try{
-      [window.rainLayer,window.windLayer,window.tempLayer,window.humLayer,window.pmLayer,window.dengueLayer].forEach(Lyr=>{
-        if(Lyr && window.map.hasLayer(Lyr)) window.map.removeLayer(Lyr);
+      [
+        window.rainLayer, window.windLayer, window.tempLayer,
+        window.humLayer, window.pmLayer, window.dengueLayer,
+        window.dengueOutlineLayer, window.clinicsLayer
+      ].forEach(Lyr => {
+        if (Lyr && window.map.hasLayer(Lyr)) window.map.removeLayer(Lyr);
       });
-      if(kind==='wind') window.map.addLayer(window.windLayer);
-      else if(kind==='temp') window.map.addLayer(window.tempLayer);
-      else if(kind==='hum') window.map.addLayer(window.humLayer);
-      else if(kind==='pm') window.map.addLayer(window.pmLayer);
-      else if(kind==='dengue') window.map.addLayer(window.dengueLayer);
-      else if(kind==='clinics') window.map.addLayer(window.clinicsLayer);
+      // remove dengue badges if leaving dengue
+      if (kind !== 'dengue') clearDengueBadges();
+
+      if (kind==='wind') window.map.addLayer(window.windLayer);
+      else if (kind==='temp') window.map.addLayer(window.tempLayer);
+      else if (kind==='hum') window.map.addLayer(window.humLayer);
+      else if (kind==='pm') window.map.addLayer(window.pmLayer);
+      else if (kind==='dengue') {
+        window.map.addLayer(window.dengueOutlineLayer);
+        window.map.addLayer(window.dengueLayer);
+      }
+      else if (kind==='clinics') window.map.addLayer(window.clinicsLayer);
       else window.map.addLayer(window.rainLayer);
+
       renderLegend(kind);
       window.__overlay__ = kind;
     }catch(e){}
@@ -521,6 +578,7 @@ const clinicSvg = (color="#e11d48") => (
   window.updateDengue   = function(geojsonJson){ try{ renderDengue(JSON.parse(geojsonJson)); }catch(e){} };
   window.updateClinics  = function(geojsonJson){ try{ renderClinics(JSON.parse(geojsonJson)); }catch(e){} };
 
+  // ---- Initial render ----
   try { renderRainfall(${rainJSON}); } catch(e){}
   try { renderWind(${windJSON}); } catch(e){}
   try { renderTemp(${tempJSON}); } catch(e){}
@@ -552,6 +610,7 @@ const clinicSvg = (color="#e11d48") => (
     dark,
   ]);
 
+  // Expose a small imperative API to parent
   useImperativeHandle(
     ref,
     () => ({
@@ -559,94 +618,94 @@ const clinicSvg = (color="#e11d48") => (
         if (!webRef.current) return;
         const z = Number.isFinite(newZoom) ? newZoom : zoom;
         webRef.current.injectJavaScript(`
-        try { if (window.map) { window.map.setView([${newLat}, ${newLon}], ${z}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.map) { window.map.setView([${newLat}, ${newLon}], ${z}); } } catch (e) {}
+          true;
+        `);
       },
       setRainfall: (pointsArray) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(pointsArray || []);
         webRef.current.injectJavaScript(`
-        try { if (window.updateRainfall) { window.updateRainfall(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updateRainfall) { window.updateRainfall(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setWind: (pointsArray) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(pointsArray || []);
         webRef.current.injectJavaScript(`
-        try { if (window.updateWind) { window.updateWind(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updateWind) { window.updateWind(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setTemp: (pointsArray) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(pointsArray || []);
         webRef.current.injectJavaScript(`
-        try { if (window.updateTemp) { window.updateTemp(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updateTemp) { window.updateTemp(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setHum: (pointsArray) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(pointsArray || []);
         webRef.current.injectJavaScript(`
-        try { if (window.updateHum) { window.updateHum(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updateHum) { window.updateHum(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setPM: (pointsArray) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(pointsArray || []);
         webRef.current.injectJavaScript(`
-        try { if (window.updatePM) { window.updatePM(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updatePM) { window.updatePM(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setDengue: (geojson) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(geojson || null);
         webRef.current.injectJavaScript(`
-        try { if (window.updateDengue) { window.updateDengue(${JSON.stringify(
-          payload
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.updateDengue) { window.updateDengue(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setClinics: (geojson) => {
         if (!webRef.current) return;
         const payload = JSON.stringify(geojson || null);
         webRef.current.injectJavaScript(`
-       try { if (window.updateClinics) { window.updateClinics(${JSON.stringify(
-         payload
-       )}); } } catch (e) {}
-       true;
-     `);
+          try { if (window.updateClinics) { window.updateClinics(${JSON.stringify(
+            payload
+          )}); } } catch (e) {}
+          true;
+        `);
       },
       setOverlay: (kind) => {
         if (!webRef.current) return;
         webRef.current.injectJavaScript(`
-        try { if (window.showOverlay) { window.showOverlay(${JSON.stringify(
-          kind || "rain"
-        )}); } } catch (e) {}
-        true;
-      `);
+          try { if (window.showOverlay) { window.showOverlay(${JSON.stringify(
+            kind || "rain"
+          )}); } } catch (e) {}
+          true;
+        `);
       },
     }),
     [zoom]
   );
 
-  // keep your prop-sync effects as-is
+  // Keep prop-sync effects (inject just the updated dataset)
   useEffect(() => {
     if (!webRef.current || !webReadyRef.current) return;
     webRef.current.injectJavaScript(`
@@ -698,9 +757,9 @@ const clinicSvg = (color="#e11d48") => (
   useEffect(() => {
     if (!webRef.current || !webReadyRef.current) return;
     webRef.current.injectJavaScript(`
-     try { if (window.updateClinics) { window.updateClinics(${latestClinicsRef.current}); } } catch (e) {}
-     true;
-   `);
+      try { if (window.updateClinics) { window.updateClinics(${latestClinicsRef.current}); } } catch (e) {}
+      true;
+    `);
   }, [clinicsGeoJSON]);
 
   useEffect(() => {
@@ -747,6 +806,9 @@ const clinicSvg = (color="#e11d48") => (
             }); } } catch(e){}
             try { if (window.updateDengue)   { window.updateDengue(${
               latestDengueRef.current
+            }); } } catch(e){}
+            try { if (window.updateClinics)  { window.updateClinics(${
+              latestClinicsRef.current
             }); } } catch(e){}
             try { if (window.showOverlay)    { window.showOverlay(${JSON.stringify(
               overlay || "rain"

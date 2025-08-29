@@ -1,4 +1,12 @@
-// screens/LocationSettings.js
+/**
+ * LocationSettings
+ * -----------------------------------------------------------------------------
+ *   Configure:
+ *     * Current/Mocked location preview
+ *     * Demo location toggle (uses mock coordinates)
+ *     * Hazard mock toggles (flood/haze/dengue/wind/heat) for testing flows
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -22,7 +30,6 @@ import { useTranslation } from "react-i18next";
 import {
   getMockFlags,
   setMockFlag,
-  getMockFloodEnabled,
   setMockFloodEnabled,
 } from "../utils/mockFlags";
 
@@ -30,6 +37,7 @@ export default function LocationSettings() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
 
+  // Per-hazard mock toggles (synced from persistent flags on mount)
   const [mockFlood, setMockFlood] = useState(false);
   const [mockHaze, setMockHaze] = useState(false);
   const [mockDengue, setMockDengue] = useState(false);
@@ -39,51 +47,66 @@ export default function LocationSettings() {
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
+  // Location + demo state
   const [loading, setLoading] = useState(true);
   const [loc, setLoc] = useState(null);
   const [demoOn, setDemoOn] = useState(false);
   const [err, setErr] = useState("");
 
+  // Load current location label + demo toggle
   const load = async () => {
     setLoading(true);
     setErr("");
     try {
-      const [label, demo, notif] = await Promise.all([
-        resolveLocationLabel(),
+      const [label, demo] = await Promise.all([
+        resolveLocationLabel(), // { coords, address?, postal?, region?, mocked? }
         getDemoLocationEnabled(),
       ]);
       setLoc(label);
       setDemoOn(demo);
     } catch (e) {
-      setErr(e?.message || t("location.error_fetch", { ns: "common" }));
+      setErr(
+        e?.message ||
+          t("location.error_fetch", {
+            ns: "common",
+            defaultValue: "Could not fetch your location.",
+          })
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // Initial load of location info
   useEffect(() => {
     load();
   }, []);
 
+  // Sync mock flags once on mount
   useEffect(() => {
     let alive = true;
     (async () => {
-      const flags = await getMockFlags();
-      if (!alive) return;
-      setMockFlood(!!flags.flood);
-      setMockHaze(!!flags.haze);
-      setMockDengue(!!flags.dengue);
-      setMockWind(!!flags.wind);
-      setMockHeat(!!flags.heat);
+      try {
+        const flags = await getMockFlags(); // { flood, haze, dengue, wind, heat }
+        if (!alive) return;
+        setMockFlood(!!flags.flood);
+        setMockHaze(!!flags.haze);
+        setMockDengue(!!flags.dengue);
+        setMockWind(!!flags.wind);
+        setMockHeat(!!flags.heat);
+      } catch {
+        // ignore; leave defaults
+      }
     })();
     return () => {
       alive = false;
     };
   }, []);
 
+  // Toggle handlers (persist + update local state)
   const toggleFlood = async (v) => {
     setMockFlood(v);
-    await setMockFloodEnabled(v);
+    await setMockFloodEnabled(v); // flood uses a dedicated helper
   };
   const toggleHaze = async (v) => {
     setMockHaze(v);
@@ -102,12 +125,14 @@ export default function LocationSettings() {
     await setMockFlag("heat", v);
   };
 
+  // Demo location master toggle
   const onToggleDemo = async (v) => {
     setDemoOn(v);
     await setDemoLocationEnabled(v);
-    load();
+    load(); // refresh label (will reflect mocked flag)
   };
 
+  // Coordinate preview (fixed precision)
   const coordText = loc
     ? `${loc.coords.latitude.toFixed(6)}, ${loc.coords.longitude.toFixed(6)}`
     : "-";
@@ -120,11 +145,16 @@ export default function LocationSettings() {
           onPress={() => nav.goBack()}
           style={s.backBtn}
           hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", { defaultValue: "Back" })}
         >
           <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={[s.title, { color: theme.colors.text }]}>
-          {t("location.title", { ns: "common" })}
+          {t("location.title", {
+            ns: "common",
+            defaultValue: "Location & Testing",
+          })}
         </Text>
         <View style={{ width: 40 }} />
       </View>
@@ -137,7 +167,10 @@ export default function LocationSettings() {
         {/* Current Location */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
-            {t("location.current_position", { ns: "common" })}
+            {t("location.current_position", {
+              ns: "common",
+              defaultValue: "Current Position",
+            })}
           </Text>
 
           {loading ? (
@@ -149,7 +182,10 @@ export default function LocationSettings() {
                   { color: theme.colors.subtext, marginLeft: 8 },
                 ]}
               >
-                {t("location.fetching", { ns: "common" })}
+                {t("location.fetching", {
+                  ns: "common",
+                  defaultValue: "Fetching…",
+                })}
               </Text>
             </View>
           ) : err ? (
@@ -157,12 +193,18 @@ export default function LocationSettings() {
           ) : (
             <>
               <Row
-                label={t("location.coordinates", { ns: "common" })}
+                label={t("location.coordinates", {
+                  ns: "common",
+                  defaultValue: "Coordinates",
+                })}
                 value={coordText}
                 theme={theme}
               />
               <Row
-                label={t("location.region", { ns: "common" })}
+                label={t("location.region", {
+                  ns: "common",
+                  defaultValue: "Region",
+                })}
                 value={loc?.region || "-"}
                 theme={theme}
               />
@@ -174,7 +216,10 @@ export default function LocationSettings() {
                     { color: theme.colors.subtext, marginTop: 8 },
                   ]}
                 >
-                  {t("location.demo_using", { ns: "common" })}
+                  {t("location.demo_using", {
+                    ns: "common",
+                    defaultValue: "Using demo location (mocked).",
+                  })}
                 </Text>
               )}
             </>
@@ -187,9 +232,14 @@ export default function LocationSettings() {
             ]}
             activeOpacity={0.9}
             onPress={load}
+            accessibilityRole="button"
+            accessibilityLabel={t("location.refresh", {
+              ns: "common",
+              defaultValue: "Refresh",
+            })}
           >
             <Text style={s.btnText}>
-              {t("location.refresh", { ns: "common" })}
+              {t("location.refresh", { ns: "common", defaultValue: "Refresh" })}
             </Text>
           </TouchableOpacity>
         </View>
@@ -197,21 +247,34 @@ export default function LocationSettings() {
         {/* Demo Testing */}
         <View style={[s.card, { backgroundColor: theme.colors.card }]}>
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
-            {t("location.testing", { ns: "common" })}
+            {t("location.testing", {
+              ns: "common",
+              defaultValue: "Demo & Testing",
+            })}
           </Text>
           <View style={s.rowBetween}>
             <Text style={[s.label, { color: theme.colors.text }]}>
-              {t("location.demo_toggle_label", { ns: "common" })}
+              {t("location.demo_toggle_label", {
+                ns: "common",
+                defaultValue: "Use Demo Location",
+              })}
             </Text>
             <Switch value={demoOn} onValueChange={onToggleDemo} />
           </View>
           <Text style={[s.small, { color: theme.colors.subtext }]}>
-            {t("location.demo_desc", { ns: "common" })}
+            {t("location.demo_desc", {
+              ns: "common",
+              defaultValue:
+                "When enabled, the app uses a mock location for previews and detections.",
+            })}
           </Text>
         </View>
 
         {/* Mock Disaster */}
-        <View style={[s.card, { backgroundColor: theme.colors.card }]}>
+        <View
+          style={[s.card, { backgroundColor: theme.colors.card }]}
+          testID="mock-disasters-card"
+        >
           <Text style={[s.cardTitle, { color: theme.colors.text }]}>
             {t("location.mock_disaster_title", {
               ns: "common",
@@ -231,6 +294,7 @@ export default function LocationSettings() {
             })}
           </Text>
 
+          {/* Flood */}
           <View style={s.rowBetween}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_flood_label", {
@@ -240,7 +304,6 @@ export default function LocationSettings() {
             </Text>
             <Switch value={mockFlood} onValueChange={toggleFlood} />
           </View>
-
           <Text
             style={[s.small, { color: theme.colors.subtext, marginTop: 6 }]}
           >
@@ -250,6 +313,8 @@ export default function LocationSettings() {
                 "Simulates a Flash Flood (Danger) near your current/demo location.",
             })}
           </Text>
+
+          {/* Haze */}
           <View style={[s.rowBetween, { marginTop: 14 }]}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_haze_label", {
@@ -266,6 +331,7 @@ export default function LocationSettings() {
             })}
           </Text>
 
+          {/* Dengue */}
           <View style={[s.rowBetween, { marginTop: 14 }]}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_dengue_label", {
@@ -282,6 +348,7 @@ export default function LocationSettings() {
             })}
           </Text>
 
+          {/* Wind */}
           <View style={[s.rowBetween, { marginTop: 14 }]}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_wind_label", {
@@ -298,6 +365,7 @@ export default function LocationSettings() {
             })}
           </Text>
 
+          {/* Heat */}
           <View style={[s.rowBetween, { marginTop: 14 }]}>
             <Text style={[s.label, { color: theme.colors.text }]}>
               {t("location.mock_heat_label", {
@@ -315,15 +383,20 @@ export default function LocationSettings() {
           </Text>
         </View>
 
-        {/* Note */}
+        {/* Attribution note */}
         <Text style={[s.note, { color: theme.colors.subtext }]}>
-          {t("location.onemap_note", { ns: "common" })}
+          {t("location.onemap_note", {
+            ns: "common",
+            defaultValue:
+              "Maps © OneMap/SLA. Hazard visuals are for demonstration when mocks are enabled.",
+          })}
         </Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+/** Small 2-column row for key/value pairs */
 function Row({ label, value, theme }) {
   return (
     <View style={rowStyles.row}>
@@ -339,6 +412,8 @@ function Row({ label, value, theme }) {
     </View>
   );
 }
+
+/* --------------------------- Styles (local) --------------------------- */
 
 const rowStyles = StyleSheet.create({
   row: { flexDirection: "row", marginTop: 8 },
@@ -364,6 +439,7 @@ const makeStyles = (theme) =>
     },
     title: { fontSize: 18, fontWeight: "800" },
     body: { padding: 14, gap: 10 },
+
     card: {
       borderRadius: 14,
       padding: 14,
@@ -375,8 +451,10 @@ const makeStyles = (theme) =>
     },
     cardTitle: { fontWeight: "900", fontSize: 16, marginBottom: 6 },
     centerRow: { flexDirection: "row", alignItems: "center" },
+
     btn: { borderRadius: 12, paddingVertical: 12, alignItems: "center" },
     btnText: { color: "#fff", fontWeight: "900" },
+
     rowBetween: {
       marginTop: 10,
       flexDirection: "row",
@@ -386,5 +464,6 @@ const makeStyles = (theme) =>
     label: { fontWeight: "800" },
     small: { fontSize: 12, fontWeight: "700" },
     err: { fontWeight: "800" },
+
     note: { fontSize: 12, fontWeight: "700", marginTop: 6, lineHeight: 16 },
   });

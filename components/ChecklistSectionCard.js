@@ -1,15 +1,29 @@
-// components/ChecklistSectionCard.js
+/**
+ * File: components/ChecklistSectionCard.js
+ * Purpose: Render a single checklist section card showing:
+ *  - section title and completion percent
+ *  - a progress bar
+ *  - tappable items with a left accent bar and a done icon
+ *
+ * Responsibilities:
+ *  - Compute per-section progress (done/total → %).
+ *  - Reflect current theme (light/dark) for card, text and shadows.
+ *  - Invoke onToggle(sectionId, itemId) when an item row is pressed.
+ */
+
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 
+// Render a checklist section with progress and tappable items
 export default function ChecklistSectionCard({ section, onToggle }) {
   const { theme } = useThemeContext();
   const items = section.items ?? [];
   const color = section.color || theme.colors.primary;
   const dark = theme.key === "dark";
 
+  // Compute done/total and a rounded percentage for the header + bar
   const progress = useMemo(() => {
     const total = items.length || 1;
     const done = items.filter((i) => i.done).length;
@@ -44,11 +58,14 @@ export default function ChecklistSectionCard({ section, onToggle }) {
         ]}
       >
         <View
-          style={[styles.fill, { width: `${progress.pct}%`, backgroundColor: color }]}
+          style={[
+            styles.fill,
+            { width: `${progress.pct}%`, backgroundColor: color },
+          ]}
         />
       </View>
 
-      {/* Items */}
+      {/* Item list */}
       <View style={{ marginTop: 8 }}>
         {items.map((it) => {
           const done = !!it.done;
@@ -64,16 +81,12 @@ export default function ChecklistSectionCard({ section, onToggle }) {
                   shadowColor: dark ? "transparent" : "#000",
                 },
               ]}
+              accessibilityRole="button"
+              accessibilityLabel={it.text}
+              accessibilityState={{ checked: done }}
             >
-              {/* FULL-HEIGHT accent bar, flush to the left, square right edge */}
-              <View
-                style={[
-                  styles.rowAccent,
-                  {
-                    backgroundColor: color,
-                  },
-                ]}
-              />
+              {/* Full-height accent bar at the far left */}
+              <View style={[styles.rowAccent, { backgroundColor: color }]} />
 
               <Text style={[styles.rowText, { color: theme.colors.text }]}>
                 {it.text}
@@ -146,7 +159,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: ACCENT_W,
-    // Rounded only on the LEFT side; square on the right edge
     borderTopLeftRadius: ROW_RADIUS,
     borderBottomLeftRadius: ROW_RADIUS,
   },

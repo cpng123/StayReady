@@ -1,6 +1,15 @@
-// utils/hazardCards.js
-// Build localized Early Warning cards from hazard objects.
+/** File: utils/hazardCards.js
+ * Purpose: Build localized Early Warning “card” view models from hazard objects.
+ * Responsibilities:
+ *  - Map hazard severities to short labels and colors for the UI.
+ *  - Provide per-kind titles and descriptions (i18n-aware).
+ *  - Convert raw hazard objects into card items consumable by the screen.
+ * Notes:
+ *  - `t` is the i18next translate function passed in by the caller.
+ *  - Descriptions use hazard.metrics when present (e.g., pm25/hi/km/cases).
+ */
 
+// Map severity → short label (localized)
 export const sevLabel = (sev, t) =>
   sev === "danger"
     ? t("early.severity.high", "High")
@@ -8,10 +17,11 @@ export const sevLabel = (sev, t) =>
     ? t("early.severity.med", "Med")
     : t("early.severity.safe", "Safe");
 
+// Map severity → color used by the card badge
 export const sevColor = (sev) =>
   sev === "danger" ? "#F25555" : sev === "warning" ? "#F29F3D" : "#03A55A";
 
-// Card images (swap heat if you have a dedicated asset)
+// Card banner images per hazard kind (swap heat if you add a dedicated asset)
 export const CARD_IMG = {
   flood: require("../assets/General/flash-flood2.jpg"),
   haze: require("../assets/General/pm-haze2.jpg"),
@@ -20,6 +30,7 @@ export const CARD_IMG = {
   heat: require("../assets/General/pm-haze2.jpg"),
 };
 
+// Return the localized title string per hazard kind
 export const cardTitle = (kind, t) =>
   ({
     flood: t("early.cards.flood.title", "Flash Flood"),
@@ -29,6 +40,7 @@ export const cardTitle = (kind, t) =>
     heat: t("early.cards.heat.title", "Heat Advisory"),
   }[kind] || t("home.hazard.alert", "Hazard Alert"));
 
+// Build a localized, severity-aware description for a hazard
 export const cardDesc = (h, t) => {
   const sev = h.severity || "safe";
   const m = h.metrics || {};
@@ -99,6 +111,7 @@ export const cardDesc = (h, t) => {
   }
 };
 
+// Convert a hazard object to a display-ready card item
 export const toCardItem = (h, t) => ({
   id: h.kind,
   title: cardTitle(h.kind, t),
@@ -109,6 +122,7 @@ export const toCardItem = (h, t) => ({
   hazard: h,
 });
 
+// Build an array of card items from hazards (optionally limit length)
 export const buildCardItems = (hazards = [], t, limit) => {
   const list = hazards.map((h) => toCardItem(h, t));
   return typeof limit === "number" ? list.slice(0, limit) : list;

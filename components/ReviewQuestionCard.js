@@ -1,3 +1,22 @@
+/**
+ * File: components/ReviewQuestionCard.js
+ * Purpose: Compact review card for a finished question showing outcome
+ *          (correct / wrong / time’s up), with a colored status stripe
+ *          and a top-right action (bookmark / trash / custom).
+ *
+ * Responsibilities:
+ *  - Render question index/total, text, and answer outcome lines.
+ *  - Color the left stripe: green (correct), red (wrong), blue (time’s up),
+ *    else theme primary.
+ *  - Expose a configurable action icon with active/inactive state.
+ *  - Respect app theming via ThemeProvider.
+ *
+ * Props:
+ *  - index, total, text, options, answerIndex, selectedIndex, timesUp
+ *  - actionIcon, actionActive, actionIconColor, actionActiveColor
+ *  - onActionPress, style
+ */
+
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,10 +35,10 @@ export default function ReviewQuestionCard({
   selectedIndex,
   timesUp,
   // top-right action icon
-  actionIcon = "bookmark",          // "bookmark" | "trash-outline" | any Ionicons name
-  actionActive = false,             // when true and actionIcon is bookmark, show filled/red
-  actionIconColor,                  // override idle color (e.g., red for trash)
-  actionActiveColor,                // override active color (default red)
+  actionIcon = "bookmark", // "bookmark" | "trash-outline" | any Ionicons name
+  actionActive = false, // when true and actionIcon is bookmark, show filled/red
+  actionIconColor, // override idle color (e.g., red for trash)
+  actionActiveColor, // override active color (default red)
   onActionPress,
   style,
 }) {
@@ -60,7 +79,21 @@ export default function ReviewQuestionCard({
           #{index + 1}/{total}
         </Text>
 
-        <TouchableOpacity activeOpacity={0.8} style={s.actionBtn} onPress={onActionPress}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={s.actionBtn}
+          onPress={onActionPress}
+          accessibilityRole="button"
+          accessibilityLabel={
+            actionIcon === "trash-outline"
+              ? "Remove"
+              : actionIcon === "bookmark"
+              ? actionActive
+                ? "Remove bookmark"
+                : "Add bookmark"
+              : "Action"
+          }
+        >
           <Ionicons name={iconName} size={20} color={iconColor} />
         </TouchableOpacity>
       </View>

@@ -1,4 +1,9 @@
-// screens/ResourceHubScreen.js
+/**
+ * ResourceHubScreen
+ * -----------------------------------------------------------------------------
+ * A curated landing page for preparedness content.
+ */
+
 import React, { useMemo } from "react";
 import {
   View,
@@ -14,9 +19,11 @@ import ImageOverlayCard from "../components/ImageOverlayCard";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
+// Layout constants
 const SCREEN_PADDING = 16;
 const GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+// 2-column card width, accounting for padding and inter-card gap
 const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 
 export default function ResourceHubScreen({ navigation }) {
@@ -24,6 +31,7 @@ export default function ResourceHubScreen({ navigation }) {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
+  // Header copy shown above the grid
   const Header = (
     <View style={styles.headerCopy}>
       <Text style={styles.h1}>{t("resource.title", "Resource Hub")}</Text>
@@ -46,7 +54,7 @@ export default function ResourceHubScreen({ navigation }) {
         />
       </View>
 
-      {/* Grid (2 columns) */}
+      {/* 2-column grid */}
       <FlatList
         data={PREPAREDNESS}
         keyExtractor={(i) => i.id}

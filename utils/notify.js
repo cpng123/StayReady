@@ -1,15 +1,38 @@
-// utils/notify.js
+/**
+ * File: utils/notify.js
+ * Purpose: Local push notification utilities for StayReady. Initializes OS
+ * channels/permissions, stores the user preference for “All vs Danger-only”
+ * alerts, and emits hazard notifications (with a simple inbox log).
+ *
+ * Design notes:
+ *  - In-app notifications are always enabled now (no master toggle).
+ *    A legacy key migration ensures old “false” values won’t block alerts.
+ *  - Preference KEY_NOTIFY_ALL controls whether Warning-level alerts are sent.
+ *    If false ⇒ only Danger alerts are delivered.
+ *  - Per-kind throttle (60s) prevents spam when feeds update quickly.
+ *
+ * Storage keys:
+ *  - KEY_NOTIFY_ALL  → boolean (true = Warning + Danger, false = Danger-only)
+ *  - KEY_NOTIFY_LOG  → array of entries { id, kind, severity, title, body, time, read, hazard }
+ *  - (legacy) KEY_NOTIFY_ENABLED → coerced to "true" once to avoid blocking
+ *
+ * Platform setup:
+ *  - Android: create channel "default" (HIGH, vibration, sound).
+ *  - iOS: request permissions on init.
+ */
+
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
-const KEY_NOTIFY_ENABLED = "notify:enabled";
+const KEY_NOTIFY_ENABLED = "notify:enabled"; // legacy
 const KEY_NOTIFY_LOG = "notify:log";
 const KEY_NOTIFY_ALL = "notify:all";
 
-let _notifyEnabledCache = null;
+let _notifyEnabledCache = null; // kept for legacy compatibility
 let _notifyAllCache = null;
 
+// Ensure old builds that stored "false" for KEY_NOTIFY_ENABLED don't suppress alerts now
 async function _ensureLegacyEnabledTrue() {
   try {
     const raw = await AsyncStorage.getItem(KEY_NOTIFY_ENABLED);
@@ -19,6 +42,7 @@ async function _ensureLegacyEnabledTrue() {
   } catch {}
 }
 
+// Always show foreground alerts in this dev-friendly design
 Notifications.setNotificationHandler({
   handleNotification: async () => {
     const enabled = true;
@@ -30,8 +54,11 @@ Notifications.setNotificationHandler({
   },
 });
 
+// Initialize OS-level notification plumbing (channels + permission)
 export async function initNotifications() {
   await _ensureLegacyEnabledTrue();
+
+  // Android channel
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "Default",
@@ -42,16 +69,19 @@ export async function initNotifications() {
     });
   }
 
+  // Ask for permission (iOS; Android 13+ may also present a dialog)
   const perm = await Notifications.getPermissionsAsync();
   if (!perm.granted) await Notifications.requestPermissionsAsync();
 }
 
+// Legacy: we now always treat notifications as enabled
 export async function getNotificationsEnabled() {
   await _ensureLegacyEnabledTrue();
   _notifyEnabledCache = true;
   return true;
 }
 
+// Read/write: user preference for including Warning-level alerts
 export async function getNotifyAll() {
   if (_notifyAllCache !== null) return _notifyAllCache;
   const raw = await AsyncStorage.getItem(KEY_NOTIFY_ALL);
@@ -63,6 +93,7 @@ export async function setNotifyAll(v) {
   await AsyncStorage.setItem(KEY_NOTIFY_ALL, JSON.stringify(_notifyAllCache));
 }
 
+// Simple in-app inbox utilities (log, unread count, mark read)
 export async function getNotificationLog() {
   const raw = await AsyncStorage.getItem(KEY_NOTIFY_LOG);
   const list = raw ? JSON.parse(raw) : [];
@@ -93,7 +124,7 @@ async function appendToLog(entry) {
   await AsyncStorage.setItem(KEY_NOTIFY_LOG, JSON.stringify(list));
 }
 
-/* --------- Titles + body builder (unchanged logic) ---------- */
+// --------- Titles + message builder for each hazard kind ---------
 const TITLE_FOR = {
   flood: "Flash Flood Warning",
   haze: "Haze (PM2.5) Advisory",
@@ -126,18 +157,14 @@ function buildBody(hazard) {
         : `Strong winds in ${loc}. Secure loose items; ride/drive with care.`;
     case "heat":
       return severity === "danger"
-        ? `Extreme heat in ${loc}${
-            hi ? ` (HI ≈ ${hi}°C)` : ""
-          }. Stay in shade/AC; check on the vulnerable.`
-        : `High heat in ${loc}${
-            hi ? ` (HI ≈ ${hi}°C)` : ""
-          }. Reduce strenuous activity; hydrate.`;
+        ? `Extreme heat in ${loc}${hi ? ` (HI ≈ ${hi}°C)` : ""}. Stay in shade/AC; check on the vulnerable.`
+        : `High heat in ${loc}${hi ? ` (HI ≈ ${hi}°C)` : ""}. Reduce strenuous activity; hydrate.`;
     default:
       return "Stay alert and stay safe.";
   }
 }
 
-/* --------- NEW: compact hazard snapshot for inbox ----------- */
+// Compact snapshot stored with each inbox entry
 function snapshotHazard(h) {
   if (!h) return null;
   const { kind, severity, title, locationName, metrics, locationCoords } = h;
@@ -151,35 +178,55 @@ function snapshotHazard(h) {
   };
 }
 
-/* ----------------- Main: send + record once ------------------ */
-const _lastByKind = {};
+// ----------------- Main emitter (used by hooks/useNotifyOnHazard) -----------------
+const _lastByKind = {}; // per-kind throttle (ms since epoch)
 
+/**
+ * maybeNotifyHazard(hazard)
+ * - Skips if:
+ *   • notifications disabled (legacy check; now always true)
+ *   • user set Danger-only and severity !== "danger"
+ *   • hazard kind is not in our allowlist
+ *   • last notification for this kind was < 60s ago
+ * - Otherwise schedules a local notification and logs it to the inbox.
+ */
 export async function maybeNotifyHazard(hazard) {
   if (!hazard) return;
 
+  // Legacy gate (kept for API symmetry)
   const enabled = _notifyEnabledCache ?? (await getNotificationsEnabled());
   if (!enabled) return;
 
+  // Severity filter by user preference
   const notifyAll = _notifyAllCache ?? (await getNotifyAll());
   const sev = hazard.severity || "safe";
   if (!notifyAll && sev !== "danger") return;
 
+  // Allowlist check
   const kind = hazard.kind;
   const ALLOWED = new Set(["flood", "haze", "dengue", "wind", "heat"]);
   if (!ALLOWED.has(kind)) return;
 
+  // Throttle per kind (60s)
   const now = Date.now();
   if (_lastByKind[kind] && now - _lastByKind[kind] < 60_000) return;
   _lastByKind[kind] = now;
 
+  // Build and dispatch
   const title = hazard.title || TITLE_FOR[kind] || "Hazard Alert";
   const body = buildBody(hazard);
 
   await Notifications.scheduleNotificationAsync({
-    content: { title, body, sound: true },
-    trigger: null,
+    content: {
+      title,
+      body,
+      sound: true,
+      ...(Platform.OS === "android" ? { channelId: "default" } : {}),
+    },
+    trigger: null, // deliver immediately
   });
 
+  // Append to in-app inbox
   const entry = {
     id: `${now}-${kind}-${Math.random().toString(36).slice(2, 8)}`,
     kind,

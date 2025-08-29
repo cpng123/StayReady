@@ -1,3 +1,12 @@
+/**
+ * ChecklistScreen
+ * ----------------------------------------------------------------------
+ *   Display the preparedness checklist split across filter "tabs" with:
+ *     - Full-text search
+ *     - Per-item check/uncheck with persistence
+ *     - Reset-all confirmation
+ */
+
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { SafeAreaView, View, FlatList, StyleSheet } from "react-native";
 import { useThemeContext } from "../theme/ThemeProvider";
@@ -19,11 +28,11 @@ import {
 
 export default function ChecklistScreen({ navigation }) {
   const { theme } = useThemeContext();
-  // Pull both namespaces
+  // Pull both namespaces; we’ll mostly use "checklist"
   const { t } = useTranslation(["common", "checklist"]);
 
-  // Helper: data/checklist.js currently uses keys like "checklist.titles.X".
-  // This wrapper auto-prefixes with "checklist:" if no namespace is present.
+  // This wrapper ensures keys are looked up under the "checklist" namespace
+  // when the caller omits an explicit namespace.
   const tChecklist = useCallback(
     (key, fallback) => {
       const k = key.includes(":") ? key : `checklist:${key}`;
@@ -32,35 +41,41 @@ export default function ChecklistScreen({ navigation }) {
     [t]
   );
 
-  // translated tabs
+  /* ------------------------------ Filters/Tabs ----------------------------- */
+  // Localized filters (e.g., Safety / Flood / Haze ...)
   const FILTERS = useMemo(() => getChecklistFilters(tChecklist), [tChecklist]);
 
-  // keep a stable default id; fall back to first tab if needed
+  // Keep a stable default filter; ensure it exists after language updates
   const [filter, setFilter] = useState("safety");
-
   useEffect(() => {
     if (!FILTERS.find((f) => f.id === filter) && FILTERS[0]) {
       setFilter(FILTERS[0].id);
     }
   }, [FILTERS, filter]);
 
+  /* --------------------------------- Search -------------------------------- */
   const [query, setQuery] = useState("");
-  const [doneMap, setDoneMap] = useState({});
-  const [confirmOpen, setConfirmOpen] = useState(false);
 
+  /* --------------------------- Checked-state map --------------------------- */
+  // doneMap: { [itemId: string]: boolean }
+  const [doneMap, setDoneMap] = useState({});
   useEffect(() => {
     (async () => setDoneMap(await loadChecklistDoneMap()))();
   }, []);
 
+  /* -------------------------- Sections (data layer) ------------------------ */
+  // Raw sections for the current filter (already localized)
   const rawSections = useMemo(
     () => getSectionsByFilter(filter, tChecklist),
     [filter, tChecklist]
   );
+  // Sections with `done` merged in from persisted map
   const sections = useMemo(
     () => applyDoneToSections(rawSections, doneMap),
     [rawSections, doneMap]
   );
 
+  // Search filter (case-insensitive on item.text)
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return sections;
@@ -72,25 +87,32 @@ export default function ChecklistScreen({ navigation }) {
       .filter((s) => s.items.length > 0);
   }, [sections, query]);
 
-  const onToggle = async (_sectionId, itemId) => {
+  /* ----------------------------- Item toggling ----------------------------- */
+  const onToggle = useCallback((_sectionId, itemId) => {
     setDoneMap((prev) => {
       const next = { ...prev, [itemId]: !prev[itemId] };
+      // Persist asynchronously; no need to await
       saveChecklistDoneMap(next);
       return next;
     });
-  };
+  }, []);
 
-  // reset handlers
-  const openResetConfirm = () => setConfirmOpen(true);
-  const closeResetConfirm = () => setConfirmOpen(false);
-  const confirmResetAll = async () => {
+  /* ------------------------------- Reset all ------------------------------- */
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const openResetConfirm = useCallback(() => setConfirmOpen(true), []);
+  const closeResetConfirm = useCallback(() => setConfirmOpen(false), []);
+  const confirmResetAll = useCallback(async () => {
     await clearChecklistDoneMap();
     setDoneMap({});
     setConfirmOpen(false);
-  };
+  }, []);
 
+  /* --------------------------------- Render -------------------------------- */
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
+    >
+      {/* Top bar with reset button (right) */}
       <TopBar
         title={t("checklist:screen_title", "StayReady Checklist")}
         onBack={() => navigation.goBack()}
@@ -98,15 +120,18 @@ export default function ChecklistScreen({ navigation }) {
         onRightPress={openResetConfirm}
       />
 
+      {/* Search field (local filter only) */}
       <SearchRow
         value={query}
         onChangeText={setQuery}
-        placeholder={t("common.search", { ns: "common" })}
+        placeholder={t("common:search", "Search")}
         showSort={false}
       />
 
+      {/* Filter chips (tabs) */}
       <FilterChips options={FILTERS} activeId={filter} onChange={setFilter} />
 
+      {/* Sections list */}
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
         data={visible}
@@ -115,8 +140,13 @@ export default function ChecklistScreen({ navigation }) {
           <ChecklistSectionCard section={item} onToggle={onToggle} />
         )}
         showsVerticalScrollIndicator={false}
+        // Lightweight perf hints for mid-size lists:
+        initialNumToRender={8}
+        windowSize={8}
+        removeClippedSubviews
       />
 
+      {/* Reset confirmation modal */}
       <ConfirmModal
         visible={confirmOpen}
         title={t("checklist:reset_title", "Reset all checks?")}

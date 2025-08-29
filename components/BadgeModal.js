@@ -1,3 +1,28 @@
+/**
+ * File: components/BadgeModal.js
+ * Purpose: Full-screen modal to preview a badge (locked/unlocked) with a gentle
+ * pulse animation, localized message, and actions (Share / Close).
+ *
+ * Responsibilities:
+ *  - Present badge art, title and a contextual message (locked vs unlocked).
+ *  - Animate the badge icon while the modal is open for a celebratory feel.
+ *  - Offer primary (Share) and secondary (Close) actions when unlocked.
+ *  - Respect theme colors and i18n strings supplied by the parent.
+ *
+ * Props:
+ *  - open    : boolean (whether the modal is visible)
+ *  - badge   : { title, desc, icon, achieved: bool }
+ *  - onClose : () => void
+ *  - onShare : () => void
+ *  - theme   : ThemeProvider theme object (expects colors.card, colors.text, etc.)
+ *  - t       : i18n translate fn
+ *
+ * Accessibility & UX:
+ *  - Background overlay closes on tap (Pressable outside card).
+ *  - Card area is inert to prevent accidental dismissal.
+ *  - Clear button labels; share icon has sufficient contrast on primary button.
+ */
+
 import React, { memo, useEffect, useRef } from "react";
 import {
   View,
@@ -12,13 +37,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 /**
- * Props:
- *  - open, badge, onClose, onShare, theme
- *  - t: i18n translate fn
+ * Modal that celebrates/unlocks a badge, or explains how to unlock it.
  */
 function BadgeModal({ open, badge, onClose, onShare, theme, t }) {
+  // Pulse animation scale value
   const scale = useRef(new Animated.Value(1)).current;
 
+  // Start/stop pulse loop based on `open`
   useEffect(() => {
     let loop;
     if (open) {
@@ -46,6 +71,7 @@ function BadgeModal({ open, badge, onClose, onShare, theme, t }) {
 
   const locked = !badge?.achieved;
 
+  // Localized body copy varies with locked/unlocked state
   const msg = badge
     ? locked
       ? t("badges.modal.locked_msg", {
@@ -65,8 +91,9 @@ function BadgeModal({ open, badge, onClose, onShare, theme, t }) {
       transparent
       onRequestClose={onClose}
     >
-      {/* tap outside to close */}
+      {/* Tap outside the card to close */}
       <Pressable style={styles.overlay} onPress={onClose}>
+        {/* Stop propagation so taps inside the card don't close the modal */}
         <Pressable
           onPress={() => {}}
           style={[styles.card, { backgroundColor: theme.colors.card }]}
@@ -92,6 +119,7 @@ function BadgeModal({ open, badge, onClose, onShare, theme, t }) {
           </Text>
 
           {locked ? (
+            // Locked: only Close
             <View style={styles.btnCol}>
               <TouchableOpacity
                 style={styles.secondaryBtn}
@@ -106,6 +134,7 @@ function BadgeModal({ open, badge, onClose, onShare, theme, t }) {
               </TouchableOpacity>
             </View>
           ) : (
+            // Unlocked: Share + Close
             <View style={styles.btnCol}>
               <TouchableOpacity
                 style={styles.primaryBtn}

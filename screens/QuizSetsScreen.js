@@ -1,4 +1,10 @@
-// screens/QuizSetsScreen.js
+/**
+ * QuizSetsScreen
+ * -----------------------------------------------------------------------------
+ * Topic landing page for quizzes. Displays a hero image, localized header copy,
+ * and a 2-column grid of quiz “sets” for the selected category.
+ */
+
 import React, { useMemo } from "react";
 import {
   SafeAreaView,
@@ -15,6 +21,7 @@ import { useThemeContext } from "../theme/ThemeProvider";
 import QuizSetCard from "../components/QuizSetCard";
 import { useTranslation } from "react-i18next";
 
+// Mapping from category id → hero image used for both header and cards. 
 const QUIZ_IMAGES = {
   flood: require("../assets/General/quiz-flood.jpg"),
   haze: require("../assets/General/quiz-haze.jpg"),
@@ -29,15 +36,21 @@ const QUIZ_IMAGES = {
   heatstroke: require("../assets/General/quiz-heatstroke.jpg"),
 };
 
+// Layout constants
 const SCREEN_PADDING = 16;
 const GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+// 2-column card width, accounting for outer padding and inter-card gap.
 const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 
+// Renders the list of quiz sets belonging to a category.
 export default function QuizSetsScreen({ navigation, route }) {
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { i18n } = useTranslation();
+
+  // Select the localized quiz bundle once per language.
+  // Falls back to English if a specific locale file isn't found.
   const QUIZ = useMemo(() => {
     try {
       switch (i18n.language) {
@@ -56,16 +69,20 @@ export default function QuizSetsScreen({ navigation, route }) {
     }
   }, [i18n.language]);
 
+  // Resolve active category (fallback to first category if none is provided).
   const categoryId = route?.params?.categoryId;
   const category =
     (QUIZ?.categories ?? []).find((c) => c.id === categoryId) ??
     (QUIZ?.categories ?? [])[0];
 
+  // Pick a hero image based on category id; default to flood.
   const heroImage = QUIZ_IMAGES[category?.id] ?? QUIZ_IMAGES.flood;
+
+  // Build header title: "<Topic> Quizzes" (localized suffix if available).
   const titleBase = route?.params?.title || category?.title || "Quiz";
   const title = `${titleBase} ${QUIZ?.strings?.quizzesSuffix || "Quizzes"}`;
 
-  // Prefer a localized intro from the category; else build a simple fallback
+  // Prefer a localized intro from the category; else use the template/fallback.
   const intro =
     category?.intro ||
     (QUIZ?.strings?.introTemplate
@@ -74,6 +91,7 @@ export default function QuizSetsScreen({ navigation, route }) {
 
   const sets = category?.sets ?? [];
 
+  //Navigate to the quiz play screen for the selected set.
   const openSet = (set) => {
     navigation.navigate("QuizPlay", {
       categoryId,
@@ -82,9 +100,9 @@ export default function QuizSetsScreen({ navigation, route }) {
     });
   };
 
+  // Render a single quiz set tile.
   const renderItem = ({ item }) => {
     const count = item.questions?.length ?? item.count ?? 10;
-
     return (
       <QuizSetCard
         title={item.title}
@@ -111,6 +129,8 @@ export default function QuizSetsScreen({ navigation, route }) {
             onPress={() => navigation.goBack()}
             activeOpacity={0.85}
             style={[styles.backBtn, { backgroundColor: theme.colors.overlay }]}
+            accessibilityRole="button"
+            accessibilityLabel="Back"
           >
             <Ionicons name="chevron-back" size={26} color="#fff" />
           </TouchableOpacity>

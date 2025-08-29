@@ -1,6 +1,17 @@
-// screens/HazardDetailScreen.js
+/**
+ * HazardDetailScreen
+ * -----------------------------------------------------------------------------
+ *   Detailed view for a hazard card:
+ *     - Themed hero image + back button
+ *     - HazardBanner with localized title/severity/date/location
+ *     - Long description tailored to severity
+ *     - Mini Leaflet map preview with a CTA to open the full Map screen
+ *     - “Safety Tips” grid (first section of the matching Preparedness Guide)
+ */
+
 import React, { useMemo } from "react";
 import {
+  SafeAreaView,
   View,
   Text,
   StyleSheet,
@@ -16,6 +27,7 @@ import HazardBanner from "../components/HazardBanner";
 import LeafletMapWebView from "../components/LeafletMapWebView";
 import { getGuideById } from "../data/preparednessGuides";
 
+// layout constants
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const H_PADDING = 14; // matches body padding below
 const GAP = 10;
@@ -29,6 +41,8 @@ const HERO_IMG = {
   wind: require("../assets/General/strong-wind2.jpg"),
   heat: require("../assets/General/heat.jpg"),
 };
+// Generic fallback to keep <Image> safe even if kind is unexpected
+const HERO_FALLBACK = HERO_IMG.flood;
 
 // Which MapScreen overlay to open for each hazard
 const OVERLAY_FOR = {
@@ -45,7 +59,7 @@ const GUIDE_ID_FOR = {
   haze: "haze",
   dengue: "dengue",
   wind: "wind",
-  heat: "heatstroke", // make sure this matches your i18n & guide IDs
+  heat: "heatstroke", // ensure this matches your i18n & guide IDs
 };
 
 // Localized titles (reuse your i18n keys)
@@ -66,9 +80,11 @@ const longDescFor = (h, t) => {
     h.locationName || m.locality || t("settings.country_sg", "Singapore");
   const region =
     m.region || h.locationName || t("settings.country_sg", "Singapore");
-  const km = m.km != null ? m.km.toFixed(1) : undefined;
+  const km =
+    m.km != null && !isNaN(Number(m.km)) ? Number(m.km).toFixed(1) : undefined;
   const cases = m.cases != null ? m.cases : undefined;
-  const hi = m.hi != null ? m.hi.toFixed(1) : undefined;
+  const hi =
+    m.hi != null && !isNaN(Number(m.hi)) ? Number(m.hi).toFixed(1) : undefined;
 
   switch (h.kind) {
     case "flood":
@@ -155,13 +171,16 @@ const longDescFor = (h, t) => {
   }
 };
 
-// Safety Tips — first grid of the corresponding Preparedness guide
+// Safety Tips grid
+//   - Pulls the first section from the corresponding Preparedness Guide
+//   - Shows up to 4 tiles (2x2), localized via preparedness namespace
 function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
   const guideId = GUIDE_ID_FOR[hazardKind] || "flood";
   const guide = getGuideById(guideId);
   const firstSection = guide?.sections?.[0];
   if (!firstSection) return null;
 
+  // Optional remap for guides whose first section ids differ from i18n keys
   const SECTION_KEY_MAP = {
     wind: {
       "wind-prep": "prepareBefore",
@@ -173,6 +192,7 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
 
   const rawKey = firstSection.id || firstSection.key || "section";
   const sectionKey = normalizeKey(guideId, rawKey);
+
   const items = (firstSection.items || []).slice(0, 4);
   const lastRowStart = items.length - (items.length % 2 === 0 ? 2 : 1);
 
@@ -187,6 +207,8 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
           onPress={() =>
             navigation.navigate("PreparednessGuide", { id: guideId })
           }
+          accessibilityRole="button"
+          accessibilityLabel={t("common.see_more", "See More")}
         >
           <Text style={[styles.seeMore, { color: theme.colors.primary }]}>
             {t("common.see_more", "See More")}
@@ -196,7 +218,7 @@ function SafetyTipsGrid({ hazardKind, navigation, theme, t, styles }) {
 
       <FlatList
         data={items}
-        keyExtractor={(i) => i.id}
+        keyExtractor={(i, idx) => String(i?.id ?? `tip_${idx}`)}
         numColumns={2}
         scrollEnabled={false}
         columnWrapperStyle={{ justifyContent: "space-between" }}
@@ -234,7 +256,7 @@ export default function HazardDetailScreen({ navigation, route }) {
   const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  // Params from card tap
+  // Params from card tap (fallback ensures component always renders)
   const hazard = route?.params?.hazard || { kind: "none", severity: "safe" };
   const kind = hazard.kind;
   const title = titleFor(kind, t);
@@ -248,7 +270,7 @@ export default function HazardDetailScreen({ navigation, route }) {
     year: "numeric",
     timeZone: "Asia/Singapore",
   });
-  let timeStr = now
+  const timeStr = now
     .toLocaleTimeString("en-SG", {
       hour: "numeric",
       minute: "2-digit",
@@ -259,17 +281,20 @@ export default function HazardDetailScreen({ navigation, route }) {
 
   const locLabel = hazard.locationName || null;
   const overlayKey = OVERLAY_FOR[kind] || "rain";
+  const heroImgSrc = HERO_IMG[kind] || HERO_FALLBACK;
 
   // Everything above Safety Tips is the list header
   const ListHeader = (
     <>
       {/* Hero + back */}
       <View style={styles.hero}>
-        <Image source={HERO_IMG[kind]} style={styles.heroImg} />
+        <Image source={heroImgSrc} style={styles.heroImg} />
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
           activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", "Back")}
         >
           <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
@@ -325,7 +350,9 @@ export default function HazardDetailScreen({ navigation, route }) {
   );
 
   return (
-    <View style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
+    >
       {/* One main FlatList: header above, then Safety Tips as the only item */}
       <FlatList
         data={[{ type: "tips" }]}
@@ -343,13 +370,15 @@ export default function HazardDetailScreen({ navigation, route }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 16 }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
+
+    // Hero
     hero: { height: 180, backgroundColor: theme.colors.card },
     heroImg: { width: "100%", height: "100%", resizeMode: "cover" },
     backBtn: {
@@ -364,6 +393,8 @@ const makeStyles = (theme) =>
       backgroundColor:
         theme.key === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.35)",
     },
+
+    // Body
     body: { padding: H_PADDING },
     h1: { fontSize: 20, fontWeight: "800", color: theme.colors.text },
     sectionTitle: {
@@ -374,6 +405,7 @@ const makeStyles = (theme) =>
     },
     p: { marginTop: 6, color: theme.colors.subtext, lineHeight: 20 },
 
+    // Map preview card
     mapCard: {
       marginTop: 8,
       borderRadius: 12,

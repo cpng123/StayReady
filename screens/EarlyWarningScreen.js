@@ -1,3 +1,11 @@
+/**
+ * EarlyWarningScreen
+ * ---------------------------------------------------------------------------
+ *   Shows a quick “early warnings” overview:
+ *     - A full-width, auto-advancing carousel of the most important hazards
+ *     - A 2-column grid of hazard cards underneath
+ */
+
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   View,
@@ -17,6 +25,7 @@ import WarningCard from "../components/WarningCard";
 import useHazards from "../hooks/useHazards";
 import { useTranslation } from "react-i18next";
 
+/* ---- Layout constants ---- */
 const SCREEN_PADDING = 16;
 const GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -28,12 +37,13 @@ export default function EarlyWarningScreen({ navigation }) {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
-  // ---- Carousel state ----
+  /* --------------------------- Carousel state --------------------------- */
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Ask for at most 5 cards to keep the hero and grid snappy
   const { loading, cards: ewCards = [] } = useHazards(undefined, 5);
   const carouselRef = useRef(null);
 
-  // Auto-advance every 5s, loop
+  // Auto-advance the carousel every 5 seconds.
   useEffect(() => {
     if (!ewCards.length) return;
     const id = setInterval(() => {
@@ -46,12 +56,14 @@ export default function EarlyWarningScreen({ navigation }) {
     return () => clearInterval(id);
   }, [currentIndex, ewCards.length]);
 
+  // Sync page index after manual swipes
   const onMomentumEnd = (e) => {
     const newIndex = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setCurrentIndex(newIndex);
   };
 
-  // Compute a sliding "window" of dots
+  // Compute a sliding window of dot indices so we show at most MAX_DOTS
+  // indicators. This keeps the overlay compact even if there are many slides.
   const getDotWindow = (total, current, max = MAX_DOTS) => {
     if (total <= max)
       return {
@@ -84,7 +96,7 @@ export default function EarlyWarningScreen({ navigation }) {
 
   const isEmpty = !ewCards.length;
 
-  // ---- List header (title + paragraph) ----
+  /* --------------------------- List header copy -------------------------- */
   const ListHeader = (
     <View style={styles.headerCopy}>
       <Text style={styles.h1}>{t("home.early.title", "Early Warning")}</Text>
@@ -94,9 +106,10 @@ export default function EarlyWarningScreen({ navigation }) {
     </View>
   );
 
+  /* -------------------------------- Render ------------------------------- */
   return (
     <SafeAreaView style={styles.safe}>
-      {/* ===== Top Carousel (with loader placeholder) ===== */}
+      {/* ===== HERO: full-width carousel (or placeholder while loading) ===== */}
       <View style={styles.hero}>
         {isEmpty ? (
           <View style={styles.heroPlaceholder}>
@@ -116,6 +129,9 @@ export default function EarlyWarningScreen({ navigation }) {
               offset: SCREEN_WIDTH * index,
               index,
             })}
+            // Small perf hints; the hero list is tiny
+            initialNumToRender={3}
+            windowSize={3}
             renderItem={({ item }) => (
               <TouchableOpacity
                 activeOpacity={0.85}
@@ -124,6 +140,7 @@ export default function EarlyWarningScreen({ navigation }) {
                 }
                 style={{ width: SCREEN_WIDTH, height: "100%" }}
               >
+                {/* Slide image + gradient to improve text contrast */}
                 <Image source={item.img} style={styles.heroImg} />
                 <LinearGradient
                   colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.55)"]}
@@ -144,16 +161,18 @@ export default function EarlyWarningScreen({ navigation }) {
           />
         )}
 
-        {/* Back button (always visible) */}
+        {/* Back button overlaid on the hero (always available) */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", "Back")}
         >
           <Ionicons name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
 
-        {/* Dots (only when we have cards) */}
+        {/* Dot indicators (only when slides are present) */}
         {!isEmpty && (
           <View style={styles.dots}>
             {hasLeft && <View style={[styles.dot, styles.dotFaded]} />}
@@ -171,7 +190,7 @@ export default function EarlyWarningScreen({ navigation }) {
         )}
       </View>
 
-      {/* ===== Grid list (with loader/empty fallback) ===== */}
+      {/* ===== GRID: hazard cards; empty+loading fallbacks ===== */}
       {loading && isEmpty ? (
         <View style={styles.listLoaderWrap}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -209,6 +228,10 @@ export default function EarlyWarningScreen({ navigation }) {
               }
             />
           )}
+          // Modest perf hints for mid-size lists
+          initialNumToRender={6}
+          windowSize={8}
+          removeClippedSubviews
         />
       )}
     </SafeAreaView>
@@ -219,7 +242,7 @@ const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1, backgroundColor: theme.colors.appBg },
 
-    // Carousel
+    // HERO / Carousel
     hero: {
       height: 180,
       backgroundColor: theme.key === "dark" ? "#1F2937" : "#e7eef8",
@@ -271,6 +294,7 @@ const makeStyles = (theme) =>
       justifyContent: "center",
     },
 
+    // Dot indicators (centered group with a subtle backdrop)
     dots: {
       position: "absolute",
       bottom: 10,
@@ -292,7 +316,7 @@ const makeStyles = (theme) =>
     dotActive: { backgroundColor: "#ffffff" },
     dotFaded: { opacity: 0.45 },
 
-    // Header inside FlatList
+    // Header for the grid
     headerCopy: { paddingTop: 14, paddingBottom: 6 },
     h1: {
       fontSize: 22,
@@ -302,7 +326,7 @@ const makeStyles = (theme) =>
     },
     p: { color: theme.colors.subtext, lineHeight: 20, marginBottom: 8 },
 
-    // List loader
+    // Grid loader
     listLoaderWrap: {
       flex: 1,
       alignItems: "center",

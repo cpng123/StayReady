@@ -1,4 +1,11 @@
-// screens/SOSScreen.js
+/**
+ * SOSScreen
+ * -----------------------------------------------------------------------------
+ * A high-visibility SOS activator that uses sound, vibration, and flashlight
+ * strobing to attract attention and optionally dispatches messages to saved
+ * emergency contacts.
+ */
+
 import React, { useRef, useState, useEffect } from "react";
 import {
   SafeAreaView,
@@ -26,30 +33,31 @@ export default function SOSScreen() {
   const isDark = theme.key === "dark";
   const { t } = useTranslation();
 
-  const soundRef = useRef(null);
-  const [active, setActive] = useState(false);
+  // Alarm state
+  const soundRef = useRef(null); // looping siren sound instance
+  const [active, setActive] = useState(false); // UI state: SOS on/off
 
-  // keep a ref in sync so timers read the latest
+  // mirror `active` in a ref so delayed callbacks see fresh value
   const activeRef = useRef(false);
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
 
-  // one-shot dispatch guard + timer
+  // single-dispatch guard + delayed send timer
   const sendTimerRef = useRef(null);
   const sentOnceRef = useRef(false);
 
-  // FLASH / CAMERA
+  // Flashlight / Camera (torch)
   const [camStatus, requestPermission] = useCameraPermissions();
   const [torchOn, setTorchOn] = useState(false);
   const [camReady, setCamReady] = useState(false);
   const strobeTimerRef = useRef(null);
-  const STROBE_INTERVAL_MS = 800;
+  const STROBE_INTERVAL_MS = 800; // flip torch every 0.8s
 
-  // Guardrail modal
+  // Guard-rail modal when no contacts exist
   const [guardOpen, setGuardOpen] = useState(false);
 
-  // Configure audio (bypass iOS mute switch)
+  // Configure audio so siren plays under iOS mute switch and keeps focus
   useEffect(() => {
     Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
@@ -62,7 +70,7 @@ export default function SOSScreen() {
     }).catch(() => {});
   }, []);
 
-  // Ask camera permission once (for flashlight)
+  // Request camera permission upfront; needed to control torch
   useEffect(() => {
     (async () => {
       if (!camStatus?.granted) {
@@ -71,16 +79,21 @@ export default function SOSScreen() {
     })();
   }, [camStatus, requestPermission]);
 
-  // Cleanup on unmount
+  // Hard cleanup on unmount (ensure alarm stops)
   useEffect(() => {
     return () => {
       stopAlarm().catch(() => {});
     };
   }, []);
 
+  // Start the SOS alarm:
+  // - configure audio + start looping siren
+  // - begin repeating vibration
+  // - start torch strobe (if permission granted)
+  // - after 3s, auto-dispatch to contacts (once) if still active
   const startAlarm = async () => {
     try {
-      // AUDIO
+      // AUDIO (make sure we're in a permissive mode)
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         interruptionModeIOS: InterruptionModeIOS.DoNotMix,
@@ -97,10 +110,10 @@ export default function SOSScreen() {
       );
       soundRef.current = sound;
 
-      // VIBRATION
+      // VIBRATION (pattern: start immediately, on 1000ms, off 500ms, repeat)
       Vibration.vibrate([0, 1000, 500], true);
 
-      // FLASH (only if permitted)
+      // FLASH (requires camera permission)
       if (camStatus?.granted) {
         setTorchOn(true);
         strobeTimerRef.current = setInterval(() => {
@@ -108,12 +121,12 @@ export default function SOSScreen() {
         }, STROBE_INTERVAL_MS);
       }
 
-      // state flags
+      // Mark as active and reset the single-dispatch guard
       setActive(true);
       activeRef.current = true;
       sentOnceRef.current = false;
 
-      // after 3s, if still active, send alerts
+      // After 3 seconds of continuous activation, dispatch alerts (once)
       clearTimeout(sendTimerRef.current);
       sendTimerRef.current = setTimeout(async () => {
         if (!activeRef.current || sentOnceRef.current) return;
@@ -124,14 +137,20 @@ export default function SOSScreen() {
           }
           sentOnceRef.current = true;
         } catch {
-          // swallow for demo
+          // Swallow for demo; production could log/report
         }
       }, 3000);
     } catch (e) {
-      // ignore for demo
+      // Non-fatal for demo; consider user feedback in production
     }
   };
 
+  // Stop everything and clean up:
+  // - stop/unload siren
+  // - cancel timers and guards
+  // - stop vibration
+  // - stop strobe + turn torch off
+  // - reset active state
   const stopAlarm = async () => {
     try {
       // AUDIO
@@ -141,7 +160,7 @@ export default function SOSScreen() {
         soundRef.current = null;
       }
     } finally {
-      // cancel timers/flags
+      // Timers & guards
       clearTimeout(sendTimerRef.current);
       sendTimerRef.current = null;
       sentOnceRef.current = false;
@@ -156,19 +175,18 @@ export default function SOSScreen() {
       }
       setTorchOn(false);
 
-      // state
+      // State
       setActive(false);
       activeRef.current = false;
     }
   };
 
-  // When user taps the SOS button
+  // Main button handler: toggles alarm; shows guard-rail if no contacts yet
   const onTap = async () => {
     if (active) {
       stopAlarm();
       return;
     }
-    // Not active: check if any contacts exist; show guardrail if 0
     try {
       const contacts = await getContacts();
       if (!contacts || contacts.length === 0) {
@@ -177,20 +195,22 @@ export default function SOSScreen() {
         startAlarm();
       }
     } catch {
+      // If we fail to read contacts, still allow alarm to start
       startAlarm();
     }
   };
 
-  // Layout constants
+  // Layout constants / styling helpers
   const TAB_BAR_HEIGHT = 55;
   const BANNER_GAP = 10;
   const bannerBottom = insets.bottom + TAB_BAR_HEIGHT + BANNER_GAP;
 
+  // Subtle background ring palette varies by theme
   const RING_COLORS = isDark
     ? ["#FFFFFF26", "#FFFFFF1F", "#FFFFFF14"]
     : ["#FDE5E5", "#F9D2D2", "#F6BABA"];
 
-  // i18n strings
+  // i18n subtitle (two-line), with injected delay for clarity
   const delaySeconds = 3;
   const subtitle = active
     ? `${t("sos.subtitle_active_line1")}\n${t("sos.subtitle_active_line2", {
@@ -204,6 +224,7 @@ export default function SOSScreen() {
     <View
       style={{ flex: 1, backgroundColor: isDark ? "transparent" : "#FFF6F5" }}
     >
+      {/* Dark theme gets a richer red gradient behind the content */}
       {isDark && (
         <LinearGradient
           colors={["#6E0F20", "#B32638"]}
@@ -214,7 +235,7 @@ export default function SOSScreen() {
       )}
 
       <SafeAreaView style={styles.safe}>
-        {/* Header */}
+        {/* Header (title + two-line subtitle) */}
         <View style={[styles.header, { marginTop: 40 }]}>
           <Text style={[styles.title, { color: theme.colors.text }]}>
             {t("sos.title")}
@@ -230,7 +251,7 @@ export default function SOSScreen() {
           </Text>
         </View>
 
-        {/* Invisible Camera (only mounted when active & permission granted) */}
+        {/* Invisible Camera (only when active & permitted) drives the torch */}
         {active && camStatus?.granted && (
           <CameraView
             facing="back"
@@ -239,13 +260,13 @@ export default function SOSScreen() {
               position: "absolute",
               width: 24,
               height: 24,
-              opacity: 0.001,
+              opacity: 0.001, // make it effectively invisible
             }}
             onCameraReady={() => setCamReady(true)}
           />
         )}
 
-        {/* SOS Button */}
+        {/* Central SOS button with concentric background rings */}
         <View style={styles.centerWrap}>
           <View
             style={[
@@ -276,6 +297,7 @@ export default function SOSScreen() {
             ]}
           >
             {isDark ? (
+              // Dark theme: lighter core for contrast
               <LinearGradient
                 colors={["#e4e4e4ff", "#e4e4e4ff"]}
                 start={{ x: 0, y: 0 }}
@@ -292,6 +314,7 @@ export default function SOSScreen() {
                 </Text>
               </LinearGradient>
             ) : (
+              // Light theme: red gradient core
               <LinearGradient
                 colors={
                   active ? ["#FF9E9E", "#FF6F6F"] : ["#FF6161", "#F34040"]
@@ -308,7 +331,7 @@ export default function SOSScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Bottom dock: contacts button */}
+        {/* Bottom dock: Manage Contacts CTA */}
         <View
           style={[
             styles.bottomDock,
@@ -337,7 +360,7 @@ export default function SOSScreen() {
         </View>
       </SafeAreaView>
 
-      {/* Guardrail modal (0 contacts) */}
+      {/* Guard-rail modal (user has 0 contacts) */}
       <ConfirmModal
         visible={guardOpen}
         title={t("sos.guard_title")}
@@ -346,7 +369,7 @@ export default function SOSScreen() {
         cancelLabel={t("sos.guard_not_now")}
         onCancel={() => {
           setGuardOpen(false);
-          // user chose to proceed without contacts → start alarm
+          // User chose to proceed without contacts → still start the alarm
           startAlarm();
         }}
         onConfirm={() => {

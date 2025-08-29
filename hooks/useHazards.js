@@ -1,4 +1,21 @@
-// hooks/useHazards.js
+/**
+ * File: hooks/useHazards.js
+ * Purpose: Aggregate live datasets and mock flags to infer current hazards,
+ *          pick the top hazard for the home banner, and build Early Warning cards.
+ *
+ * Responsibilities:
+ *  - Fetch latest rainfall, humidity, PM2.5, wind, temperature, and dengue GeoJSON.
+ *  - Respect local mock flags to simulate hazards (for demos/tests).
+ *  - Run classifiers to decide the single top hazard + per-kind hazard list.
+ *  - Map hazards into lightweight card items (title/level/color/image/desc).
+ *  - Expose a `refresh()` function to re-run the pipeline on demand.
+ *
+ * Notes:
+ *  - i18n: All labels use `react-i18next` keys with English fallbacks.
+ *  - Network errors: each fetch is wrapped with `.catch` → safe empty default.
+ *  - `center`: user/location coordinate influences dengue proximity checks.
+ */
+
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -12,6 +29,7 @@ import {
 import { decideGlobalHazard, evaluateAllHazards } from "../utils/hazard";
 import { getMockFlags } from "../utils/mockFlags";
 
+// Local asset registry for hazard card thumbnails
 const images = {
   flood: require("../assets/General/flash-flood2.jpg"),
   haze: require("../assets/General/pm-haze2.jpg"),
@@ -20,16 +38,21 @@ const images = {
   heat: require("../assets/General/heat.jpg"),
 };
 
+// Main hook: returns { loading, topHazard, cards, refresh }
 export default function useHazards(center, limit = 5) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+
+  // Default “no hazard” banner until data resolves
   const [topHazard, setTopHazard] = useState({
     kind: "none",
     title: t("home.hazard.none", "No Hazard Detected"),
     severity: "safe",
   });
+
   const [cards, setCards] = useState([]);
 
+  // Build a single Early Warning card from a hazard object
   const toCardItem = useCallback(
     (h) => {
       const sev = h.severity || "safe";
@@ -52,8 +75,8 @@ export default function useHazards(center, limit = 5) {
           heat: t("early.cards.heat.title", "Heat Advisory"),
         }[h.kind] || t("home.hazard.alert", "Hazard Alert");
 
-      // short description reused from your previous logic if needed:
-      const desc = h.desc || ""; // (optional) keep empty if you already render desc elsewhere
+      // Optional: keep short desc empty if the UI composes a richer one elsewhere
+      const desc = h.desc || "";
 
       return {
         id: h.kind,
@@ -68,6 +91,7 @@ export default function useHazards(center, limit = 5) {
     [t]
   );
 
+  // One-shot loader: fetch feeds → classify → produce banner + cards
   const load = useCallback(async () => {
     setLoading(true);
     let alive = true;
@@ -85,6 +109,7 @@ export default function useHazards(center, limit = 5) {
 
       if (!alive) return;
 
+      // Decide single top hazard for banner
       const hazard = decideGlobalHazard({
         center,
         rainfallPoints: rain.points || [],
@@ -97,6 +122,7 @@ export default function useHazards(center, limit = 5) {
       });
       setTopHazard(hazard);
 
+      // Build per-kind list for grid/cards and cap by `limit`
       const all = evaluateAllHazards({
         center,
         rainfallPoints: rain.points || [],
@@ -117,12 +143,12 @@ export default function useHazards(center, limit = 5) {
     };
   }, [center, limit, toCardItem]);
 
-  // initial + whenever center changes
+  // Kick off on mount and whenever `center` changes
   useEffect(() => {
     load();
   }, [load]);
 
-  // expose explicit refresh (returns a Promise)
+  // Public manual refetch; consumers can call on pull-to-refresh
   const refresh = useCallback(() => load(), [load]);
 
   return { loading, topHazard, cards, refresh };

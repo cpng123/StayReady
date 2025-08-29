@@ -88,15 +88,20 @@ export default function App() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     (async () => {
+      // Ensure translation resources + persisted language are ready before UI mounts,
+      // so there’s no visible flicker from default -> saved language.
       await initI18n();
+
+      // Set up Android notification channel; request permission if previously enabled.
       await initNotifications();
       setReady(true);
     })();
   }, []);
 
-  if (!ready) return null;
+  if (!ready) return null; // Provide i18n to the whole tree
 
   return (
+    // Provide i18n to the whole tree
     <I18nextProvider i18n={i18n}>
       <ThemeProvider>
         <SafeAreaProvider>

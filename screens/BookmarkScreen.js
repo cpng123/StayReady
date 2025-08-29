@@ -1,4 +1,11 @@
-// screens/BookmarkScreen.js
+/**
+ * BookmarkScreen
+ * ------------------------------------------------------------
+ *   - Displays the user's bookmarked quiz questions.
+ *   - Provides search + category chips to filter results.
+ *   - Allows deleting a single bookmark with a confirmation modal.
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, FlatList, View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -18,26 +25,13 @@ import { useTranslation } from "react-i18next";
 
 const RED = "#DC2626";
 
-function useQuizBundle() {
-  const { i18n } = useTranslation();
-  const ns = "quiz";
-  const lng = i18n.language;
-  const fallbackLng = Array.isArray(i18n.options?.fallbackLng)
-    ? i18n.options.fallbackLng[0]
-    : i18n.options?.fallbackLng || "en";
-  return (
-    i18n.getResourceBundle(lng, ns) ||
-    i18n.getResourceBundle(fallbackLng, ns) ||
-    {}
-  );
-}
-
 export default function BookmarkScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation("common");
 
+  // -------- Filters & inputs --------
   // Build localized chip options (fallbacks provided)
   const CHIP_OPTIONS = useMemo(
     () => [
@@ -61,20 +55,26 @@ export default function BookmarkScreen() {
 
   const [query, setQuery] = useState("");
   const [chip, setChip] = useState("all");
+
+  // -------- Data state --------
+  // The full list of bookmarks
   const [items, setItems] = useState([]);
 
-  // delete confirm modal state
+  // Delete confirm modal state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingId, setPendingId] = useState(null);
 
+  // Load current bookmarks
   const load = async () => setItems(await getAllBookmarks());
 
+  // Initial load + keep list live via subscription
   useEffect(() => {
     load();
     const unsub = subscribeBookmarks(load);
     return unsub;
   }, []);
 
+  // Derived: filtered & searched bookmarks
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return items
@@ -87,8 +87,10 @@ export default function BookmarkScreen() {
       );
   }, [items, chip, query]);
 
+  // Whether there are any bookmarks at all (affects empty copy)
   const hasAny = items.length > 0;
 
+  // -------- Delete flow --------
   const requestDelete = (id) => {
     setPendingId(id);
     setConfirmOpen(true);
@@ -105,6 +107,7 @@ export default function BookmarkScreen() {
     setPendingId(null);
   };
 
+  // -------- Empty state --------
   const EmptyState = () => (
     <View style={s.emptyWrap}>
       <Ionicons
@@ -131,15 +134,19 @@ export default function BookmarkScreen() {
     </View>
   );
 
+  // -------- Render --------
   return (
     <SafeAreaView style={s.safe}>
       <TopBar
         title={t("bookmarks.title", "Bookmarked Questions")}
         onBack={() => navigation.goBack()}
       />
+
+      {/* Search + category chips */}
       <SearchRow value={query} onChangeText={setQuery} showSort={false} />
       <FilterChips options={CHIP_OPTIONS} activeId={chip} onChange={setChip} />
 
+      {/* Bookmarks list */}
       <FlatList
         contentContainerStyle={{
           paddingHorizontal: 14,
@@ -167,6 +174,7 @@ export default function BookmarkScreen() {
         )}
       />
 
+      {/* Delete confirmation */}
       <ConfirmModal
         visible={confirmOpen}
         title={t("bookmarks.confirm.title", "Delete bookmark?")}

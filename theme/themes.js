@@ -16,7 +16,7 @@ export const lightTheme = {
     drawerBg: "#ffffff",
     overlay: "rgba(0,0,0,0.35)",
   },
-  statusBarStyle: "dark", // expo StatusBar
+  statusBarStyle: "dark",
   navTheme: {
     ...DefaultTheme,
     colors: { ...DefaultTheme.colors, background: "#f4f4f4", card: "#ffffff", text: "#111" },

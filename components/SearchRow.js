@@ -1,4 +1,17 @@
-// components/SearchRow.js
+/**
+ * File: components/SearchRow.js
+ * Purpose: Compact search bar with optional sort toggle, themed for light/dark and i18n-aware.
+ *
+ * Responsibilities:
+ *  - Render a text input with leading search icon and localized placeholder.
+ *  - Emit value changes via onChangeText and support the "search" return key.
+ *  - Optionally show a sort toggle button (swap-vertical icon) that calls onSortToggle.
+ *  - Adapt container, border, and text colors based on the current theme.
+ *
+ * Props:
+ *  - value, onChangeText, placeholder?, onSortToggle?, showSort=true
+ */
+
 import React from "react";
 import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

@@ -1,3 +1,18 @@
+/**
+ * File: components/RewardCard.js
+ * Purpose: Compact, image-led reward list item showing title, short description,
+ *          and point cost, styled with the app theme and localized labels.
+ *
+ * Responsibilities:
+ *  - Render left-aligned thumbnail with rounded mask.
+ *  - Show reward title, 2-line description, and points with i18n suffix.
+ *  - Use theme colors for text and surface; keep layout performant with memoized styles.
+ *
+ * Props:
+ *  - item: { image, title, desc, points }
+ *  - theme: Theme object from ThemeProvider (theme.colors.*)
+ */
+
 import React, { useMemo } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";

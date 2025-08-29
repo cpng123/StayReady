@@ -1,4 +1,11 @@
-// screens/PreparednessGuideScreen.js
+/**
+ * PreparednessGuideScreen
+ * -----------------------------------------------------------------------------
+ *   Show a localized, image-forward preparedness guide for a selected hazard,
+ *   with “Why it matters”, actionable sections (grid), an interactive-learning
+ *   CTA, and curated external resources.
+ */
+
 import React, { useState, useMemo } from "react";
 import {
   SafeAreaView,
@@ -32,20 +39,14 @@ function ReasonCard({ icon, label, onPress, theme }) {
       style={[styles.reasonCard, { backgroundColor: theme.colors.card }]}
       activeOpacity={0.9}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
     >
       <Image
         source={icon}
-        style={{
-          width: 45,
-          height: 45,
-          marginBottom: 8,
-          resizeMode: "contain",
-        }}
+        style={{ width: 45, height: 45, marginBottom: 8, resizeMode: "contain" }}
       />
-      <Text
-        style={[styles.reasonText, { color: theme.colors.text }]}
-        numberOfLines={2}
-      >
+      <Text style={[styles.reasonText, { color: theme.colors.text }]} numberOfLines={2}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -56,29 +57,17 @@ function ReasonCard({ icon, label, onPress, theme }) {
 function ReasonModal({ visible, onClose, reason, theme, t }) {
   if (!visible) return null;
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalBackdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </View>
       <View style={styles.modalCenter} pointerEvents="box-none">
-        <View
-          style={[styles.modalCard, { backgroundColor: theme.colors.card }]}
-        >
+        <View style={[styles.modalCard, { backgroundColor: theme.colors.card }]}>
           <View style={{ alignItems: "center", marginBottom: 12 }}>
             {reason?.icon ? (
               <Image
                 source={reason.icon}
-                style={{
-                  width: 80,
-                  height: 80,
-                  resizeMode: "contain",
-                  marginBottom: 12,
-                }}
+                style={{ width: 80, height: 80, resizeMode: "contain", marginBottom: 12 }}
               />
             ) : null}
             <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
@@ -90,23 +79,21 @@ function ReasonModal({ visible, onClose, reason, theme, t }) {
             </Text>
           </View>
           <Text style={[styles.modalBody, { color: theme.colors.subtext }]}>
-            {reason?.text
-              ? reason.text
-              : t("preparedness_screen.reason_more_details", {
-                  ns: "common",
-                  defaultValue:
-                    "More details about this reason will appear here...",
-                })}
+            {reason?.text ??
+              t("preparedness_screen.reason_more_details", {
+                ns: "common",
+                defaultValue: "More details about this reason will appear here...",
+              })}
           </Text>
           <View style={{ height: 12 }} />
           <TouchableOpacity
             style={[styles.modalBtn, { backgroundColor: theme.colors.primary }]}
             onPress={onClose}
             activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.close", { ns: "common" })}
           >
-            <Text style={styles.modalBtnText}>
-              {t("common.close", { ns: "common" })}
-            </Text>
+            <Text style={styles.modalBtnText}>{t("common.close", { ns: "common" })}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -151,6 +138,7 @@ function SectionGrid({ section, sectionKey, guideId, theme, t }) {
               <Text style={[styles.tileCaption, { color: theme.colors.text }]}>
                 {t(`${guideId}.sections.${effectiveKey}.items.${item.id}`, {
                   ns: "preparedness",
+                  defaultValue: item.text || "",
                 })}
               </Text>
             </View>
@@ -169,7 +157,12 @@ function InteractiveLearning({ theme, onPress, t }) {
         {t("preparedness_screen.interactive_learning", { ns: "common" })}
       </Text>
 
-      <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={t("preparedness_screen.interactive_cta", { ns: "common" })}
+      >
         <ImageBackground
           source={require("../assets/General/interactive-learning.jpg")}
           style={styles.interactiveCard}
@@ -186,10 +179,7 @@ function InteractiveLearning({ theme, onPress, t }) {
             <View style={styles.interactiveBtn}>
               <Ionicons name="play" size={16} color="#0A84FF" />
               <Text
-                style={[
-                  styles.interactiveBtnText,
-                  { color: theme.colors.primary },
-                ]}
+                style={[styles.interactiveBtnText, { color: theme.colors.primary }]}
               >
                 {t("preparedness_screen.interactive_cta", { ns: "common" })}
               </Text>
@@ -207,18 +197,14 @@ function ExternalResources({ resources = [], theme, navigation, guideId, t }) {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.extHeaderRow}>
-        <Text
-          style={[
-            styles.h2,
-            styles.extHeaderTitle,
-            { color: theme.colors.text },
-          ]}
-        >
+        <Text style={[styles.h2, styles.extHeaderTitle, { color: theme.colors.text }]}>
           {t("preparedness_screen.external_resources", { ns: "common" })}
         </Text>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => navigation.navigate("ExternalResources")}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.see_more", { ns: "common" })}
         >
           <Text style={[styles.seeMore, { color: theme.colors.primary }]}>
             {t("common.see_more", { ns: "common" })}
@@ -231,12 +217,8 @@ function ExternalResources({ resources = [], theme, navigation, guideId, t }) {
           key={r.id}
           item={{
             ...r,
-            title: t(`${guideId}.externalResources.${r.id}.title`, {
-              ns: "preparedness",
-            }),
-            desc: t(`${guideId}.externalResources.${r.id}.desc`, {
-              ns: "preparedness",
-            }),
+            title: t(`${guideId}.externalResources.${r.id}.title`, { ns: "preparedness" }),
+            desc: t(`${guideId}.externalResources.${r.id}.desc`, { ns: "preparedness" }),
           }}
           theme={theme}
           navigation={navigation}
@@ -250,58 +232,42 @@ export default function PreparednessGuideScreen({ navigation, route }) {
   const { theme } = useThemeContext();
   const { t } = useTranslation();
 
-  const guideId = route?.params?.id;
-  const guide = getGuideById(guideId) || getGuideById("flood");
+  // Pick guide; if id invalid/empty, default to flood. Use guide.id for all i18n keys.
+  const routeId = route?.params?.id;
+  const guide = getGuideById(routeId) || getGuideById("flood");
+  const effectiveId = guide?.id || "flood";
 
   const { hero, reasons = [], sections = [] } = guide;
 
-  const translatedTitle = t(`${guideId}.title`, { ns: "preparedness" });
-  const translatedDescription = t(`${guideId}.description`, {
-    ns: "preparedness",
-  });
+  const translatedTitle = t(`${effectiveId}.title`, { ns: "preparedness" });
+  const translatedDescription = t(`${effectiveId}.description`, { ns: "preparedness" });
 
-  const QUIZ_ID_MAP = {
-    thunderstorm: "storm",
-    firstaid: "aid",
-    emergencykit: "kit",
-  };
-  const quizCategoryId = QUIZ_ID_MAP[guideId] || guideId || "flood";
+  const QUIZ_ID_MAP = { thunderstorm: "storm", firstaid: "aid", emergencykit: "kit" };
+  const quizCategoryId = QUIZ_ID_MAP[effectiveId] || effectiveId || "flood";
 
   const [reasonOpen, setReasonOpen] = useState(false);
   const [activeReason, setActiveReason] = useState(null);
 
   const openReason = (r) => {
-    const label = t(`${guideId}.reasons.${r.id}.label`, { ns: "preparedness" });
-    const text = t(`${guideId}.reasons.${r.id}.text`, { ns: "preparedness" });
+    const label = t(`${effectiveId}.reasons.${r.id}.label`, { ns: "preparedness" });
+    const text = t(`${effectiveId}.reasons.${r.id}.text`, { ns: "preparedness" });
     setActiveReason({ ...r, label, text });
     setReasonOpen(true);
   };
   const closeReason = () => setReasonOpen(false);
 
+  // Map data keys -> canonical section keys used in i18n
   const SECTION_KEY_MAP = {
-    wind: {
-      "wind-prep": "prepareBefore",
-      "wind-during": "protectDuring",
-      "wind-after": "recoverAfter",
-    },
-    aid: {
-      "aid-before": "before",
-      "aid-during": "during",
-      "aid-after": "after",
-    },
-    disease: {
-      "disease-prevent": "preventBefore",
-      "disease-during": "protectDuring",
-      "disease-after": "recoverAfter",
-    },
+    wind: { "wind-prep": "prepareBefore", "wind-during": "protectDuring", "wind-after": "recoverAfter" },
+    aid: { "aid-before": "before", "aid-during": "during", "aid-after": "after" },
+    disease: { "disease-prevent": "preventBefore", "disease-during": "protectDuring", "disease-after": "recoverAfter" },
   };
-
   const normalizeKey = (gid, k) => SECTION_KEY_MAP[gid]?.[k] || k;
 
-  // Build main FlatList sections (removed 'stats')
+  // Sections for the main FlatList (reasons → grids → interactive → external)
   const SECTIONS = useMemo(() => {
     const head = [{ type: "reasons" }];
-    const grids = sections.map((s, idx) => ({
+    const grids = (sections || []).map((s, idx) => ({
       type: "grid",
       section: s,
       key: s.id || s.key || `section-${idx}`,
@@ -318,8 +284,13 @@ export default function PreparednessGuideScreen({ navigation, route }) {
         <Image source={hero} style={styles.heroImg} />
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={[styles.backBtn, { backgroundColor: theme.colors.overlay }]}
+          style={[
+            styles.backBtn,
+            { backgroundColor: theme.colors.overlay ?? "rgba(0,0,0,0.35)" },
+          ]}
           activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", { ns: "common", defaultValue: "Back" })}
         >
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
@@ -346,10 +317,7 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       return (
         <View style={styles.bodyWrap}>
           <Text style={[styles.h2, { color: theme.colors.text }]}>
-            {t("preparedness_screen.why_title", {
-              ns: "common",
-              topic: translatedTitle,
-            })}
+            {t("preparedness_screen.why_title", { ns: "common", topic: translatedTitle })}
           </Text>
 
           <FlatList
@@ -358,17 +326,12 @@ export default function PreparednessGuideScreen({ navigation, route }) {
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.edgeToEdge}
-            contentContainerStyle={{
-              paddingVertical: 6,
-              paddingHorizontal: H_PADDING - 1,
-            }}
+            contentContainerStyle={{ paddingVertical: 6, paddingHorizontal: H_PADDING - 1 }}
             ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
             renderItem={({ item: r }) => (
               <ReasonCard
                 icon={r.icon}
-                label={t(`${guideId}.reasons.${r.id}.label`, {
-                  ns: "preparedness",
-                })}
+                label={t(`${effectiveId}.reasons.${r.id}.label`, { ns: "preparedness" })}
                 onPress={() => openReason(r)}
                 theme={theme}
               />
@@ -378,17 +341,13 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       );
     }
     if (item.type === "grid") {
+      const rawKey = item.section.id || item.section.key;
+      const sectionKey = normalizeKey(effectiveId, rawKey);
       return (
         <SectionGrid
-          section={{
-            ...item.section,
-            id: normalizeKey(guideId, item.section.id || item.section.key),
-          }}
-          sectionKey={normalizeKey(
-            guideId,
-            item.section.id || item.section.key
-          )}
-          guideId={guideId || "flood"}
+          section={{ ...item.section, id: sectionKey }}
+          sectionKey={sectionKey}
+          guideId={effectiveId}
           theme={theme}
           t={t}
         />
@@ -412,7 +371,7 @@ export default function PreparednessGuideScreen({ navigation, route }) {
       return (
         <ExternalResources
           resources={guide.externalResources}
-          guideId={guideId || "flood"}
+          guideId={effectiveId}
           theme={theme}
           navigation={navigation}
           t={t}
@@ -423,9 +382,7 @@ export default function PreparednessGuideScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
-    >
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.appBg }]}>
       <FlatList
         data={SECTIONS}
         keyExtractor={(s, i) => s.key ?? `${s.type}-${i}`}
@@ -479,14 +436,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
-  reasonText: {
-    textAlign: "center",
-    fontWeight: "500",
-    fontSize: 14,
-    lineHeight: 16,
-  },
-
-  // (Removed statsCard since Quick Stats section is gone)
+  reasonText: { textAlign: "center", fontWeight: "500", fontSize: 14, lineHeight: 16 },
 
   tileCard: {
     borderRadius: CARD_RADIUS,
@@ -506,16 +456,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)",
-  },
-  modalCenter: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
+  modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.35)" },
+  modalCenter: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
   modalCard: {
     width: "100%",
     maxWidth: 380,
@@ -538,10 +480,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
   },
-  interactiveTint: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.12)",
-  },
+  interactiveTint: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.12)" },
   interactiveContent: { paddingHorizontal: 16, paddingVertical: 12 },
   interactiveTitle: {
     color: "#fff",

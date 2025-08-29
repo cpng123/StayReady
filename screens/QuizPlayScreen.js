@@ -1,4 +1,9 @@
-// screens/QuizPlayScreen.js
+/**
+ * QuizPlayScreen
+ * -----------------------------------------------------------------------------
+ * Interactive quiz gameplay screen.
+ */
+
 import React, { useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -38,6 +43,7 @@ export default function QuizPlayScreen({ navigation, route }) {
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t, i18n } = useTranslation();
 
+  // Resolve the localized quiz bundle once (with fallback) to feed normalizeQuestions.
   const QUIZ_L10N = useMemo(() => {
     const ns = "quiz";
     const lng = i18n.language;
@@ -63,15 +69,19 @@ export default function QuizPlayScreen({ navigation, route }) {
       ? t("games.daily.title", "Daily Challenge")
       : t("games.generic.quiz", "Quiz"));
 
+  // Prefer explicitly supplied questions; otherwise normalize from i18n bundle.
   const questions = useMemo(() => {
     if (Array.isArray(customQuestions) && customQuestions.length)
       return customQuestions;
     return normalizeQuestions(QUIZ_L10N, categoryId, setId, t);
   }, [customQuestions, categoryId, setId, QUIZ_L10N]);
 
+  // SFX + Haptics controllers (persisted preferences inside hooks).
   const sfx = useSound();
   const haptics = useHaptics();
 
+  // Handle quiz completion: persist attempt, mark daily done if applicable,
+  // and navigate to the result screen with a full review payload.
   const onFinish = async ({
     score,
     correctCount,
@@ -116,9 +126,11 @@ export default function QuizPlayScreen({ navigation, route }) {
     });
   };
 
+  // Core engine: timing, selection, reveal flags, toasts, and transitions.
   const engine = useQuizEngine({ questions, sfx, haptics, onFinish });
   const back = useBackConfirm(navigation);
 
+  // UI state for modals
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
 
@@ -132,7 +144,7 @@ export default function QuizPlayScreen({ navigation, route }) {
         onRightPress={() => setSettingsOpen(true)}
       />
 
-      {/* Meta pill */}
+      {/* Progress + score pill */}
       <MetaPill progress={engine.progressText} score={engine.score} />
 
       {/* Content */}
@@ -189,7 +201,7 @@ export default function QuizPlayScreen({ navigation, route }) {
         hint={engine.hintText}
       />
 
-      {/* Settings Modal (now includes Haptics) */}
+      {/* Settings Modal (sound + haptics + theme entry) */}
       <SettingsModal
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}

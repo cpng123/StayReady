@@ -1,4 +1,24 @@
-// navigation/AppNavigator.js
+/**
+ * File: navigation/AppNavigator.js
+ * Purpose: Define the app’s primary navigation shell using a Stack → Drawer → Tabs layout.
+ *
+ * Responsibilities:
+ *  - Bottom tabs for the main sections (SOS, Resource Hub, Home, Games, More).
+ *  - Right-side drawer for secondary destinations (Map, Early Warning, Checklist, etc.).
+ *  - Centralized theming & i18n for labels, colors, and icons.
+ *  - “More” tab opens the drawer instead of navigating to a screen.
+ *
+ * Structure:
+ *  Stack.Navigator (headerless)
+ *    └─ Drawer.Navigator (right-side, custom content = SideMenu)
+ *        └─ Tab.Navigator (MainTabs)
+ *
+ * Notes:
+ *  - Uses RootNavigation.navigate to jump to Stack-level screens from the drawer.
+ *  - Tab bar styling adapts to the current theme from ThemeProvider.
+ *  - i18n keys: nav.* for tabs; drawer.* for drawer items.
+ */
+
 import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -25,10 +45,12 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
+// Simple placeholder used by the "More" tab (drawer opener)
 function EmptyScreen() {
   return <View style={{ flex: 1 }} />;
 }
 
+// Bottom tab navigator (main surfaces)
 function MainTabs() {
   const { theme } = useThemeContext();
   const { t } = useTranslation();
@@ -61,6 +83,7 @@ function MainTabs() {
         tabBarHideOnKeyboard: true,
       }}
     >
+      {/* SOS */}
       <Tab.Screen
         name="SOSTab"
         component={SOSScreen}
@@ -76,6 +99,8 @@ function MainTabs() {
           ),
         }}
       />
+
+      {/* Resource Hub */}
       <Tab.Screen
         name="ResourceTab"
         component={ResourceHubScreen}
@@ -91,6 +116,8 @@ function MainTabs() {
           ),
         }}
       />
+
+      {/* Home */}
       <Tab.Screen
         name="HomeTab"
         component={HomeScreen}
@@ -102,6 +129,8 @@ function MainTabs() {
           ),
         }}
       />
+
+      {/* Games */}
       <Tab.Screen
         name="GamesTab"
         component={GamesScreen}
@@ -113,6 +142,8 @@ function MainTabs() {
           ),
         }}
       />
+
+      {/* “More” opens the drawer instead of navigating */}
       <Tab.Screen
         name="MoreTab"
         component={EmptyScreen}
@@ -134,6 +165,7 @@ function MainTabs() {
   );
 }
 
+// Small row component for drawer items
 function Row({ icon, label, onPress, textColor }) {
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.8}>
@@ -145,13 +177,15 @@ function Row({ icon, label, onPress, textColor }) {
   );
 }
 
+// Custom drawer content (links jump to Stack-level routes via RootNavigation)
 function SideMenu({ navigation }) {
-  const { theme, themeKey, setThemeKey } = useThemeContext();
+  const { theme } = useThemeContext();
   const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.drawerBg }}>
       <DrawerContentScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Brand header */}
         <View style={[styles.headerRow, styles.leftMargin]}>
           <Image
             source={require("../assets/logo.png")}
@@ -168,6 +202,8 @@ function SideMenu({ navigation }) {
             StayReady
           </Text>
         </View>
+
+        {/* Divider */}
         <View
           style={[
             styles.divider,
@@ -176,7 +212,8 @@ function SideMenu({ navigation }) {
           ]}
         />
 
-        <View style={styles.leftMargin}>
+        {/* Drawer links */}
+        <View className="links" style={styles.leftMargin}>
           <Row
             icon={
               <MaterialCommunityIcons
@@ -270,10 +307,9 @@ function SideMenu({ navigation }) {
           />
         </View>
 
+        {/* Footer: theme toggle */}
         <View style={{ flex: 1 }} />
-        <View
-          style={[styles.leftMargin, { marginRight: 16, marginBottom: 12 }]}
-        >
+        <View style={[styles.leftMargin, { marginRight: 16, marginBottom: 12 }]}>
           <ThemeToggle />
         </View>
       </DrawerContentScrollView>
@@ -281,6 +317,7 @@ function SideMenu({ navigation }) {
   );
 }
 
+// Outermost navigator: stack that hosts the drawer (which hosts the tabs)
 export default function AppNavigator() {
   const { theme } = useThemeContext();
   return (

@@ -1,9 +1,16 @@
+/**
+ * WarningCard
+ * - Compact hazard/alert card used in lists and carousels.
+ * - Shows image, severity badge (color/label), title, and a localized description.
+ * - Mirrors the detail screen’s description logic for consistency.
+ */
+
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
-/** Mirror the detail screen’s description builder */
+// Mirror the detail screen’s description builder
 function longDescFor(h, t) {
   if (!h) return "";
   const sev = h.severity || "safe";
@@ -17,56 +24,82 @@ function longDescFor(h, t) {
   switch (h.kind) {
     case "flood":
       return sev === "danger"
-        ? t("early.cards.flood.desc.danger",
+        ? t(
+            "early.cards.flood.desc.danger",
             "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements.",
-            { place })
+            { place }
+          )
         : sev === "warning"
-        ? t("early.cards.flood.desc.warning",
+        ? t(
+            "early.cards.flood.desc.warning",
             "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.",
-            { place })
-        : t("early.cards.flood.desc.safe",
-            "No significant rain detected. Drains and canals at normal levels.");
+            { place }
+          )
+        : t(
+            "early.cards.flood.desc.safe",
+            "No significant rain detected. Drains and canals at normal levels."
+          );
     case "haze":
       return sev === "danger"
-        ? t("early.cards.haze.desc.danger",
+        ? t(
+            "early.cards.haze.desc.danger",
             "Unhealthy PM2.5 in the {{region}}. Stay indoors; use purifier; wear N95 if going out.",
-            { region })
+            { region }
+          )
         : sev === "warning"
-        ? t("early.cards.haze.desc.warning",
+        ? t(
+            "early.cards.haze.desc.warning",
             "Elevated PM2.5 in the {{region}}. Limit outdoor activity; consider a mask.",
-            { region })
-        : t("early.cards.haze.desc.safe",
-            "Air quality is within normal range across Singapore.");
+            { region }
+          )
+        : t(
+            "early.cards.haze.desc.safe",
+            "Air quality is within normal range across Singapore."
+          );
     case "dengue":
       return sev === "danger"
-        ? t("early.cards.dengue.desc.danger",
+        ? t(
+            "early.cards.dengue.desc.danger",
             "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists.",
-            { place, cases })
+            { place, cases }
+          )
         : sev === "warning"
-        ? t("early.cards.dengue.desc.warning",
+        ? t(
+            "early.cards.dengue.desc.warning",
             "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.",
-            { place, km })
-        : t("early.cards.dengue.desc.safe",
-            "No active cluster within 5 km of your location.");
+            { place, km }
+          )
+        : t(
+            "early.cards.dengue.desc.safe",
+            "No active cluster within 5 km of your location."
+          );
     case "wind":
       return sev === "danger"
-        ? t("early.cards.wind.desc.danger",
+        ? t(
+            "early.cards.wind.desc.danger",
             "Damaging winds in the {{region}}. Stay indoors; avoid coastal or open areas.",
-            { region })
+            { region }
+          )
         : sev === "warning"
-        ? t("early.cards.wind.desc.warning",
+        ? t(
+            "early.cards.wind.desc.warning",
             "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.",
-            { region })
+            { region }
+          )
         : t("early.cards.wind.desc.safe", "Winds are light to moderate.");
     case "heat":
       return sev === "danger"
-        ? t("early.cards.heat.desc.danger",
+        ? t(
+            "early.cards.heat.desc.danger",
             "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Stay in shade/AC; check the vulnerable.",
-            { region, hi })
+            { region, hi }
+          )
         : sev === "warning"
-        ? t("early.cards.heat.desc.warning",
+        ? t(
+            "early.cards.heat.desc.warning",
             "High heat in the {{region}} (HI ≈ {{hi}}°C). Reduce strenuous activity; drink water often.",
-            { region, hi })
+            { region, hi }
+          )
         : t("early.cards.heat.desc.safe", "Heat risk is low. Keep hydrated.");
     default:
       return t("home.hazard.slogan", "Stay Alert, Stay Safe");

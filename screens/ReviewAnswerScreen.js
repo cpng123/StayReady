@@ -1,3 +1,9 @@
+/**
+ * ReviewAnswerScreen
+ * -----------------------------------------------------------------------------
+ * Read-only review of answered quiz questions with per-question bookmarking.
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, FlatList, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -10,19 +16,25 @@ export default function ReviewAnswerScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { theme } = useThemeContext();
-  const s = useMemo(() => ({ safe: { flex: 1, backgroundColor: theme.colors.appBg } }), [theme]);
+
+  // Minimal dynamic style so surfaces follow the active theme.
+  const s = useMemo(
+    () => ({ safe: { flex: 1, backgroundColor: theme.colors.appBg } }),
+    [theme]
+  );
 
   const { title = "Review Questions", review = [], meta = {} } = route.params || {};
   // meta can contain: { categoryId, categoryLabel, setId, setTitle }
 
-  const [bmMap, setBmMap] = useState({}); // { [id]: true }
+  const [bmMap, setBmMap] = useState({}); // { [questionId]: true }
 
+  // On mount / when the review list changes, prefetch bookmark states for all items.
   useEffect(() => {
     (async () => {
       const entries = {};
       for (let i = 0; i < review.length; i++) {
         const q = review[i];
-        const id = q.id ?? `${meta.setId ?? "set"}:${i}:${q.text?.slice(0,40)}`;
+        const id = q.id ?? `${meta.setId ?? "set"}:${i}:${q.text?.slice(0, 40)}`;
         entries[id] = await isBookmarked(id);
       }
       setBmMap(entries);
@@ -30,7 +42,7 @@ export default function ReviewAnswerScreen() {
   }, [review, meta.setId]);
 
   const onToggle = async (q, index) => {
-    const id = q.id ?? `${meta.setId ?? "set"}:${index}:${q.text?.slice(0,40)}`;
+    const id = q.id ?? `${meta.setId ?? "set"}:${index}:${q.text?.slice(0, 40)}`;
     const payload = toBookmarkItem({
       id,
       categoryId: meta.categoryId,
@@ -56,8 +68,10 @@ export default function ReviewAnswerScreen() {
         keyExtractor={(_, i) => String(i)}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         renderItem={({ item, index }) => {
-          const id = item.id ?? `${meta.setId ?? "set"}:${index}:${item.text?.slice(0,40)}`;
+          // Prefer a provided id; otherwise derive a stable-ish fallback for persistence.
+          const id = item.id ?? `${meta.setId ?? "set"}:${index}:${item.text?.slice(0, 40)}`;
           const active = !!bmMap[id];
+
           return (
             <ReviewQuestionCard
               index={index}

@@ -1,8 +1,23 @@
+/**
+ * File: utils/storage.js
+ * Purpose: Centralize AsyncStorage keys and helpers for StayReady/Quizverse.
+ *
+ * Responsibilities:
+ *  - Define a single source of truth for namespaced keys going forward.
+ *  - Keep a list of legacy keys so “clear cache” and “reset all” work safely
+ *    during migration.
+ *  - Provide tiny JSON helpers (get/set/remove) and higher-level clear/reset ops.
+ *
+ * Notes:
+ *  - Use KEYS (namespaced) for any new feature.
+ *  - Legacy keys are retained only so that maintenance screens can clean up
+ *    older installs without breaking user prefs.
+ */
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-/**
- * New, namespaced keys (recommended going forward)
- */
+/* ----------------------------- New keys (preferred) ----------------------------- */
+
 const PREFIX = "@quizverse:";
 
 export const KEYS = {
@@ -19,10 +34,8 @@ export const KEYS = {
   PREF_NOTIF: `${PREFIX}pref:notificationsEnabled`,
 };
 
-/**
- * Legacy keys currently used elsewhere in the app.
- * Keep them here so clearCache/resetAll work even before you migrate all callers.
- */
+/* ----------------------------- Legacy keys (cleanup/migration) ----------------------------- */
+
 const LEGACY = {
   // Settings
   K_LANG: "pref:language",
@@ -58,7 +71,8 @@ const LEGACY = {
   REDEEMED_HISTORY_KEY: "rewards:history",
 };
 
-/** Convenience sets */
+/* ----------------------------- Convenience sets ----------------------------- */
+
 const LEGACY_PREF_KEYS = new Set([
   LEGACY.K_LANG,
   LEGACY.K_NOTIF,
@@ -69,7 +83,7 @@ const LEGACY_PREF_KEYS = new Set([
 
 const LEGACY_BOOKMARK_KEYS = new Set([LEGACY.BOOKMARKS_V1]);
 
-/** Helper: is this one of “our app” keys (namespaced or legacy)? */
+// True if a key belongs to this app (either new namespaced or legacy)
 function isOurKey(k) {
   if (k.startsWith(PREFIX)) return true;
   return (
@@ -89,7 +103,9 @@ function isOurKey(k) {
   );
 }
 
-/** Basic JSON helpers */
+/* ----------------------------- Basic JSON helpers ----------------------------- */
+
+// Read and JSON-parse a value (null if absent or invalid JSON)
 export async function getItem(key) {
   const raw = await AsyncStorage.getItem(key);
   try {
@@ -99,26 +115,23 @@ export async function getItem(key) {
   }
 }
 
+// JSON-stringify and write a value
 export async function setItem(key, value) {
   await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
+// Remove a key entirely
 export async function removeItem(key) {
   await AsyncStorage.removeItem(key);
 }
 
-/**
- * Clear cached data ONLY.
- * Preserves:
- *  - Bookmarks (new + legacy)
- *  - Preferences (lang, theme, sfx, haptics, notifications; new + legacy)
- *
- * Everything else that belongs to this app is removed.
- */
+/* ----------------------------- High-level maintenance ops ----------------------------- */
+
+// Clear cached data only (keep bookmarks + preferences, both new and legacy)
 export async function clearCache() {
   const allKeys = await AsyncStorage.getAllKeys();
 
-  // What to PRESERVE
+  // Keys to preserve
   const preserve = new Set([
     // namespaced prefs
     KEYS.PREF_LANG,
@@ -139,10 +152,7 @@ export async function clearCache() {
   if (toRemove.length) await AsyncStorage.multiRemove(toRemove);
 }
 
-/**
- * Full reset: removes EVERYTHING for this app
- * (both namespaced and legacy keys).
- */
+// Full reset: remove everything belonging to this app (namespaced + legacy)
 export async function resetAll() {
   const allKeys = await AsyncStorage.getAllKeys();
   const ours = allKeys.filter(isOurKey);

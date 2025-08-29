@@ -1,4 +1,13 @@
-// screens/BadgeRewardScreen.js
+/**
+ * BadgeRewardScreen
+ * ------------------------------------------------------------
+ *   - Shows a hero summary (badges earned + available points).
+ *   - Lets user toggle between "Badges" & "Rewards".
+ *   - Supports sorting (badges: Default/Unlocked/Locked; rewards: Default/Price ↑/↓).
+ *   - Opens a badge modal for details & share.
+ *   - Navigates to RewardDetail, passing available point balance.
+ */
+
 import React, { useMemo, useState, useCallback } from "react";
 import {
   SafeAreaView,
@@ -49,15 +58,23 @@ export default function BadgeRewardScreen() {
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
 
+  // Tabs: "badge" or "rewards"
   const [tab, setTab] = useState("badge");
+
+  // Summary: { badgesEarned, points } — points here reflect AVAILABLE balance
   const [summary, setSummary] = useState({ badgesEarned: 0, points: 0 });
+
+  // Full badge list (already localized & shaped by buildBadgeList)
   const [items, setItems] = useState([]);
+
+  // Rewards dataset (localized; static list)
   const [rewards, setRewards] = useState(getRewards(t));
 
-  // Sort state
+  // Sort state for both tabs
   const [badgeSortIx, setBadgeSortIx] = useState(0);
-  const [rewardSortIx, setRewardSortIx] = useState(1); // keep your existing default (Price ↑)
+  const [rewardSortIx, setRewardSortIx] = useState(1); // default to Price ↑
 
+  // Cycle the active sort mode based on current tab
   const cycleSort = () => {
     if (tab === "badge") {
       setBadgeSortIx((i) => (i + 1) % BADGE_SORTS.length);
@@ -66,40 +83,49 @@ export default function BadgeRewardScreen() {
     }
   };
 
-  // Modal state
+  // Modal state for viewing a single badge & sharing
   const [activeBadge, setActiveBadge] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  // Load/refresh:
+  // - Fetch badge items + summary
+  // - Fetch redeemed total
+  // - Compute AVAILABLE points = earned - redeemed
   const load = useCallback(async () => {
     const { items, summary } = await buildBadgeList(t);
     const redeemedTotal = await getRedeemedTotal();
-    // Show *available* points (earned - redeemed)
     const available = computeAvailablePoints(summary.points, redeemedTotal);
     setItems(items);
     setSummary({ ...summary, points: available });
-  }, []);
+  }, [t]);
 
+  // Refresh whenever this screen gains focus (e.g., returning from RewardDetail)
   useFocusEffect(
     useCallback(() => {
       load();
     }, [load])
   );
 
+  // Open badge modal
   const openBadge = useCallback((badge) => {
     setActiveBadge(badge);
     setShowModal(true);
   }, []);
 
+  // Close badge modal
   const closeBadge = useCallback(() => setShowModal(false), []);
 
+  // Share earned badge (no-op if still locked)
   const shareBadge = useCallback(async () => {
     if (!activeBadge?.achieved) return;
     try {
-      // Localized share payload (buildSharePayload is backward compatible)
-      await Share.share(buildSharePayload(activeBadge, t));
-    } catch {}
+      await Share.share(buildSharePayload(activeBadge, t)); // uses localized payload when available
+    } catch {
+      // swallow share errors
+    }
   }, [activeBadge, t]);
 
+  // Sorted lists derived from state
   const sortedBadges = useMemo(
     () => sortBadges(items, badgeSortIx),
     [items, badgeSortIx]
@@ -109,6 +135,7 @@ export default function BadgeRewardScreen() {
     [rewards, rewardSortIx]
   );
 
+  // FlatList helpers
   const renderBadge = useCallback(
     ({ item }) => <BadgeCard item={item} theme={theme} onPress={openBadge} />,
     [theme, openBadge]
@@ -121,7 +148,7 @@ export default function BadgeRewardScreen() {
         onPress={() =>
           nav.navigate("RewardDetail", {
             item,
-            pointsAvailable: summary.points, // pass available balance
+            pointsAvailable: summary.points, // pass available balance to detail
           })
         }
       >
@@ -131,19 +158,20 @@ export default function BadgeRewardScreen() {
     [nav, summary.points, theme]
   );
 
-  // Current sort label value – we keep array value as fallback
+  // Current sort label (localized fallback to raw label)
   const sortValue =
     tab === "badge" ? BADGE_SORTS[badgeSortIx] : REWARD_SORTS[rewardSortIx];
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
-      {/* HERO */}
+      {/* ---------- HERO ---------- */}
       <View style={s.heroWrap}>
         <ImageBackground
           source={require("../assets/General/badge-blue.jpg")}
           style={s.hero}
           imageStyle={{}}
         >
+          {/* top-to-bottom darkening to keep text legible */}
           <LinearGradient
             pointerEvents="none"
             colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
@@ -173,7 +201,7 @@ export default function BadgeRewardScreen() {
 
           {/* Stats under title */}
           <View style={s.statsContainer}>
-            {/* Badges */}
+            {/* Badges earned */}
             <View style={s.statCellCompact}>
               <Image source={ICONS.badges} style={s.statIconImg} />
               <View style={s.statTextCol}>
@@ -186,7 +214,7 @@ export default function BadgeRewardScreen() {
 
             <View style={s.vertDivider} />
 
-            {/* Points */}
+            {/* Points (available) */}
             <View style={s.statCellCompact}>
               <Image source={ICONS.points} style={s.statIconImg} />
               <View style={s.statTextCol}>
@@ -200,7 +228,7 @@ export default function BadgeRewardScreen() {
         </ImageBackground>
       </View>
 
-      {/* Tabs + sort label */}
+      {/* ---------- Tabs + sort label ---------- */}
       <View style={{ paddingHorizontal: 14, marginTop: 12, marginBottom: 2 }}>
         <SegmentToggle
           options={[
@@ -226,7 +254,7 @@ export default function BadgeRewardScreen() {
         </Text>
       </View>
 
-      {/* Content */}
+      {/* ---------- Content ---------- */}
       {tab === "badge" ? (
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 24 }}
@@ -251,7 +279,7 @@ export default function BadgeRewardScreen() {
         />
       )}
 
-      {/* Badge Modal */}
+      {/* ---------- Badge Modal ---------- */}
       <BadgeModal
         open={showModal}
         badge={activeBadge}
@@ -263,8 +291,6 @@ export default function BadgeRewardScreen() {
     </SafeAreaView>
   );
 }
-
-/* ---------- styles ---------- */
 
 const makeStyles = (theme) =>
   StyleSheet.create({

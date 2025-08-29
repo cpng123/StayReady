@@ -1,4 +1,13 @@
-// screens/GamesScreen.js
+/**
+ * GamesScreen
+ * -----------------------------------------------------------------------------
+ *   Hub for quiz-based learning:
+ *     - Shows user stats (taken / accuracy / streak)
+ *     - Daily challenge CTA (start or review)
+ *     - Quick Tips carousel (localized)
+ *     - Category grid of all quiz sets (localized)
+ */
+
 import React, { useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -19,11 +28,13 @@ import { getStatsSummary } from "../utils/progressStats";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 
+// ---- layout constants -------------------------------------------------------
 const SCREEN_PADDING = 16;
 const GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = Math.floor((SCREEN_WIDTH - SCREEN_PADDING * 2 - GAP) / 2);
 
+// ---- static images keyed by quiz category id --------------------------------
 const QUIZ_IMAGES = {
   flood: require("../assets/General/quiz-flood.jpg"),
   haze: require("../assets/General/quiz-haze.jpg"),
@@ -35,16 +46,18 @@ const QUIZ_IMAGES = {
   kit: require("../assets/General/quiz-kit.jpg"),
   disease: require("../assets/General/quiz-disease.jpg"),
   earthquake: require("../assets/General/quiz-earthquake.jpg"),
-  heatstroke: require("../assets/General/quiz-heatstroke.jpg")
+  heatstroke: require("../assets/General/quiz-heatstroke.jpg"),
 };
+// Generic fallback (used only if a category id has no matching asset)
+const FALLBACK_IMG = require("../assets/General/quiz-background.jpg");
 
-export default function GamesScreen({ navigation }) {
+export default function GamesScreen() {
   const nav = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { t, i18n } = useTranslation();
 
-  // Dynamically load quiz.json based on the selected language
+  // ---- Load localized quiz payload by language (static requires) ------------
   const QUIZ = useMemo(() => {
     try {
       switch (i18n.language) {
@@ -66,24 +79,32 @@ export default function GamesScreen({ navigation }) {
     }
   }, [i18n.language]);
 
+  // Category tiles:
+  //  - depend on QUIZ so that titles & counts refresh after language change.
+  //  - image fallback guards against missing asset keys.
   const categories = useMemo(
     () =>
       (QUIZ?.categories ?? []).map((c) => ({
         id: c.id,
         title: c.title,
-        image: QUIZ_IMAGES[c.id],
+        image: QUIZ_IMAGES[c.id] || FALLBACK_IMG,
         setCount: (c.sets ?? []).length,
       })),
-    [t]
+    [QUIZ]
   );
 
+  // ---- user stats & daily challenge state -----------------------------------
   const [stats, setStats] = useState({ taken: 0, accuracy: 0, streak: 0 });
+  const [daily, setDaily] = useState({ loading: true, data: null });
 
-  // -------------- Localize Quick Tips here ----------------
+  // ---- Localize & map quick tips --------------------------------------------
   const rawTips = useMemo(() => pickRandomTips(5), []);
   const tips = useMemo(() => {
     return (rawTips || []).map((tip) => {
-      // Category title from preparedness ns; fallback to home.prep.topic.*; fallback to existing title
+      // Category display title:
+      // - preparedness ns (per-guide title)
+      // - common ns fallback
+      // - raw text fallback
       const categoryTitle =
         t(`${tip.categoryId}.title`, {
           ns: "preparedness",
@@ -96,10 +117,10 @@ export default function GamesScreen({ navigation }) {
         tip.categoryTitle ||
         "";
 
-      // Tip text by convention:
-      // 1) if tip.i18nKey exists, use it directly (ns can be encoded in the key if you like)
-      // 2) else use common: tips.{tip.id}.text
-      // 3) fallback to original tip.text
+      // Tip text:
+      // - explicit i18n key (if provided)
+      // - common:t("tips.<id>.text")
+      // - raw text fallback
       const text =
         (tip.i18nKey ? t(tip.i18nKey) : "") ||
         t(`tips.${tip.id}.text`, {
@@ -111,22 +132,20 @@ export default function GamesScreen({ navigation }) {
 
       return { ...tip, categoryTitle, text };
     });
-    // re-run when language changes
+    // recompute on language changes
   }, [rawTips, t, i18n.language]);
-  // --------------------------------------------------------
 
-  const [daily, setDaily] = useState({ loading: true, data: null });
-
+  // ---- helpers to (re)load dashboard data -----------------------------------
   const refreshDaily = async () => {
     const data = await getDailyToday(QUIZ);
     setDaily({ loading: false, data });
   };
-
   const refreshStats = async () => {
     const s = await getStatsSummary();
     setStats(s);
   };
 
+  // Refresh daily + stats whenever screen is focused (and after language swap)
   useFocusEffect(
     React.useCallback(() => {
       refreshDaily();
@@ -134,6 +153,7 @@ export default function GamesScreen({ navigation }) {
     }, [i18n.language])
   );
 
+  // ---- Navigation actions ----------------------------------------------------
   const onDailyPress = () => {
     if (!daily.data) return;
     const { questions, completed, key, review, meta } = daily.data;
@@ -165,19 +185,21 @@ export default function GamesScreen({ navigation }) {
   };
 
   const openCategory = (cat) => {
-    navigation.navigate?.("QuizSets", { categoryId: cat.id, title: cat.title });
+    nav.navigate("QuizSets", { categoryId: cat.id, title: cat.title });
   };
 
   const goToGuide = (tip) => {
-    navigation.navigate?.("PreparednessGuide", { id: tip.categoryId });
+    nav.navigate("PreparednessGuide", { id: tip.categoryId });
   };
 
+  // Button text depends on daily state
   const dailyBtnText = daily.loading
     ? t("games.daily.loading", "Loading...")
     : daily.data?.completed
     ? t("games.daily.review_answer", "Review Answer")
     : t("games.daily.start", "Start Challenge");
 
+  // ---- FlatList header: title, stats, daily card, quick tips -----------------
   const Header = (
     <View style={styles.headerWrap}>
       <Text style={styles.h1}>{t("games.title", "Safety Quiz")}</Text>
@@ -185,7 +207,7 @@ export default function GamesScreen({ navigation }) {
         {t("games.subtitle", "Quiz your preparedness skills.")}
       </Text>
 
-      {/* Stats */}
+      {/* Stats pill row */}
       <View style={[styles.statsCard, { backgroundColor: theme.colors.card }]}>
         <StatCol
           label={t("games.stats.taken", "Quiz Taken")}
@@ -218,7 +240,7 @@ export default function GamesScreen({ navigation }) {
         />
       </View>
 
-      {/* Daily challenge */}
+      {/* Daily challenge hero card */}
       <TouchableOpacity activeOpacity={0.85} onPress={onDailyPress}>
         <ImageBackground
           source={require("../assets/General/quiz-background.jpg")}
@@ -245,6 +267,7 @@ export default function GamesScreen({ navigation }) {
         </ImageBackground>
       </TouchableOpacity>
 
+      {/* Quick tips carousel */}
       <Text style={styles.sectionTitle}>
         {t("games.quick_tips", "Quick Tips")}
       </Text>
@@ -255,12 +278,14 @@ export default function GamesScreen({ navigation }) {
         onPressTip={goToGuide}
       />
 
+      {/* Category grid heading */}
       <Text style={[styles.sectionTitle, { marginTop: 10 }]}>
         {t("games.categories_quiz", "Categories Quiz")}
       </Text>
     </View>
   );
 
+  // ---- Render ----------------------------------------------------------------
   return (
     <SafeAreaView
       style={[styles.safe, { backgroundColor: theme.colors.appBg }]}
@@ -291,6 +316,7 @@ export default function GamesScreen({ navigation }) {
   );
 }
 
+/** Small presentational column inside the stats pill row */
 function StatCol({ label, value, theme }) {
   return (
     <View style={pillStyles.col}>
@@ -313,6 +339,8 @@ const pillStyles = StyleSheet.create({
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },
+
+    // Header / titles
     headerWrap: { paddingTop: 10, paddingBottom: 8 },
     h1: { fontSize: 22, fontWeight: "800", color: theme.colors.text },
     hSub: {
@@ -321,6 +349,8 @@ const makeStyles = (theme) =>
       marginTop: 2,
       marginBottom: 14,
     },
+
+    // Stats card
     statsCard: {
       flexDirection: "row",
       alignItems: "stretch",
@@ -334,6 +364,8 @@ const makeStyles = (theme) =>
       shadowOffset: { width: 0, height: 4 },
       elevation: 3,
     },
+
+    // Daily challenge hero
     dailyCard: {
       borderRadius: 16,
       overflow: "hidden",
@@ -365,6 +397,8 @@ const makeStyles = (theme) =>
       borderRadius: 12,
     },
     dailyBtnText: { color: "#1D4ED8", fontWeight: "800" },
+
+    // Sections
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
@@ -372,6 +406,8 @@ const makeStyles = (theme) =>
       marginTop: 6,
       marginBottom: 4,
     },
+
+    // Quick tips (overrides used by QuickTipsCarousel)
     tipCard: {
       flexDirection: "row",
       alignItems: "center",

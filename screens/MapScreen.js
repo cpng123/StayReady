@@ -1,4 +1,11 @@
-// screens/MapScreen.js
+/**
+ * MapScreen
+ * -----------------------------------------------------------------------------
+ *   Full-screen interactive Leaflet map with live layers (rain, wind, temp,
+ *   humidity, PM2.5), dengue clusters and nearby clinics. A bottom “sheet”
+ *   shows the current hazard banner + a metric selector bar.
+ */
+
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import {
   View,
@@ -27,6 +34,7 @@ import { decideGlobalHazard } from "../utils/hazard";
 import { getMockFlags } from "../utils/mockFlags";
 import HazardBanner from "../components/HazardBanner";
 
+// Local image icons for non-vector items
 const DENGUE_ICON = require("../assets/General/dengue.png");
 const CLINIC_ICON = require("../assets/General/clinic.png");
 
@@ -36,16 +44,20 @@ export default function MapScreen({ route, navigation }) {
   const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
+  // If a single marker is provided by caller (e.g., detail screen), pass as array
   const presetPin = route?.params?.pin ? [route.params.pin] : [];
+
+  // Center starts at SG fallback until we resolve actual/demo coords
   const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
   const [recenterLoading, setRecenterLoading] = useState(false);
 
+  // Derived global hazard shown in the banner
   const [hazard, setHazard] = useState({
     kind: "none",
     title: t("home.hazard.none", "No Hazard Detected"),
   });
 
-  // datasets
+  // Latest data points by metric (fed into the WebView layers)
   const [rainPoints, setRainPoints] = useState([]);
   const [windPoints, setWindPoints] = useState([]);
   const [tempPoints, setTempPoints] = useState([]);
@@ -54,20 +66,21 @@ export default function MapScreen({ route, navigation }) {
   const [dengueGeoJSON, setDengueGeoJSON] = useState(null);
   const [clinicsGeoJSON, setClinicsGeoJSON] = useState(null);
 
-  // active overlay
+  // Active overlay/layer & bottom sheet layout
   const [overlay, setOverlay] = useState("rain");
-  const [sheetHeight, setSheetHeight] = useState(180); // sensible default
+  const [sheetHeight, setSheetHeight] = useState(180); // reserve space for legend offset
   const onSheetLayout = React.useCallback(
     (e) => setSheetHeight(Math.ceil(e.nativeEvent.layout.height)),
     []
   );
 
+  // Allow caller to preselect an overlay (e.g., from HazardDetail “View on Map”)
   useEffect(() => {
     const ov = route?.params?.overlay;
     if (ov) setOverlay(ov);
   }, [route?.params?.overlay]);
 
-  // get user location once
+  // Get (real or demo) location once initially
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -76,13 +89,15 @@ export default function MapScreen({ route, navigation }) {
         if (!alive) return;
         setCenter({ lat: res.coords.latitude, lon: res.coords.longitude });
       } catch {
-        // keep default SG center
+        // keep default SG center silently
       }
     })();
-    return () => (alive = false);
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  // Fetch all datasets once on mount
+  // Fetch ALL datasets once on mount, push to WebView (imperative bridge)
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -114,7 +129,7 @@ export default function MapScreen({ route, navigation }) {
         setDengueGeoJSON(dengueJSON);
         setClinicsGeoJSON(clinicsJSON);
 
-        // push into webview if mounted
+        // Push into Leaflet webview if mounted
         mapRef.current?.setRainfall(rp);
         mapRef.current?.setWind(wp);
         mapRef.current?.setTemp(tp);
@@ -122,8 +137,8 @@ export default function MapScreen({ route, navigation }) {
         mapRef.current?.setPM(pp);
         if (dengueJSON) mapRef.current?.setDengue(dengueJSON);
         if (clinicsJSON) mapRef.current?.setClinics(clinicsJSON);
-      } catch (e) {
-        // optionally log
+      } catch {
+        // ignore network errors; map will just show less info
       }
     })();
     return () => {
@@ -131,6 +146,7 @@ export default function MapScreen({ route, navigation }) {
     };
   }, []);
 
+  // Recompute hazard whenever inputs change (includes mock flags)
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -169,33 +185,44 @@ export default function MapScreen({ route, navigation }) {
     t,
   ]);
 
+  // On focus, refresh a subset quickly and re-evaluate hazard
   useFocusEffect(
     React.useCallback(() => {
       let alive = true;
       (async () => {
-        const [rain, hum, mockFlood] = await Promise.all([
+        const [rain, hum, mockFlags] = await Promise.all([
           getRainfallLatest().catch(() => ({ points: [] })),
           getRelativeHumidityLatest().catch(() => ({ points: [] })),
           getMockFlags().catch(() => ({})),
         ]);
         if (!alive) return;
+
         const result = decideGlobalHazard({
           center,
           rainfallPoints: rain.points || [],
           humPoints: humPoints.length ? humPoints : hum.points || [],
-          pmPoints: pmPoints,
-          windPoints: windPoints,
-          tempPoints: tempPoints,
-          dengueGeoJSON: dengueGeoJSON,
+          pmPoints,
+          windPoints,
+          tempPoints,
+          dengueGeoJSON,
+          mockFlags,
         });
         setHazard(result);
       })();
       return () => {
         alive = false;
       };
-    }, [center])
+    }, [
+      center,
+      humPoints.length,
+      pmPoints,
+      windPoints,
+      tempPoints,
+      dengueGeoJSON,
+    ])
   );
 
+  // On focus, recenter to (possibly mocked) current location without reloading WebView
   useFocusEffect(
     React.useCallback(() => {
       let alive = true;
@@ -206,8 +233,6 @@ export default function MapScreen({ route, navigation }) {
           const lat = res.coords.latitude;
           const lon = res.coords.longitude;
           setCenter({ lat, lon });
-
-          // move the Leaflet camera without reloading the WebView
           mapRef.current?.recenter(lat, lon, 13);
         } catch {
           // ignore; keep previous center
@@ -219,6 +244,7 @@ export default function MapScreen({ route, navigation }) {
     }, [])
   );
 
+  // Manual recenter button
   const recenterToMe = async () => {
     try {
       setRecenterLoading(true);
@@ -230,13 +256,13 @@ export default function MapScreen({ route, navigation }) {
     }
   };
 
+  // Switch overlay, inform WebView (so it can toggle layer)
   const selectOverlay = (kind) => {
     setOverlay(kind);
     mapRef.current?.setOverlay(kind);
   };
 
-  // -------- Banner helpers ----------
-  // Current date in Singapore
+  /* ---------- Banner helpers (SG-localized date/time) ---------- */
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
     weekday: "short",
@@ -251,10 +277,12 @@ export default function MapScreen({ route, navigation }) {
     hour12: true,
     timeZone: "Asia/Singapore",
   });
+  // Ensure AM/PM uppercase for consistency across platforms
   timeStr = timeStr.replace(/am|pm/, (m) => m.toUpperCase());
 
   const locLabel = hazard.locationName || null;
-  // Bottom nav items (FlatList) incl. Dengue
+
+  // Bottom metric bar items (icons + labels)
   const navItems = useMemo(
     () => [
       {
@@ -292,6 +320,7 @@ export default function MapScreen({ route, navigation }) {
     [t]
   );
 
+  // Render a single metric pill
   const renderNavItem = ({ item }) => {
     const isActive = item.key === overlay;
     return (
@@ -305,6 +334,7 @@ export default function MapScreen({ route, navigation }) {
         onPress={() => selectOverlay(item.key)}
         accessibilityRole="button"
         accessibilityLabel={item.label}
+        testID={`metric-${item.key}`}
       >
         {item.img ? (
           <Image
@@ -326,6 +356,7 @@ export default function MapScreen({ route, navigation }) {
 
   return (
     <View style={[styles.container]}>
+      {/* Leaflet Map (fills screen; legend offset accounts for the sheet) */}
       <LeafletMapWebView
         ref={mapRef}
         lat={center.lat}
@@ -348,17 +379,18 @@ export default function MapScreen({ route, navigation }) {
         dark={theme.key === "dark"}
       />
 
-      {/* top-left back */}
+      {/* Back (top-left) */}
       <TouchableOpacity
         style={styles.backBtn}
         onPress={() => navigation.goBack()}
         accessibilityRole="button"
         accessibilityLabel={t("common.back", "Back")}
+        testID="map-back"
       >
         <Ionicons name="chevron-back" size={26} color={theme.colors.text} />
       </TouchableOpacity>
 
-      {/* recenter (bottom-right, above warning) */}
+      {/* Recenter (bottom-right, positioned above the sheet) */}
       <TouchableOpacity
         style={[
           styles.recenterBtn,
@@ -369,33 +401,30 @@ export default function MapScreen({ route, navigation }) {
         disabled={recenterLoading}
         accessibilityRole="button"
         accessibilityLabel={t("home.map.recenter", "Recenter to my location")}
+        testID="map-recenter"
       >
         <Ionicons name="locate" size={22} color={theme.colors.text} />
       </TouchableOpacity>
 
-      {/* bottom sheet wrapper */}
+      {/* Bottom sheet: hazard banner + metric bar */}
       <View style={styles.bottomSheet} onLayout={onSheetLayout}>
-        {/* warning banner */}
         <HazardBanner
           hazard={hazard}
           dateStr={dateStr}
           timeAgoStr={timeStr}
           locLabel={locLabel}
-          style={{ marginBottom: 10 }} // spacing above the metric bar
+          style={{ marginBottom: 10 }}
         />
 
-        {/* metric bar */}
-        <View>
-          <FlatList
-            data={navItems}
-            keyExtractor={(i) => i.key}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.edgeToEdge}
-            contentContainerStyle={styles.metricListContent}
-            renderItem={renderNavItem}
-          />
-        </View>
+        <FlatList
+          data={navItems}
+          keyExtractor={(i) => i.key}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.edgeToEdge}
+          contentContainerStyle={styles.metricListContent}
+          renderItem={renderNavItem}
+        />
       </View>
     </View>
   );

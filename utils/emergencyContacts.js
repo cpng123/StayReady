@@ -1,4 +1,24 @@
-// utils/emergencyContacts.js
+/**
+ * File: utils/emergencyContacts.js
+ * Purpose: Manage user emergency contacts and provide “one-tap SOS” dispatch
+ *          via SMS and/or WhatsApp, including current GPS location links.
+ *
+ * Responsibilities:
+ *  - CRUD for saved contacts in AsyncStorage.
+ *  - “Test mode” switch to simulate dispatch without sending.
+ *  - Build a helpful emergency message (time + GPS + map links).
+ *  - Detect basic connectivity / app availability (internet, WhatsApp).
+ *  - Open platform-specific channels (SMS composer, WhatsApp deep link).
+ *  - Dispatch to a single contact or a list (sequential to avoid UI clashes).
+ *
+ * Notes:
+ *  - Location permission is requested at send time; if denied/unavailable,
+ *    message still sends with a note (“Location unavailable.”).
+ *  - WhatsApp linking uses digits-only phone numbers (strip “+” and symbols).
+ *  - SMS sending uses expo-sms when available; otherwise falls back to URL scheme.
+ *  - Keep messages short and actionable; avoid PII beyond what the user intends.
+ */
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import * as Network from "expo-network";
@@ -10,6 +30,8 @@ const CONTACTS_KEY = "emergency:contacts";
 const TEST_MODE_KEY = "emergency:testMode";
 
 /* -------------------- CRUD -------------------- */
+
+// Return array of saved contacts [{ id, label, channel, value }, ...]
 export async function getContacts() {
   try {
     const raw = await AsyncStorage.getItem(CONTACTS_KEY);
@@ -18,17 +40,24 @@ export async function getContacts() {
     return [];
   }
 }
+
+// Persist full contact list (overwrites entire list)
 export async function saveContacts(list) {
   try {
     await AsyncStorage.setItem(CONTACTS_KEY, JSON.stringify(list || []));
   } catch {}
 }
 
+/* -------------------- test mode flag -------------------- */
+
+// Enable/disable test mode (no actual send)
 export async function setTestMode(on) {
   try {
     await AsyncStorage.setItem(TEST_MODE_KEY, on ? "1" : "0");
   } catch {}
 }
+
+// Read test mode (boolean)
 export async function getTestMode() {
   try {
     return (await AsyncStorage.getItem(TEST_MODE_KEY)) === "1";
@@ -38,6 +67,8 @@ export async function getTestMode() {
 }
 
 /* -------------------- connectivity helpers -------------------- */
+
+// Best-effort internet reachability check
 async function hasInternet() {
   try {
     const s = await Network.getNetworkStateAsync();
@@ -46,6 +77,8 @@ async function hasInternet() {
     return false;
   }
 }
+
+// Check if WhatsApp can handle a send intent
 async function hasWhatsApp() {
   try {
     return await Linking.canOpenURL("whatsapp://send?text=hi");
@@ -53,9 +86,12 @@ async function hasWhatsApp() {
     return false;
   }
 }
+
 const enc = (s) => encodeURIComponent(s || "");
 
 /* -------------------- message builder (with GPS) -------------------- */
+
+// Build a concise SOS message including GPS (if permitted) and map links
 export async function buildEmergencyMessage() {
   let body = "🚨 EMERGENCY: I need help. Please contact me ASAP.";
   let mapsLines = [];
@@ -89,9 +125,10 @@ export async function buildEmergencyMessage() {
 }
 
 /* -------------------- channel openers (SMS + WhatsApp only) -------------------- */
+
+// Open WhatsApp prefilled to a phone number with text (digits only for wa.me/app)
 async function openWhatsApp(phone, text) {
-  // WhatsApp expects country code WITHOUT '+' in wa.me / app scheme
-  const digits = (phone || "").replace(/[^\d]/g, ""); // e.g. "+65XXXXXXXX" -> "65XXXXXXXX"
+  const digits = (phone || "").replace(/[^\d]/g, ""); // "+65 8123 4567" -> "6581234567"
   const app = `whatsapp://send?phone=${digits}&text=${enc(text)}`;
   const web = `https://wa.me/${digits}?text=${enc(text)}`;
   try {
@@ -101,13 +138,13 @@ async function openWhatsApp(phone, text) {
   }
 }
 
+// Open system SMS composer (expo-sms) or fall back to sms: URL scheme
 async function openSMS(phone, text) {
   const avail = await SMS.isAvailableAsync();
   if (avail) {
-    // Opens system Messages UI; resolves when user comes back
+    // Opens Messages UI; promise resolves when user returns
     await SMS.sendSMSAsync([phone], text);
   } else {
-    // Fallback deep link
     const scheme = `sms:${phone}${
       Platform.OS === "ios" ? "&" : "?"
     }body=${enc(text)}`;
@@ -116,6 +153,8 @@ async function openSMS(phone, text) {
 }
 
 /* -------------------- dispatch (auto: SMS then WA if online) -------------------- */
+
+// Send to a single contact using chosen channel (auto → SMS then WA if online)
 export async function dispatchToContact(
   contact,
   message,
@@ -130,9 +169,9 @@ export async function dispatchToContact(
   try {
     if (ch === "auto") {
       const online = await hasInternet();
-      await openSMS(val, message);
+      await openSMS(val, message); // always try SMS first (works offline)
       if (online && (await hasWhatsApp())) {
-        await openWhatsApp(val, message); // after SMS returns
+        await openWhatsApp(val, message); // then WhatsApp if available
       }
       return { ok: true };
     }
@@ -147,16 +186,13 @@ export async function dispatchToContact(
       return { ok: true };
     }
 
-    return { ok: false, reason: "unknown-channel" }; // unreachable with our editor (auto only)
+    return { ok: false, reason: "unknown-channel" };
   } catch (e) {
     return { ok: false, reason: e?.message || "failed" };
   }
 }
 
-/**
- * Dispatch to all contacts sequentially (avoids stacking multiple system SMS UIs).
- * Returns { message, results, testMode } where results is an array of {ok,reason?}.
- */
+// Dispatch to all contacts sequentially (avoids multiple SMS composers at once)
 export async function dispatchEmergency(contacts) {
   const message = await buildEmergencyMessage();
   const testMode = await getTestMode();

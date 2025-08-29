@@ -37,7 +37,7 @@ StayReady is a disaster-readiness app for Singapore. It shows nearby hazards (fl
 - **Expo Go** app **version 52** on your device:
   - Android: [Expo Go SDK 52](https://expo.dev/go?sdkVersion=52&platform=android&device=true](https://expo.dev/go?sdkVersion=52&platform=android&device=true))
 
-> **Why Expo 52?** Your local toolchain (SDK 52) and the Expo Go app must match major versions to run the project.
+> **Why Expo 52?** The local toolchain (SDK 52) and the Expo Go app must match major versions to run the project.
 
 ---
 

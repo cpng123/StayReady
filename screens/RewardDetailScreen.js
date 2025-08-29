@@ -1,3 +1,9 @@
+/**
+ * RewardDetailScreen
+ * -----------------------------------------------------------------------------
+ * Detail page for a single reward item with the ability to redeem it for points.
+ */
+
 import React, { useMemo, useState } from "react";
 import {
   View,
@@ -25,7 +31,7 @@ export default function RewardDetailScreen() {
   const { item: rawItem, pointsAvailable = 0 } = route.params || {};
   const baseKey = rawItem?.id ? `rewards.catalog.${rawItem.id}` : null;
 
-  // Localize fields safely
+  // Localize fields safely with fallbacks to raw item values
   const item = {
     ...rawItem,
     title: baseKey
@@ -42,7 +48,7 @@ export default function RewardDetailScreen() {
     details: baseKey
       ? t(`${baseKey}.details`, {
           defaultValue: rawItem.details,
-          returnObjects: true, // IMPORTANT for arrays
+          returnObjects: true, // IMPORTANT: ensures arrays are returned intact
         })
       : rawItem.details,
   };
@@ -53,6 +59,10 @@ export default function RewardDetailScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState(null); // "success" | "insufficient" | "error"
 
+  // Attempt to redeem the current reward.
+  // - If user balance is insufficient, show an "insufficient" modal.
+  // - Otherwise, call `redeemItem`; on success, deduct local balance and show "success".
+  // - On failure, show a generic "error" modal.
   const onRedeem = async () => {
     if (available < price) {
       setModalStatus("insufficient");
@@ -69,6 +79,8 @@ export default function RewardDetailScreen() {
     setModalOpen(true);
   };
 
+  // Close the feedback modal.
+  // Navigates back if the last status was a successful redemption.
   const closeModal = () => {
     setModalOpen(false);
     if (modalStatus === "success") nav.goBack();

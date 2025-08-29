@@ -1,10 +1,22 @@
-// utils/quizLogic.js
+/**
+ * File: utils/quizLogic.js
+ * Purpose: Core quiz/gameplay helpers for StayReady.
+ *  - Define timing constants (per-question timer, reveal delay).
+ *  - Provide localized UI strings (toasts, encouragements).
+ *  - Normalize heterogeneous quiz data into a consistent shape.
+ *  - Shuffle options while preserving the correct answer index.
+ *  - Compute XP rewards and derive answer reveal flags.
+ *
+ * Notes:
+ *  - No side effects or storage; pure helpers only.
+ *  - All user-facing text is passed through i18n (the caller supplies `t`).
+ */
 
 // ---- Tunables / constants ----
-export const QUESTION_SECONDS = 20;
-export const REVEAL_DELAY_MS = 2800;
+export const QUESTION_SECONDS = 20;   // seconds allowed per question
+export const REVEAL_DELAY_MS = 2800;  // delay before moving to next question after reveal
 
-/** Build localized toast theme */
+// Build a localized toast theme for Correct / Incorrect / Time's up
 export const getToastTheme = (t) => ({
   correct: {
     bg: "#16A34A",
@@ -23,19 +35,20 @@ export const getToastTheme = (t) => ({
   },
 });
 
-/** Localized encouragement messages */
+// Localized encouragement messages shown after incorrect answers
 export const getEncouragement = (t) => [
   t("games.encourage.1", "Oof! That was tricky."),
   t("games.encourage.2", "XP missed... but knowledge gained!"),
   t("games.encourage.3", "You'll get the next one!"),
 ];
 
+// Pick one encouragement at random
 export const pickEncouragement = (t) => {
   const msgs = getEncouragement(t);
   return msgs[Math.floor(Math.random() * msgs.length)];
 };
 
-// Map A/B/C/D → 0/1/2/3
+// Map A/B/C/D → 0/1/2/3 (tolerant of case/spacing)
 export const letterToIndex = (k) =>
   ({ A: 0, B: 1, C: 2, D: 3 }[String(k || "").toUpperCase()]);
 
@@ -52,7 +65,10 @@ export function shuffleWithAnswer(options, answerIndex) {
   };
 }
 
-// Normalize quiz structure into a single standard shape
+// Normalize quiz structure into a standard shape for the gameplay UI
+// - Picks requested category/set (falls back to first available).
+// - Accepts various answer formats (index, key, text) and resolves to 0-based index.
+// - Shuffles options and remaps the correct index accordingly.
 export function normalizeQuestions(quizData, categoryId, setId, t) {
   const categories = quizData?.categories || [];
   const cat =
@@ -69,9 +85,11 @@ export function normalizeQuestions(quizData, categoryId, setId, t) {
     vals.find((v) => typeof v === "string" && v.trim().length) || "";
 
   return (set.questions || []).map((q, idx) => {
+    // Normalize options to strings
     const options =
       q.options?.map((o) => (typeof o === "string" ? o : o?.text ?? "")) ?? [];
 
+    // Resolve correct answer index from multiple possible shapes
     let rawIndex =
       typeof q.correctIndex === "number"
         ? q.correctIndex
@@ -83,18 +101,24 @@ export function normalizeQuestions(quizData, categoryId, setId, t) {
         ? q.correct
         : null;
 
+    // Accept letter key (A/B/C/D)
     if (rawIndex == null && q.correctKey != null) {
       const li = letterToIndex(q.correctKey);
       if (li != null) rawIndex = li;
     }
+
+    // Accept exact-text match if provided
     if (rawIndex == null && typeof q.correctAnswer === "string") {
       const idxByText = options.findIndex(
         (o) => o.trim() === q.correctAnswer.trim()
       );
       if (idxByText >= 0) rawIndex = idxByText;
     }
+
+    // Final guard
     if (!(rawIndex >= 0 && rawIndex < options.length)) rawIndex = 0;
 
+    // Shuffle & remap correct index
     const shuffled = shuffleWithAnswer(options, rawIndex);
 
     return {
@@ -112,12 +136,15 @@ export function normalizeQuestions(quizData, categoryId, setId, t) {
   });
 }
 
-// XP = 1..20 scaled linearly by remaining time
+// XP reward: 1..20 scaled linearly by remaining time
 export function computeXp(timeLeft, total = QUESTION_SECONDS) {
   return Math.max(1, Math.round((timeLeft / total) * 20));
 }
 
-// Given option index & state, return reveal flags
+// Given option index & UI state, derive which highlight to show
+// - showGreen: correct answer selected before time-up
+// - showRed: user-selected wrong answer before time-up
+// - showBlue: correct answer after time-up (reveal)
 export function deriveRevealFlags(i, answerIndex, selected, locked, timesUp) {
   if (selected === null && !locked && timesUp) {
     return { showGreen: false, showRed: false, showBlue: false };

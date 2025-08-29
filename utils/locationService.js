@@ -1,25 +1,40 @@
-// utils/locationService.js
+/**
+ * File: utils/locationService.js
+ * Purpose: Provide location utilities for StayReady, including:
+ *  - OneMap token management (fetch, cache, and early refresh)
+ *  - Reverse geocoding via OneMap (address/postal lookup)
+ *  - Demo location toggle for predictable testing
+ *  - GPS coordinate retrieval with Expo Location
+ *  - Coarse region inference (N/E/W/C/S) as a network-free fallback
+ *
+ * External API:
+ *  - OneMap Singapore: https://www.onemap.gov.sg/docs/ (token lasts ~3 days)
+ *
+ * Storage keys:
+ *  - K_TOKEN / K_TOKEN_EXP: cached OneMap token + expiry (ms epoch)
+ *  - K_DEMO_LOC: boolean flag to return a fixed “demo” location
+ *
+ */
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 
-/**
- * OneMap: token-based endpoints
- * Docs: https://www.onemap.gov.sg/docs/
- * Token lasts ~3 days. We refresh a little early.
- */
-const ONEMAP_EMAIL = "fypstayready@gmail.com";
-const ONEMAP_PASSWORD = "StayReady-Grade-Only-2025!";
+/* ---------------- OneMap token config (replace with env in production) --------------- */
+const ONEMAP_EMAIL = "fypstayready@gmail.com"; // TODO: move to env
+const ONEMAP_PASSWORD = "StayReady-Grade-Only-2025!"; // TODO: move to env
 const TOKEN_URL = "https://www.onemap.gov.sg/api/auth/post/getToken";
 const REVGEOCODE_URL = "https://www.onemap.gov.sg/api/public/revgeocode";
 
+/* ----------------------------------- Storage keys ----------------------------------- */
 const K_TOKEN = "onemap:token";
 const K_TOKEN_EXP = "onemap:tokenExp"; // ms since epoch
 const K_DEMO_LOC = "location:demoEnabled";
 
-// ~2.5 days (in ms). We proactively refresh before the 3-day expiry window.
+/* -------------------------- Early refresh window (~2.5 days) ------------------------ */
 const REFRESH_EARLY_MS = 2.5 * 24 * 60 * 60 * 1000;
 
-/** Get a cached token or fetch a new one with the embedded credentials. */
+/* --------------------- Token: get cached or fetch a fresh one ----------------------- */
+// Returns a valid OneMap token (reads cache first, refreshes if expired).
 export async function getOneMapToken() {
   try {
     const [token, expRaw] = await Promise.all([
@@ -30,7 +45,7 @@ export async function getOneMapToken() {
     if (token && exp && Date.now() < exp) return token;
   } catch {}
 
-  // Fetch new token
+  // Fetch new token from OneMap auth endpoint
   const res = await fetch(TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,15 +53,14 @@ export async function getOneMapToken() {
   });
   const j = await res.json();
 
-  // OneMap returns "access_token" (and sometimes an expiry field).
+  // OneMap may return different field names across versions
   const token =
     j?.access_token || j?.token || j?.accessToken || j?.AccessToken || "";
   if (!token) throw new Error("OneMap token fetch failed");
 
-  // If API returns an expiry, use it; otherwise set our own proactive window.
+  // Use server expiry when available; else refresh a bit early ourselves
   let expAt = Date.now() + REFRESH_EARLY_MS;
-  const serverExp =
-    j?.expiry_timestamp || j?.expires_at || j?.expires_in /* seconds */;
+  const serverExp = j?.expiry_timestamp || j?.expires_at || j?.expires_in; // seconds if number
   if (serverExp) {
     if (typeof serverExp === "number") expAt = Date.now() + serverExp * 1000;
     else {
@@ -65,12 +79,15 @@ export async function getOneMapToken() {
   return token;
 }
 
-/** Toggle demo location (Marina Bay). */
+/* ----------------------------- Demo location toggles -------------------------------- */
+// Persist an on/off flag that forces a fixed “Marina Bay” location.
 export async function setDemoLocationEnabled(enabled) {
   try {
     await AsyncStorage.setItem(K_DEMO_LOC, enabled ? "1" : "0");
   } catch {}
 }
+
+// Read whether demo location is enabled.
 export async function getDemoLocationEnabled() {
   try {
     return (await AsyncStorage.getItem(K_DEMO_LOC)) === "1";
@@ -79,10 +96,12 @@ export async function getDemoLocationEnabled() {
   }
 }
 
-/** If demo is enabled, return Marina Bay coords; otherwise prompt & get GPS. */
+/* ------------------------- Current coordinates (GPS or demo) ------------------------ */
+// Returns { latitude, longitude, mocked } using demo coords if enabled, else GPS.
+// Requests foreground permission when needed.
 export async function getCurrentCoords() {
   if (await getDemoLocationEnabled()) {
-    return { latitude: 1.283, longitude: 103.860, mocked: true };
+    return { latitude: 1.283, longitude: 103.86, mocked: true }; // Marina Bay
   }
 
   const { status } = await Location.requestForegroundPermissionsAsync();
@@ -98,23 +117,23 @@ export async function getCurrentCoords() {
   };
 }
 
-/** Heuristic region classifier as a graceful fallback (no network). */
+/* ------------------------- Region heuristic (no network needed) --------------------- */
+// Quick quadrant classifier for SG: North/East/West/South/Central.
 export function regionFromLatLon(lat, lon) {
   if (lat >= 1.3905) return "North";
   if (lat <= 1.285) return "South";
-  if (lon >= 103.90) return "East";
+  if (lon >= 103.9) return "East";
   if (lon <= 103.72) return "West";
   return "Central";
 }
 
-/**
- * Reverse geocode via OneMap.
- * Returns: { addressLine, postal, building, road, block }
- */
+/* -------------------------------- Reverse geocoding --------------------------------- */
+// Call OneMap Reverse Geocode and normalize response into a compact shape.
+// Returns { addressLine, postal, building, road, block } or null when not found.
 export async function reverseGeocode(lat, lon) {
   const token = await getOneMapToken();
 
-  // OneMap reverse geocode (token-based). Some deployments accept token in query.
+  // Some deployments accept token in query
   const url =
     `${REVGEOCODE_URL}?location=${lat},${lon}` +
     `&addressType=All&otherFeatures=Y&token=${encodeURIComponent(token)}`;
@@ -122,9 +141,12 @@ export async function reverseGeocode(lat, lon) {
   const r = await fetch(url, { headers: { Accept: "application/json" } });
   const j = await r.json();
 
-  // Handle different result shapes across versions
+  // Handle different response shapes across versions
   const first =
-    j?.GeocodeInfo?.[0] || j?.results?.[0] || j?.ReverseGeocodeInfo?.[0] || null;
+    j?.GeocodeInfo?.[0] ||
+    j?.results?.[0] ||
+    j?.ReverseGeocodeInfo?.[0] ||
+    null;
 
   if (!first) return null;
 
@@ -140,11 +162,9 @@ export async function reverseGeocode(lat, lon) {
   return { addressLine: bits, postal, building, road, block };
 }
 
-/**
- * Resolve a user-friendly label:
- *  - tries OneMap reverse geocode (address + postal)
- *  - always includes a coarse Region (N/E/W/C/S)
- */
+/* ----------------------- Friendly label: coords + address + region ------------------ */
+// Returns an object with coords, coarse region, and (when available) reverse-geocoded fields.
+// Never throws on reverse geocode failure; falls back to region-only.
 export async function resolveLocationLabel() {
   const { latitude, longitude, mocked } = await getCurrentCoords();
 
@@ -152,7 +172,7 @@ export async function resolveLocationLabel() {
   try {
     addr = await reverseGeocode(latitude, longitude);
   } catch {
-    // ignore -> fall back to heuristics only
+    // Ignore errors; we still return region + raw coords
   }
 
   const region = regionFromLatLon(latitude, longitude);

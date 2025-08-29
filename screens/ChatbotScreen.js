@@ -1,4 +1,10 @@
-// screens/ChatbotScreen.js
+/**
+ * ChatbotScreen
+ * --------------------------------------------------------------------
+ *   A simple in-app chatbot that calls an OpenRouter-compatible endpoint
+ *   to answer preparedness questions with Singapore-first guidance.
+ */
+
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   View,
@@ -17,14 +23,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeContext } from "../theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
+/* ---------------------------- OpenRouter config --------------------------- */
 const OPENROUTER_ENDPOINT = process.env.EXPO_PUBLIC_OPENROUTER_ENDPOINT ?? "";
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY ?? "";
 const OPENROUTER_MODEL =
   process.env.EXPO_PUBLIC_OPENROUTER_MODEL ??
   "mistralai/mistral-7b-instruct:free";
 
-// Singapore-first system prompt
+/* ------------------------- Singapore-first system prompt ------------------ */
 const SYSTEM_PROMPT_SG = `
 StayReady, a disaster-preparedness assistant for SINGAPORE.
 Always prioritise Singapore-specific guidance, laws, and agencies.
@@ -33,7 +41,7 @@ Emergency numbers (Singapore): 995 (ambulance & fire/SCDF), 999 (police), 1777 (
 Answer concisely and do NOT include analysis steps—just the final response.
 `.trim();
 
-/* -------------------- Quick FAQs: pick 3 at random once -------------------- */
+/* -------------------- Quick FAQs: pick 3 at random once ------------------- */
 const PRESET_QUESTIONS = [
   "What should I do during a flash flood?",
   "What is PM2.5 and why does it matter?",
@@ -55,7 +63,7 @@ function pick3(arr) {
   return c.slice(0, 3);
 }
 
-// Topic → resource actions
+/* ---------------------- Topic → resource actions helpers ------------------ */
 const openGuide = (id, label) => ({
   label,
   to: { screen: "PreparednessGuide", params: { id } },
@@ -64,6 +72,9 @@ const openEarlyWarnings = {
   label: "See Early Warnings",
   to: { screen: "EarlyWarning" },
 };
+
+// Returns UI actions based on the topic mentioned in the user text.
+// Keep regexes simple and resilient to spacing/punctuation.
 
 function actionsForTopic(text) {
   const s = String(text || "").toLowerCase();
@@ -91,7 +102,11 @@ function actionsForTopic(text) {
   return acts;
 }
 
-/* ---------------------- Post-process the model reply ----------------------- */
+/* ---------------------- Post-process the model reply ---------------------- */
+
+// Some models include explicit end markers. If present,
+// cut the text after those so we only show the final section.
+
 function cutAfterFinalMarkers(text) {
   if (!text) return null;
   const markers = [
@@ -106,28 +121,39 @@ function cutAfterFinalMarkers(text) {
   }
   return null;
 }
+
+// Remove any analysis/chain-of-thought blocks if they appear
 function sanitizeReply(text) {
   if (!text) return "";
   const after = cutAfterFinalMarkers(text);
   text = after || text;
+
+  // Remove fenced "analysis"/"reasoning" blocks
   text = text.replace(
     /```(?:analysis|reasoning|thoughts?|scratchpad)[\s\S]*?```/gi,
     ""
   );
+  // Remove <think> ... </think> meta
   text = text.replace(/<\s*think(?:ing)?\s*>[\s\S]*?<\s*\/\s*think\s*>/gi, "");
+  // Remove a leading "analysis:" line if present
   text = text.replace(/^\s*analysis[^\n]*\n+/i, "");
+  // Remove prefixed "Analysis/Reasoning: ..." paragraphs
   text = text.replace(
     /^(?:\s*(?:Analysis|Reasoning|Thoughts?)\s*:\s*[\s\S]*?\n\n)/i,
     ""
   );
   return text.trim();
 }
+
+// Replace non-SG emergency numbers with the local ones just in case
 function localizeSG(text) {
   if (!text) return text;
   return text
     .replace(/\b911\b/g, "999 (police) or 995 (ambulance & fire)")
     .replace(/\b112\b/g, "999 (police) or 995 (ambulance & fire)");
 }
+
+// Add a few helpful emojis to improve scannability of key CTAs
 function addFriendlyEmojis(text) {
   if (!text) return text;
   let out = text;
@@ -142,9 +168,12 @@ function addFriendlyEmojis(text) {
   out = out.replace(/\bmove to higher ground\b/gi, "⬆️ Move to higher ground");
   out = out.replace(/\bwear (an )?n95\b/gi, "😷 Wear an N95");
   out = out.replace(/\buse (a )?purifier\b/gi, "🧼 Use an air purifier");
+  // Small signature emoji at the front if no emoji starts the response
   if (!/^[🤖✅⚠️🏠⬆️😷📞🚑]/.test(out)) out = `🤖 ${out}`;
   return out;
 }
+
+// Heuristic to detect emergencies in user text and surface 995/999 CTAs
 function looksEmergency(s) {
   if (!s) return false;
   const x = s.toLowerCase();
@@ -152,6 +181,8 @@ function looksEmergency(s) {
     x
   );
 }
+
+// Emergency call-to-actions surfaced for likely emergencies
 function emergencyCTAs() {
   return [
     { label: "Call 995 (Ambulance/SCDF)", tel: "995" },
@@ -164,24 +195,29 @@ function emergencyCTAs() {
 export default function ChatbotScreen() {
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { t } = useTranslation("common");
 
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
+  // Chat state (simple array of {role, content, actions?})
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content:
-        "Hi! I’m the StayReady helper. Ask me anything about preparedness or the app.",
+      content: t(
+        "chatbot.welcome",
+        "Hi! I’m the StayReady helper. Ask me anything about preparedness or the app."
+      ),
     },
   ]);
   const [loading, setLoading] = useState(false);
 
-  // show 3 random FAQs at start; hide after the first user message
+  // Show 3 random FAQs until first user message
   const startFAQs = useMemo(() => pick3(PRESET_QUESTIONS), []);
   const [showStartFaqs, setShowStartFaqs] = useState(true);
 
+  // Keep scroll pinned to bottom as messages come in
   const scrollRef = useRef(null);
   const scrollToEnd = () =>
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 60);
@@ -189,6 +225,7 @@ export default function ChatbotScreen() {
     scrollToEnd();
   }, [messages.length]);
 
+  // Handle "action chips" the assistant may suggest
   const handleActionPress = async (a) => {
     try {
       if (a?.tel) {
@@ -206,19 +243,23 @@ export default function ChatbotScreen() {
     } catch {}
   };
 
+  // Send a message to the model and append the reply.
+  // Includes env guards and basic error handling with plain-text fallback.
   const sendMessage = async (text = input) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
 
-    // hide start FAQs after first user action
+    // Hide quick FAQs after first user message
     if (showStartFaqs) setShowStartFaqs(false);
 
+    // Append user message
     const userMessage = { role: "user", content: trimmed };
     const updated = [...messages, userMessage];
     setMessages(updated);
     setInput("");
     setLoading(true);
 
+    // Env guard
     if (!OPENROUTER_ENDPOINT || !OPENROUTER_API_KEY) {
       setMessages([
         ...updated,
@@ -233,6 +274,7 @@ export default function ChatbotScreen() {
     }
 
     try {
+      // Call OpenRouter-compatible endpoint
       const res = await fetch(OPENROUTER_ENDPOINT, {
         method: "POST",
         headers: {
@@ -255,6 +297,7 @@ export default function ChatbotScreen() {
         }),
       });
 
+      // Read as text first so we can surface server-side errors verbatim
       const textBody = await res.text();
       if (!res.ok) {
         let msg = "";
@@ -265,6 +308,7 @@ export default function ChatbotScreen() {
         throw new Error(msg || `HTTP ${res.status} ${textBody.slice(0, 200)}`);
       }
 
+      // Parse JSON
       let data;
       try {
         data = JSON.parse(textBody);
@@ -272,10 +316,14 @@ export default function ChatbotScreen() {
         throw new Error(`Bad JSON from server: ${textBody.slice(0, 200)}`);
       }
 
+      // Extract assistant text
       let ai = data?.choices?.[0]?.message?.content?.trim();
       if (!ai) throw new Error("No choices in response.");
+
+      // Sanitize & localize
       ai = addFriendlyEmojis(localizeSG(sanitizeReply(ai)));
 
+      // Build contextual actions (guides, early warnings, emergencies)
       let actions = actionsForTopic(trimmed);
       if (looksEmergency(trimmed)) actions = [...actions, ...emergencyCTAs()];
 
@@ -298,6 +346,8 @@ export default function ChatbotScreen() {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.headerBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", "Back")}
         >
           <Ionicons
             name="chevron-back"
@@ -305,7 +355,8 @@ export default function ChatbotScreen() {
             color={theme.colors.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chatbot</Text>
+        <Text style={styles.headerTitle}>{t("chatbot.title", "Chatbot")}</Text>
+        {/* Right placeholder to balance the centered title */}
         <View style={styles.headerBtn} />
       </View>
 
@@ -314,6 +365,7 @@ export default function ChatbotScreen() {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.select({ ios: 88, android: 0 })}
       >
+        {/* Conversation area */}
         <ScrollView
           ref={scrollRef}
           style={styles.chatArea}
@@ -323,6 +375,7 @@ export default function ChatbotScreen() {
           }}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Messages */}
           {messages.map((m, i) =>
             m.role === "assistant" ? (
               <View key={`${m.role}-${i}`} style={styles.rowLeft}>
@@ -332,6 +385,8 @@ export default function ChatbotScreen() {
                 />
                 <View style={[styles.bubble, styles.botBubble]}>
                   <Text style={styles.bubbleText}>{m.content}</Text>
+
+                  {/* Optional CTA buttons suggested by assistant */}
                   {Array.isArray(m.actions) && m.actions.length > 0 && (
                     <View style={styles.ctaRow}>
                       {m.actions.map((a, idx) => (
@@ -357,6 +412,7 @@ export default function ChatbotScreen() {
             )
           )}
 
+          {/* Typing bubble */}
           {loading && (
             <View style={[styles.rowLeft, { alignItems: "center" }]}>
               <Image
@@ -366,18 +422,15 @@ export default function ChatbotScreen() {
               <View style={[styles.bubble, styles.botBubble]}>
                 <ActivityIndicator size="small" color={theme.colors.primary} />
                 <Text style={[styles.bubbleText, { marginTop: 6 }]}>
-                  typing…
+                  {t("chatbot.typing", "typing…")}
                 </Text>
               </View>
             </View>
           )}
 
-          {/* Mini FAQs — only at start, disappear after first user message */}
+          {/* Mini FAQs overlay — shown only at start (until first user message) */}
           {showStartFaqs && !loading && (
-            <View
-              style={styles.faqOverlay}
-              pointerEvents="box-none"
-            >
+            <View style={styles.faqOverlay} pointerEvents="box-none">
               <View style={styles.faqInner}>
                 {startFAQs.map((q, i) => (
                   <TouchableOpacity
@@ -385,6 +438,8 @@ export default function ChatbotScreen() {
                     style={styles.suggestChip}
                     onPress={() => sendMessage(q)}
                     activeOpacity={0.9}
+                    accessibilityRole="button"
+                    accessibilityLabel={q}
                   >
                     <Text style={styles.suggestText} numberOfLines={1}>
                       {q}
@@ -401,12 +456,13 @@ export default function ChatbotScreen() {
           <TextInput
             value={input}
             onChangeText={setInput}
-            placeholder="Ask something…"
+            placeholder={t("chatbot.placeholder", "Ask something…")}
             placeholderTextColor={theme.colors.subtext}
             style={styles.input}
             editable={!loading}
             returnKeyType="send"
             onSubmitEditing={() => !loading && input.trim() && sendMessage()}
+            accessibilityLabel={t("chatbot.input_label", "Message input")}
           />
           <TouchableOpacity
             onPress={() => sendMessage()}
@@ -416,6 +472,8 @@ export default function ChatbotScreen() {
               styles.sendBtn,
               (loading || !input.trim()) && { opacity: 0.5 },
             ]}
+            accessibilityRole="button"
+            accessibilityLabel={t("chatbot.send", "Send")}
           >
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
@@ -429,10 +487,11 @@ export default function ChatbotScreen() {
   );
 }
 
-/* --------------------------------- Styles --------------------------------- */
 const makeStyles = (theme) =>
   StyleSheet.create({
     page: { flex: 1, backgroundColor: theme.colors.appBg },
+
+    // Header
     header: {
       flexDirection: "row",
       alignItems: "center",
@@ -457,8 +516,10 @@ const makeStyles = (theme) =>
       fontSize: 18,
     },
 
+    // Conversation area
     chatArea: { flex: 1, backgroundColor: theme.colors.appBg },
 
+    // Message rows
     rowLeft: {
       flexDirection: "row",
       alignItems: "flex-start",
@@ -470,8 +531,9 @@ const makeStyles = (theme) =>
       justifyContent: "flex-end",
       marginBottom: 8,
     },
-    avatar: { width: 28, height: 28, borderRadius: 6, marginRight: 8 },
 
+    // Avatars & bubbles
+    avatar: { width: 28, height: 28, borderRadius: 6, marginRight: 8 },
     bubble: {
       paddingVertical: 8,
       paddingHorizontal: 10,
@@ -493,6 +555,7 @@ const makeStyles = (theme) =>
     },
     bubbleText: { color: theme.colors.text, lineHeight: 20 },
 
+    // CTA chips suggested by assistant
     ctaRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
     ctaBtn: {
       backgroundColor: theme.colors.primary,
@@ -502,7 +565,7 @@ const makeStyles = (theme) =>
     },
     ctaText: { color: "#fff", fontWeight: "800", fontSize: 12 },
 
-    // Mini FAQ chips (3 rows, centered)
+    // Quick FAQ chips (overlayed near bottom of first view)
     suggestWrap: { marginTop: 8, marginBottom: 6, alignItems: "center" },
     suggestChip: {
       backgroundColor: theme.key === "dark" ? "#0b2942" : "#dfefff",
@@ -520,7 +583,20 @@ const makeStyles = (theme) =>
       color: theme.colors.primary,
       fontWeight: "700",
     },
+    faqOverlay: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 470, // visually tuned for typical devices; adjust if needed
+      alignItems: "center",
+      zIndex: 5,
+    },
+    faqInner: {
+      width: "92%",
+      alignItems: "center",
+    },
 
+    // Composer
     inputRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -548,19 +624,6 @@ const makeStyles = (theme) =>
       borderRadius: 10,
       backgroundColor: theme.colors.primary,
       justifyContent: "center",
-      alignItems: "center",
-    },
-    faqOverlay: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 470,
-
-      alignItems: "center",
-      zIndex: 5,
-    },
-    faqInner: {
-      width: "92%",
       alignItems: "center",
     },
   });

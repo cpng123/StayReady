@@ -1,11 +1,27 @@
+/**
+ * File: components/ImageOverlayCard.js
+ * Purpose: Display a tappable image tile with rounded corners and a dark
+ *          bottom gradient to ensure the overlaid title remains legible.
+ *
+ * Responsibilities:
+ *  - Render an image with configurable size and corner radius.
+ *  - Add a bottom area gradient (≈30% height) for text contrast.
+ *  - Overlay a single-line title centered above the gradient.
+ *  - Optionally handle presses when `onPress` is provided.
+ *
+ * Props:
+ *  - title: string shown over the gradient
+ *  - source: Image source (require(...) or { uri })
+ *  - width, height: dimensions of the card (defaults: 180×120)
+ *  - borderRadius: corner radius (default: 16)
+ *  - onPress: optional press handler (touchable only if provided)
+ *  - style: optional container style override
+ */
+
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-/**
- * Simple image card with rounded corners, a black gradient covering the bottom half,
- * and a title over the gradient.
- */
 export default function ImageOverlayCard({
   title,
   source,
@@ -16,20 +32,28 @@ export default function ImageOverlayCard({
   style,
 }) {
   return (
+    // Container touchable (dim on press only when onPress exists)
     <TouchableOpacity
       activeOpacity={onPress ? 0.5 : 1}
       onPress={onPress}
       style={[{ width, height, borderRadius }, styles.wrap, style]}
     >
+      {/* Base image layer */}
       <Image source={source} style={[styles.img, { borderRadius }]} />
 
-      {/* bottom-half gradient */}
+      {/* Bottom gradient (≈30% height) for text contrast */}
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.7)"]}
-        style={[styles.gradient, { borderBottomLeftRadius: borderRadius, borderBottomRightRadius: borderRadius }]}
+        style={[
+          styles.gradient,
+          {
+            borderBottomLeftRadius: borderRadius,
+            borderBottomRightRadius: borderRadius,
+          },
+        ]}
       />
 
-      {/* Title on top of gradient */}
+      {/* Title overlay */}
       <View style={styles.titleWrap}>
         <Text style={styles.title} numberOfLines={1}>
           {title}
@@ -65,6 +89,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "800",
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

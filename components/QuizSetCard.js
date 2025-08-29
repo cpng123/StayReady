@@ -1,15 +1,28 @@
-// components/QuizSetCard.js
+/**
+ * File: components/QuizSetCard.js
+ * Purpose: Compact card UI for a quiz set with optional thumbnail and a
+ *          prominent play action, localized question count, and theming support.
+ *
+ * Responsibilities:
+ *  - Render an optional top thumbnail image.
+ *  - Show set title and number of questions.
+ *  - Trigger onPress from both the card and the play button.
+ *  - Use ThemeProvider colors for light/dark modes.
+ *
+ * Props:
+ *  - title: string
+ *  - questionsCount: number (default 10)
+ *  - thumbnail: ImageSource
+ *  - onPress: () => void
+ *  - style: ViewStyle
+ */
+
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
 
-/**
- * Quiz set card
- * - Optional top thumbnail
- * - Bottom row: left (title + questions), right (play button)
- */
 export default function QuizSetCard({
   title,
   questionsCount = 10,
@@ -24,12 +37,14 @@ export default function QuizSetCard({
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
       style={[styles.card, { backgroundColor: theme.colors.card }, style]}
     >
       {thumbnail ? <Image source={thumbnail} style={styles.thumb} /> : null}
 
       <View style={styles.row}>
-        {/* Left: title + count */}
+        {/* left column */}
         <View style={{ flex: 1, paddingRight: 8 }}>
           <Text
             style={[styles.title, { color: theme.colors.text }]}
@@ -45,10 +60,12 @@ export default function QuizSetCard({
           </Text>
         </View>
 
-        {/* Right: play button */}
+        {/* play button */}
         <TouchableOpacity
           onPress={onPress}
           activeOpacity={0.9}
+          accessibilityRole="button"
+          accessibilityLabel={t("games.play", "Play")}
           style={[styles.play, { backgroundColor: theme.colors.primary }]}
         >
           <Ionicons name="play" size={16} color="#fff" />

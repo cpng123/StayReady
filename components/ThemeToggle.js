@@ -1,7 +1,18 @@
-// components/ThemeToggle.js
+/**
+ * File: components/ThemeToggle.js
+ * Purpose: Two-option segmented toggle to switch between Light/Dark theme.
+ *
+ * Responsibilities:
+ *  - Reflect the current theme from ThemeProvider.
+ *  - Persist changes via ThemeProvider’s setThemeKey (which already saves to storage).
+ *  - Provide accessible buttons with clear labels and selected state.
+ *
+ * Props:
+ *  - containerStyle (optional): style override for the outer wrapper.
+ */
+
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "../theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
@@ -10,12 +21,10 @@ export default function ThemeToggle({ containerStyle }) {
   const { theme, themeKey, setThemeKey } = useThemeContext();
   const { t } = useTranslation();
 
-  const setTheme = async (key) => {
+  // Avoid redundant writes; ThemeProvider persists the chosen key internally
+  const setTheme = (key) => {
     if (key === themeKey) return;
     setThemeKey(key);
-    try {
-      await AsyncStorage.setItem("pref:themeKey", key);
-    } catch {}
   };
 
   return (

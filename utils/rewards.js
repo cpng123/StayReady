@@ -1,11 +1,27 @@
-// utils/rewards.js
+/**
+ * File: utils/rewards.js
+ * Purpose: Rewards catalog + simple redemption bookkeeping for StayReady.
+ *
+ * Responsibilities:
+ *  - Expose a static list of redeemable items (copy, images, points).
+ *  - Provide a localization-aware getter (`getRewards`) to return items with translated text.
+ *  - Keep track of total points redeemed and a minimal redemption history in AsyncStorage.
+ *
+ * Notes:
+ *  - This is a demo-only flow (no real purchases/donations are executed).
+ *  - Callers are responsible for computing total XP earned; this module only
+ *    stores the amount already redeemed and basic history entries.
+ */
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-/** STORAGE KEYS */
+// ----------------------------- Storage keys -----------------------------
 const REDEEMED_TOTAL_KEY = "rewards:redeemedTotal";
 const REDEEMED_HISTORY_KEY = "rewards:history";
 
-/** Rewards dataset (now with richer longDesc + details for every item) */
+// ----------------------------- Rewards dataset -----------------------------
+// Each item includes a longer description and a bullet list of details.
+// Images are packaged in-app and referenced via require().
 export const REWARDS_DATA = [
   {
     id: "r1",
@@ -175,9 +191,10 @@ export const REWARDS_DATA = [
   },
 ];
 
-/** Localized getter (single export) */
+// ----------------------------- Public API -----------------------------
+
+// Return the rewards list, localized via `t` when provided; otherwise English defaults.
 export function getRewards(t) {
-  // `t` is optional: if not provided, we just return the raw English values.
   const hasT = typeof t === "function";
   return REWARDS_DATA.map((r) => {
     const baseKey = `rewards.catalog.${r.id}`;
@@ -189,12 +206,9 @@ export function getRewards(t) {
       : r.desc;
     const longDesc = hasT
       ? t(`${baseKey}.longDesc`, { defaultValue: r.longDesc || r.desc })
-      : (r.longDesc || r.desc);
+      : r.longDesc || r.desc;
     const details = hasT
-      ? t(`${baseKey}.details`, {
-          defaultValue: r.details,
-          returnObjects: true,
-        })
+      ? t(`${baseKey}.details`, { defaultValue: r.details, returnObjects: true })
       : r.details;
 
     return {
@@ -207,7 +221,7 @@ export function getRewards(t) {
   });
 }
 
-/** Redemption helpers */
+// Read the total number of points already redeemed (0 if none/failed).
 export async function getRedeemedTotal() {
   try {
     const raw = await AsyncStorage.getItem(REDEEMED_TOTAL_KEY);
@@ -217,16 +231,13 @@ export async function getRedeemedTotal() {
   }
 }
 
-/** Convenience: compute available balance from earned - redeemed */
+// Convenience helper: available = earned - redeemed (never below zero).
 export function computeAvailablePoints(earned, redeemedTotal) {
   return Math.max(0, (Number(earned) || 0) - (Number(redeemedTotal) || 0));
 }
 
-/**
- * Redeem an item. This **does not** recalc your earned XP; it only
- * increments the “redeemed” total and stores a small history entry.
- * Returns { ok, redeemedTotal }.
- */
+// Redeem an item: increments redeemed total and appends a small history entry.
+// Returns { ok, redeemedTotal }.
 export async function redeemItem(item) {
   const pts = Number(item?.points) || 0;
   if (pts <= 0) return { ok: false, redeemedTotal: await getRedeemedTotal() };
@@ -236,7 +247,7 @@ export async function redeemItem(item) {
   try {
     await AsyncStorage.setItem(REDEEMED_TOTAL_KEY, String(redeemedTotal));
 
-    // store small history record
+    // Append to redemption history (most recent first).
     const raw = await AsyncStorage.getItem(REDEEMED_HISTORY_KEY);
     const history = raw ? JSON.parse(raw) : [];
     history.unshift({

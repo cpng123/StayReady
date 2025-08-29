@@ -1,4 +1,12 @@
-// screens/EmergencyContactsScreen.js
+/**
+ * EmergencyContactsScreen
+ * ---------------------------------------------------------------------------
+ *   CRUD for the user's emergency contacts (Singapore-first).
+ *   - Lists saved contacts
+ *   - Add / edit via ContactEditorModal (validates +65 mobile)
+ *   - Delete with a safety confirmation
+ */
+
 import React, { useCallback, useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -16,13 +24,15 @@ import ContactEditorModal from "../components/ContactEditorModal";
 import ConfirmModal from "../components/ConfirmModal";
 import { useTranslation } from "react-i18next";
 
-/** Format +65XXXXXXXX to "+65 9XXX XXXX" for display */
+const DANGER = "#DC2626";
+
+// Format +65XXXXXXXX to "+65 9XXX XXXX" for display-only (no parsing)
 function formatSGDisplay(e164) {
   const m = /^\+65(\d{4})(\d{4})$/.exec(String(e164 || ""));
   return m ? `+65 ${m[1]} ${m[2]}` : String(e164 || "");
 }
 
-/** Create a stable random-ish id */
+// Create a stable random-ish id; used when migrating legacy items w/o id
 function makeId(seed = "") {
   const rand = Math.random().toString(36).slice(2, 8);
   return `c_${Date.now()}_${rand}${seed ? "_" + seed : ""}`;
@@ -35,14 +45,15 @@ export default function EmergencyContactsScreen() {
   const { t } = useTranslation();
 
   const [contacts, setContacts] = useState([]);
-  const [editing, setEditing] = useState(null); // {index, item} | null
+  const [editing, setEditing] = useState(null); // { index, item } | null
   const [open, setOpen] = useState(false);
 
-  // delete confirm
+  // Delete confirm modal state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmIndex, setConfirmIndex] = useState(-1);
 
-  // Load + migrate missing ids (prevents key warning)
+  // Load current contacts from storage, and migrate any missing ids
+  // (older builds might have saved items without `id`; we add one and persist).
   const load = useCallback(async () => {
     const list = (await getContacts()) || [];
     let changed = false;
@@ -54,32 +65,41 @@ export default function EmergencyContactsScreen() {
       return c;
     });
     if (changed) {
-      await saveContacts(fixed);
+      try {
+        await saveContacts(fixed);
+      } catch {
+        // non-fatal; UI will still render from in-memory state
+      }
     }
     setContacts(Array.isArray(fixed) ? fixed : []);
   }, []);
 
+  // Reload whenever screen regains focus
   useFocusEffect(
     useCallback(() => {
       load();
     }, [load])
   );
 
+  // Start add flow (empty editor)
   const onAdd = () => {
     setEditing({ index: -1, item: null });
     setOpen(true);
   };
 
+  // Start edit flow for a given item
   const onEdit = (item, index) => {
     setEditing({ index, item });
     setOpen(true);
   };
 
+  // Ask for delete confirmation
   const requestDelete = (index) => {
     setConfirmIndex(index);
     setConfirmOpen(true);
   };
 
+  // Execute deletion after user confirms
   const doDelete = async () => {
     if (confirmIndex < 0) {
       setConfirmOpen(false);
@@ -88,65 +108,111 @@ export default function EmergencyContactsScreen() {
     const next = contacts.slice();
     next.splice(confirmIndex, 1);
     setContacts(next);
-    await saveContacts(next);
+    try {
+      await saveContacts(next);
+    } catch {
+      // If save fails, we still close the dialog; user will re-open later
+    }
     setConfirmOpen(false);
     setConfirmIndex(-1);
   };
 
+  // Persist from modal:
+  //  - On edit, merge fields and ensure we keep/assign a stable `id`
+  //  - On add, prepend a new contact with a fresh `id`
   const onSave = async (payload) => {
     const next = contacts.slice();
     const normalized = { channel: "auto", ...payload };
 
     if (editing?.index >= 0) {
-      // preserve/ensure id on edit
       const existing = next[editing.index] || {};
-      const id = existing.id || normalized.id || makeId(`edit_${editing.index}`);
+      const id =
+        existing.id || normalized.id || makeId(`edit_${editing.index}`);
       next[editing.index] = { ...existing, ...normalized, id };
     } else {
-      // add new with a fresh id
       next.unshift({
         id: normalized.id || makeId("new"),
         ...normalized,
       });
     }
     setContacts(next);
-    await saveContacts(next);
+    try {
+      await saveContacts(next);
+    } catch {
+      // non-fatal
+    }
     setOpen(false);
   };
 
+  // Single list row
+  // - Tap row or pencil to edit
+  // - Trash opens a confirm modal before deletion
   const Item = ({ item, index }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.85}
         style={[s.row, { backgroundColor: theme.colors.card }]}
         onPress={() => onEdit(item, index)}
+        accessibilityRole="button"
+        accessibilityLabel={t(
+          "emergency_contacts.edit_contact",
+          "Edit contact"
+        )}
       >
-        {/* Profile icon */}
+        {/* Avatar / leading icon */}
         <View style={s.avatarWrap}>
-          <Ionicons name="person-circle" size={42} color={theme.colors.primary} />
+          <Ionicons
+            name="person-circle"
+            size={42}
+            color={theme.colors.primary}
+          />
         </View>
 
+        {/* Name + phone */}
         <View style={{ flex: 1 }}>
-          <Text style={[s.name, { color: theme.colors.text }]} numberOfLines={1}>
+          <Text
+            style={[s.name, { color: theme.colors.text }]}
+            numberOfLines={1}
+          >
             {item.name || t("emergency_contacts.unnamed", "Unnamed")}
           </Text>
-          <Text style={[s.sub, { color: theme.colors.subtext }]} numberOfLines={1}>
+          <Text
+            style={[s.sub, { color: theme.colors.subtext }]}
+            numberOfLines={1}
+          >
             {formatSGDisplay(item.value)}
           </Text>
         </View>
 
-        {/* Edit & Delete actions */}
-        <TouchableOpacity onPress={() => onEdit(item, index)} hitSlop={8} style={s.actBtn}>
-          <Ionicons name="create-outline" size={22} color={theme.colors.primary} />
+        {/* Edit & Delete actions (separate touch targets) */}
+        <TouchableOpacity
+          onPress={() => onEdit(item, index)}
+          hitSlop={8}
+          style={s.actBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.edit", "Edit")}
+        >
+          <Ionicons
+            name="create-outline"
+            size={22}
+            color={theme.colors.primary}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => requestDelete(index)} hitSlop={8} style={s.actBtn}>
-          <Ionicons name="trash-outline" size={22} color="#DC2626" />
+        <TouchableOpacity
+          onPress={() => requestDelete(index)}
+          hitSlop={8}
+          style={s.actBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.delete", "Delete")}
+        >
+          <Ionicons name="trash-outline" size={22} color={DANGER} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
+  // Empty state (when there are no contacts at all)
   const empty = (
     <View style={s.emptyWrap}>
       <Ionicons name="people-outline" size={36} color={theme.colors.subtext} />
@@ -163,28 +229,50 @@ export default function EmergencyContactsScreen() {
         onPress={onAdd}
         activeOpacity={0.9}
         style={[s.primaryBtn, { backgroundColor: theme.colors.primary }]}
+        accessibilityRole="button"
+        accessibilityLabel={t("emergency_contacts.add_contact", "Add Contact")}
       >
-        <Text style={s.primaryText}>{t("emergency_contacts.add_contact", "Add Contact")}</Text>
+        <Text style={s.primaryText}>
+          {t("emergency_contacts.add_contact", "Add Contact")}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 
+  /* -------------------------------- Render -------------------------------- */
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.colors.appBg }]}>
-      {/* Header */}
+      {/* Top bar (inline, lightweight) */}
       <View style={s.topBar}>
-        <TouchableOpacity onPress={() => nav.goBack()} style={s.backBtn} hitSlop={8}>
+        <TouchableOpacity
+          onPress={() => nav.goBack()}
+          style={s.backBtn}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back", "Back")}
+        >
           <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
+
         <Text style={[s.title, { color: theme.colors.text }]}>
           {t("emergency_contacts.title", "Emergency Contacts")}
         </Text>
-        <TouchableOpacity onPress={onAdd} style={s.addBtn} hitSlop={8}>
+
+        <TouchableOpacity
+          onPress={onAdd}
+          style={s.addBtn}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t(
+            "emergency_contacts.add_contact",
+            "Add Contact"
+          )}
+        >
           <Ionicons name="add" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
 
-      {/* Body */}
+      {/* List of contacts (empty component if none) */}
       <FlatList
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
@@ -212,7 +300,8 @@ export default function EmergencyContactsScreen() {
           "This contact will be removed from your emergency list."
         )}
         confirmLabel={t("emergency_contacts.delete", "Delete")}
-        cancelLabel={t("common.cancel", "Cancel")}
+        // Use explicit namespace for common cancel to avoid ambiguity
+        cancelLabel={t("common:cancel", "Cancel")}
         onConfirm={doDelete}
         onCancel={() => setConfirmOpen(false)}
       />
@@ -230,8 +319,18 @@ const makeStyles = (theme) =>
       justifyContent: "space-between",
       paddingHorizontal: 12,
     },
-    backBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-    addBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
+    backBtn: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    addBtn: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     title: { fontSize: 18, fontWeight: "800" },
 
     row: {

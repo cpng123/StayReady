@@ -1,4 +1,11 @@
-// screens/QuizPlayKit.js
+/**
+ * QuizPlayKit
+ * -----------------------------------------------------------------------------
+ * A cohesive set of quiz primitives (hooks + UI components) for building a
+ * timed multiple-choice gameplay flow with sound, haptics, animations, and
+ * accessibility baked in.
+ */
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
@@ -27,13 +34,11 @@ import {
 } from "../utils/quizLogic";
 import ThemeToggle from "../components/ThemeToggle";
 import { useTranslation } from "react-i18next";
-import { 
-   getNotificationsEnabled, 
-   setNotificationsEnabled as setNotifyPref, 
-   initNotifications 
- } from "../utils/notify";
-
-/* --------------------------- SOUND (SFX + BGM) --------------------------- */
+import {
+  getNotificationsEnabled,
+  setNotificationsEnabled as setNotifyPref,
+  initNotifications,
+} from "../utils/notify";
 
 export function useSound() {
   const bgRef = useRef(null);
@@ -56,17 +61,31 @@ export function useSound() {
           enabledRef.current = val;
         }
       } catch {}
+
+      // CHG: Ensure audio plays even when iOS device is in silent mode
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+          shouldDuckAndroid: true,
+          playThroughEarpieceAndroid: false,
+        });
+      } catch {}
+
       try {
         const [bg, c, w, t] = await Promise.all([
           Audio.Sound.createAsync(
             require("../assets/Sound/background.mp3"),
-            { isLooping: false, volume: 0.8 },
+            // CHG: Loop background track so it doesn't stop mid-quiz
+            { isLooping: true, volume: 0.8 },
             null,
             false
           ),
           Audio.Sound.createAsync(require("../assets/Sound/correct.mp3")),
           Audio.Sound.createAsync(require("../assets/Sound/wrong.mp3")),
-          Audio.Sound.createAsync(require("../assets/Sound/times-up.mp3")),
+          Audio.Sound.createAsync(require("../assets/Sound/times-up.mp3"))
         ]);
 
         if (!mounted) {
@@ -531,11 +550,17 @@ export function TimerBar({ barW, onLayout, time }) {
           ]}
         />
       </View>
+      {/* CHG: Increase min width so 2-digit values don't clip */}
       <Text style={[s.timeVal, { color: theme.colors.subtext }]}>{time}</Text>
     </View>
   );
 }
 
+/* CHG: Accessibility on options
+   - Mark as button
+   - Expose selected/disabled state
+   - This improves screen-reader navigation & clarity
+*/
 export function OptionItem({ text, flags, disabled, onPress }) {
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
@@ -561,6 +586,8 @@ export function OptionItem({ text, flags, disabled, onPress }) {
       activeOpacity={disabled ? 1 : 0.9}
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"                          // CHG
+      accessibilityState={{ disabled: !!disabled, selected: !!flags.showBlue }} // CHG
       style={[s.option, { borderColor }]}
     >
       <Text style={[s.optText, { color: textColor }]}>{text}</Text>
@@ -652,6 +679,12 @@ export function HintModal({ open, onClose, hint }) {
   );
 }
 
+/* --------------------- SettingsModal (cleaned up) --------------------------
+   CHANGES:
+   - Removed unused theme setters (ThemeToggle already handles theme).
+   - Added robust notifications toggle with init on enable.
+--------------------------------------------------------------------------- */
+
 export function SettingsModal({
   open,
   onClose,
@@ -660,16 +693,10 @@ export function SettingsModal({
   hapticEnabled,
   setHapticEnabled,
 }) {
-  const { theme, themeKey, setThemeKey } = useThemeContext();
+  // CHG: No longer destructuring themeKey/setThemeKey; ThemeToggle manages it
+  const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
   const { t } = useTranslation();
-
-  const setTheme = async (key) => {
-    setThemeKey(key);
-    try {
-      await AsyncStorage.setItem("pref:themeKey", key);
-    } catch {}
-  };
 
   // --- Notifications toggle (local to this modal) ---
   const [notifEnabled, setNotifEnabled] = useState(true);
@@ -681,12 +708,14 @@ export function SettingsModal({
         if (alive) setNotifEnabled(v);
       } catch {}
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const onToggleNotif = async (v) => {
     setNotifEnabled(v);
-    await setNotifyPref(v);     // persists + cancels/dismisses when OFF
+    await setNotifyPref(v); // persists + cancels/dismisses when OFF
     if (v) await initNotifications(); // ensure permissions/channel when turning ON
   };
 
@@ -750,7 +779,7 @@ export function SettingsModal({
             <Switch value={notifEnabled} onValueChange={onToggleNotif} />
           </View>
 
-          {/* Theme */}
+          {/* Theme (kept via component that already manages state) */}
           <ThemeToggle />
 
           <TouchableOpacity
@@ -825,8 +854,9 @@ const makeStyles = (theme) =>
     timeLabel: { fontSize: 12, fontWeight: "800" },
     timeTrack: { flex: 1, height: 6, borderRadius: 8, overflow: "hidden" },
     timeFill: { height: "100%", borderRadius: 8 },
+    // CHG: Was width: 14; increase to avoid text clipping for 2-digit numbers
     timeVal: {
-      width: 14,
+      minWidth: 22,
       textAlign: "right",
       fontSize: 12,
       fontWeight: "800",

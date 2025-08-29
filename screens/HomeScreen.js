@@ -1,4 +1,15 @@
-// screens/HomeScreen.js
+/**
+ * HomeScreen
+ * -----------------------------------------------------------------------------
+ *   Main dashboard with:
+ *     - Location + badges (notifications/settings)
+ *     - Donation hero card
+ *     - Mini map preview + live HazardBanner
+ *     - Quick access emergency contacts
+ *     - Early Warning horizontal list
+ *     - Preparedness resources + routine cards
+ */
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
@@ -31,8 +42,10 @@ import useNotifyOnHazard from "../hooks/useNotifyOnHazard";
 import HazardBanner from "../components/HazardBanner";
 import { getUnreadCount } from "../utils/notify";
 
+// Preparedness cards to show on Home (static helper)
 const HOME_PREPAREDNESS = getHomePreparedness(4);
 
+// External donation link
 const UNICEF_URL =
   "https://help.unicef.org/?country=SG&&campaignid=20648257412&gad_source=1&gad_campaignid=20642170995&gbraid=0AAAAADCOMi5mkgs50IleVtR5hH2KuG99d&gclid=Cj0KCQjwwZDFBhCpARIsAB95qO1fDQ_3Zci8KlH2BnokWscSyGWcXPp0eIsVwbqGRySaNc0yEdvi0pEaAjXdEALw_wcB&gclsrc=aw.ds";
 
@@ -41,8 +54,11 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { theme } = useThemeContext();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  // Current map center (defaults to SG center until resolved)
   const [center, setCenter] = useState({ lat: 1.3521, lon: 103.8198 });
 
+  // Hazards state + notifications on top hazard
   const {
     loading,
     topHazard,
@@ -51,7 +67,7 @@ export default function HomeScreen() {
   } = useHazards(center, 5);
   useNotifyOnHazard(topHazard);
 
-  // unread badge for bell
+  // Notifications unread badge for bell
   const [unread, setUnread] = useState(0);
   const refreshUnread = async () => {
     const n = await getUnreadCount();
@@ -62,11 +78,12 @@ export default function HomeScreen() {
       refreshUnread();
     }, [])
   );
-  // also refresh after topHazard changes (new notifications may be added)
+  // Also refresh after topHazard changes (new notifications may be added)
   useEffect(() => {
     refreshUnread();
   }, [topHazard?.kind]);
 
+  // Resolve device or mocked location → center map
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -75,25 +92,27 @@ export default function HomeScreen() {
         if (!alive) return;
         setCenter({ lat: res.coords.latitude, lon: res.coords.longitude });
       } catch {
-        // keep default center
+        // keep default center on failure
       }
     })();
-    return () => (alive = false);
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  // Pull-to-refresh state
+  // Pull-to-refresh (sync hazards + unread)
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await refreshHazards(); // force re-evaluate hazards (incl. mock/demo changes)
-      await refreshUnread(); // badge may change if a new alert came in
+      await refreshHazards();
+      await refreshUnread();
     } finally {
       setRefreshing(false);
     }
   };
 
-  // Dynamic header location label
+  // Dynamic header location label (address → "addr postal, Singapore")
   const [headerLoc, setHeaderLoc] = useState(
     t("settings.country_sg", "Singapore")
   );
@@ -120,16 +139,16 @@ export default function HomeScreen() {
     };
   }, [t]);
 
+  // Keep header location consistent when screen refocuses (esp. with mock mode)
   useFocusEffect(
     React.useCallback(() => {
       let alive = true;
       (async () => {
         try {
-          const res = await resolveLocationLabel(); // respects your mock flag
+          const res = await resolveLocationLabel();
           if (!alive) return;
           setCenter({ lat: res.coords.latitude, lon: res.coords.longitude });
 
-          // also refresh the header label so it matches mock/real
           const country = t("settings.country_sg", "Singapore");
           const regionName = t(
             `location.region_names.${String(res.region || "").toLowerCase()}`,
@@ -149,47 +168,71 @@ export default function HomeScreen() {
     }, [t])
   );
 
+  // Open external donation link with guardrails
   const openDonation = async () => {
     try {
       const supported = await Linking.canOpenURL(UNICEF_URL);
       if (supported) await Linking.openURL(UNICEF_URL);
-      else Alert.alert(t("common.error"), t("home.donate.error_try_later"));
+      else
+        Alert.alert(
+          t("common.error", "Error"),
+          t("home.donate.error_try_later", "Please try again later.")
+        );
     } catch {
-      Alert.alert(t("common.error"), t("home.donate.error_open"));
+      Alert.alert(
+        t("common.error", "Error"),
+        t("home.donate.error_open", "Could not open the link.")
+      );
     }
   };
 
+  // Generic confirm modal state (used for call confirmations)
   const [confirm, setConfirm] = useState({
     visible: false,
     title: "",
     message: "",
     onConfirm: null,
   });
-
   const openConfirm = (title, message, onConfirm) =>
     setConfirm({ visible: true, title, message, onConfirm });
-
   const closeConfirm = () => setConfirm((c) => ({ ...c, visible: false }));
 
+  // Dial a number using tel: with fallback alerts
   const dialNumber = async (num) => {
     const url = `tel:${num}`;
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) await Linking.openURL(url);
       else
-        Alert.alert(t("common.not_supported"), t("home.call_manual", { num }));
+        Alert.alert(
+          t("common.not_supported", "Not supported"),
+          t("home.call_manual", {
+            num,
+            defaultValue: "Please dial {{num}} manually.",
+          })
+        );
     } catch {
-      Alert.alert(t("common.error"), t("home.dial_error"));
+      Alert.alert(
+        t("common.error", "Error"),
+        t("home.dial_error", "Dial failed.")
+      );
     }
   };
 
+  // Handle taps on emergency contact cards
   const handleContactPress = (item) => {
     if (item.id === "sos") {
       navigation.navigate("SOSTab");
     } else {
       openConfirm(
-        t("home.confirm_call_title", { title: item.title }),
-        t("home.confirm_call_body", { number: item.number }),
+        t("home.confirm_call_title", {
+          title: item.title,
+          defaultValue: "Call {{title}}?",
+        }),
+        t("home.confirm_call_body", {
+          number: item.number,
+          defaultValue: "Are you sure you want to call {{number}} now?",
+        }),
         () => {
           closeConfirm();
           dialNumber(item.number);
@@ -198,6 +241,7 @@ export default function HomeScreen() {
     }
   };
 
+  // Render a single emergency contact card (localized title/subtitle)
   const renderContact = ({ item }) => {
     const tTitle = t(`home.contacts.card.${item.id}.title`, item.title);
     const tSub = t(`home.contacts.card.${item.id}.subtitle`, item.subtitle);
@@ -207,6 +251,8 @@ export default function HomeScreen() {
         style={styles.contactCard}
         activeOpacity={0.85}
         onPress={() => handleContactPress(item)}
+        accessibilityRole="button"
+        accessibilityLabel={tTitle}
       >
         <Image source={item.img} style={styles.contactIcon} />
         <View style={styles.contactTexts}>
@@ -219,8 +265,7 @@ export default function HomeScreen() {
     );
   };
 
-  // -------- Banner helpers (current date, 10 min ago, fixed location) ----------
-  // Current date in Singapore
+  // ---- Banner helpers (current date/time in Singapore, location from hazard) ----
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-SG", {
     weekday: "short",
@@ -229,19 +274,18 @@ export default function HomeScreen() {
     year: "numeric",
     timeZone: "Asia/Singapore",
   });
-
-  // 12-hour time with AM/PM (uppercase), Singapore TZ
   let timeStr = now.toLocaleTimeString("en-SG", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
     timeZone: "Asia/Singapore",
   });
-  // Normalize AM/PM to uppercase on platforms that return lowercase
   timeStr = timeStr.replace(/am|pm/, (m) => m.toUpperCase());
 
-  const locLabel = topHazard.locationName || null;
-  const earlyCards4 = ewCards.slice(0, 4);
+  const locLabel = topHazard?.locationName || null;
+
+  // Guard for undefined cards from hook
+  const earlyCards4 = (ewCards || []).slice(0, 4);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -256,7 +300,7 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* Top Bar */}
+        {/* ---------- Top Bar: location + notifications + settings ---------- */}
         <View style={styles.topBar}>
           <View style={styles.locationWrap}>
             <Ionicons
@@ -265,7 +309,9 @@ export default function HomeScreen() {
               color={theme.colors.primary}
             />
             <View style={{ marginLeft: 6 }}>
-              <Text style={styles.subtle}>{t("home.your_location")}</Text>
+              <Text style={styles.subtle}>
+                {t("home.your_location", "Your location")}
+              </Text>
               <Text style={styles.locationText}>{headerLoc}</Text>
             </View>
           </View>
@@ -322,7 +368,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Donation */}
+        {/* ---------- Donation hero ---------- */}
         <View style={styles.donateCard}>
           <Image
             source={require("../assets/General/donation.jpg")}
@@ -339,27 +385,35 @@ export default function HomeScreen() {
             />
           )}
           <View style={styles.donateOverlay}>
-            <Text style={styles.donateTitle}>{t("home.donate.title")}</Text>
+            <Text style={styles.donateTitle}>
+              {t("home.donate.title", "Support disaster relief")}
+            </Text>
             <TouchableOpacity
               style={styles.donateBtn}
               activeOpacity={0.8}
               onPress={openDonation}
+              accessibilityRole="button"
+              accessibilityLabel={t("home.donate.cta", "Donate")}
             >
-              <Text style={styles.donateBtnText}>{t("home.donate.cta")}</Text>
+              <Text style={styles.donateBtnText}>
+                {t("home.donate.cta", "Donate")}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Section Title */}
+        {/* ---------- Emergencies & info section title ---------- */}
         <Text style={styles.sectionTitle}>
-          {t("home.section.emergencies_info")}
+          {t("home.section.emergencies_info", "Emergencies & information")}
         </Text>
 
-        {/* Map Card (Leaflet preview) */}
+        {/* ---------- Map preview with HazardBanner overlay ---------- */}
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.mapCard}
           onPress={() => navigation.navigate("MapView")}
+          accessibilityRole="button"
+          accessibilityLabel={t("hazardDetail.view_on_map", "View on Map")}
         >
           <LeafletMapWebView
             lat={center.lat}
@@ -372,10 +426,10 @@ export default function HomeScreen() {
             dark={theme.key === "dark"}
           />
 
-          {/* Hazard banner */}
+          {/* Hazard banner (pointerEvents none to pass taps through to map CTA) */}
           <View pointerEvents="none" style={styles.hazardOverlay}>
             <HazardBanner
-              hazard={topHazard}
+              hazard={topHazard || { kind: "none", severity: "safe" }}
               dateStr={dateStr}
               timeAgoStr={timeStr}
               locLabel={locLabel}
@@ -383,11 +437,18 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Emergency Contacts */}
-        <View className="sectionHeader" style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle2}>{t("home.contacts.title")}</Text>
+        {/* ---------- Emergency Contacts ---------- */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle2}>
+            {t("home.contacts.title", "Emergency contacts")}
+          </Text>
         </View>
-        <Text style={styles.sectionNote}>{t("home.contacts.note")}</Text>
+        <Text style={styles.sectionNote}>
+          {t(
+            "home.contacts.note",
+            "Tap a card to call or open SOS for quick alerts."
+          )}
+        </Text>
 
         <FlatList
           data={CONTACTS}
@@ -400,19 +461,23 @@ export default function HomeScreen() {
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
         />
 
-        {/* Early Warning */}
+        {/* ---------- Early Warning preview ---------- */}
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>{t("home.early.title")}</Text>
+            <Text style={styles.sectionTitle2}>
+              {t("home.early.title", "Early Warning")}
+            </Text>
             <Text style={styles.sectionSubtitle}>
-              {t("home.early.subtitle2")}
+              {t("home.early.subtitle2", "Monitoring common hazards")}
             </Text>
           </View>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation.navigate("EarlyWarning")}
+            accessibilityRole="button"
+            accessibilityLabel={t("home.see_more", "See more")}
           >
-            <Text style={styles.seeMore}>{t("home.see_more")}</Text>
+            <Text style={styles.seeMore}>{t("home.see_more", "See more")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -435,21 +500,33 @@ export default function HomeScreen() {
               }
             />
           )}
+          ListEmptyComponent={
+            <Text style={[styles.sectionNote, { paddingHorizontal: 15 }]}>
+              {t("home.early.none", "No hazards right now.")}
+            </Text>
+          }
         />
 
-        {/* Disaster Preparedness */}
+        {/* ---------- Disaster Preparedness ---------- */}
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>{t("home.prep.title")}</Text>
+            <Text style={styles.sectionTitle2}>
+              {t("home.prep.title", "Disaster Preparedness")}
+            </Text>
             <Text style={styles.sectionSubtitle}>
-              {t("home.prep.subtitle")}
+              {t(
+                "home.prep.subtitle",
+                "Learn what to do before, during, after"
+              )}
             </Text>
           </View>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation.navigate("ResourceTab")}
+            accessibilityRole="button"
+            accessibilityLabel={t("home.see_more", "See more")}
           >
-            <Text style={styles.seeMore}>{t("home.see_more")}</Text>
+            <Text style={styles.seeMore}>{t("home.see_more", "See more")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -468,17 +545,21 @@ export default function HomeScreen() {
               onPress={() =>
                 navigation.navigate("PreparednessGuide", { id: item.id })
               }
+              accessibilityRole="button"
+              accessibilityLabel={t(`home.prep.topic.${item.id}`, item.title)}
             />
           )}
         />
 
-        {/* Routine Preparations */}
+        {/* ---------- Routine Preparations ---------- */}
         <View style={{ height: 6 }} />
         <View style={styles.ewHeaderRow}>
           <View style={styles.ewHeaderLeft}>
-            <Text style={styles.sectionTitle2}>{t("home.routine.title")}</Text>
+            <Text style={styles.sectionTitle2}>
+              {t("home.routine.title", "Routine preparations")}
+            </Text>
             <Text style={styles.sectionSubtitle}>
-              {t("home.routine.subtitle")}
+              {t("home.routine.subtitle", "Small actions to stay ready")}
             </Text>
           </View>
         </View>
@@ -505,10 +586,11 @@ export default function HomeScreen() {
                 onPress={() => {
                   if (item.id === "routine-external") {
                     navigation.navigate("ExternalResources");
-                  } else if (item.id === "routine-quiz")
+                  } else if (item.id === "routine-quiz") {
                     navigation.navigate("GamesTab");
-                  else if (item.id === "routine-checklist")
+                  } else if (item.id === "routine-checklist") {
                     navigation.navigate("Checklist");
+                  }
                 }}
                 testID={`routine-card-${item.id}`}
                 accessibilityRole="button"
@@ -521,6 +603,7 @@ export default function HomeScreen() {
         <View style={{ height: 20 }} />
       </ScrollView>
 
+      {/* Confirm dialog (generic) */}
       <ConfirmModal
         visible={confirm.visible}
         title={confirm.title}
@@ -530,12 +613,14 @@ export default function HomeScreen() {
         onCancel={closeConfirm}
         onConfirm={confirm.onConfirm}
       />
+
+      {/* Floating chatbot action */}
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.8}
         onPress={() => navigation.navigate("Chatbot")}
         accessibilityRole="button"
-        accessibilityLabel="Open Chatbot"
+        accessibilityLabel={t("home.open_chatbot", "Open Chatbot")}
       >
         <Image
           source={require("../assets/General/bot.png")}
@@ -550,6 +635,8 @@ const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1, backgroundColor: theme.colors.appBg },
     content: { paddingTop: 10, paddingHorizontal: 16, paddingBottom: 40 },
+
+    // Top bar
     topBar: {
       flexDirection: "row",
       alignItems: "center",
@@ -580,6 +667,7 @@ const makeStyles = (theme) =>
     },
     badgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
 
+    // Donation hero
     donateCard: {
       borderRadius: 16,
       overflow: "hidden",
@@ -626,6 +714,8 @@ const makeStyles = (theme) =>
       elevation: 2,
     },
     donateBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+
+    // Section titles / headers
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
@@ -648,6 +738,8 @@ const makeStyles = (theme) =>
     sectionSubtitle: { color: theme.colors.subtext, fontSize: 12 },
     seeMore: { color: theme.colors.primary, fontWeight: "700" },
     edgeToEdge: { marginHorizontal: -16 },
+
+    // Early warning headers
     ewHeaderRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -656,6 +748,8 @@ const makeStyles = (theme) =>
       marginBottom: 6,
     },
     ewHeaderLeft: { flexShrink: 1 },
+
+    // Map preview card
     mapCard: {
       backgroundColor: theme.colors.card,
       borderRadius: 16,
@@ -676,6 +770,7 @@ const makeStyles = (theme) =>
       elevation: 2,
     },
 
+    // Contact cards
     contactCard: {
       flexDirection: "row",
       alignItems: "center",
@@ -709,6 +804,8 @@ const makeStyles = (theme) =>
       color: theme.colors.subtext,
       textAlign: "center",
     },
+
+    // FAB (chatbot)
     fab: {
       position: "absolute",
       bottom: 75,

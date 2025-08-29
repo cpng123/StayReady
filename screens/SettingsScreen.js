@@ -1,3 +1,12 @@
+/**
+ * SettingsScreen (React Native / Expo)
+ * -----------------------------------------------------------------------------
+ * Centralized settings for the app. Lets users control language, theme,
+ * notification behavior, sound/haptics, and access preparedness shortcuts
+ * (location & emergency contacts). Also includes data-management utilities
+ * (clear cache / reset all).
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -62,7 +71,7 @@ export default function SettingsScreen() {
   const [clearOpen, setClearOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
 
-  /* load persisted values */
+  // load persisted values
   useEffect(() => {
     (async () => {
       try {
@@ -70,7 +79,7 @@ export default function SettingsScreen() {
           AsyncStorage.getItem(K_LANG),
           AsyncStorage.getItem(K_SFX),
           AsyncStorage.getItem(K_HAPTIC),
-          getNotifyAll(), // ✅ call the getter (bug fix)
+          getNotifyAll(), // call the getter
         ]);
 
         // language
@@ -138,7 +147,7 @@ export default function SettingsScreen() {
     } catch {}
   };
 
-  /* persist on change */
+  // persist on change
   useEffect(() => {
     AsyncStorage.setItem(K_LANG, language).catch(() => {});
   }, [language]);
@@ -149,7 +158,6 @@ export default function SettingsScreen() {
     AsyncStorage.setItem(K_HAPTIC, vibration ? "1" : "0").catch(() => {});
   }, [vibration]);
 
-  /* rows */
   const Row = ({ icon, label, right, onPress, disabled }) => (
     <TouchableOpacity
       activeOpacity={onPress ? 0.8 : 1}
@@ -539,7 +547,6 @@ export default function SettingsScreen() {
   );
 }
 
-/* ----------------------------- styles ----------------------------- */
 const makeStyles = (theme) =>
   StyleSheet.create({
     safe: { flex: 1 },

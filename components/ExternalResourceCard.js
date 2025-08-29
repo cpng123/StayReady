@@ -1,21 +1,29 @@
-// components/ExternalResourceCard.js
-import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Linking } from "react-native";
-
 /**
- * ExternalResourceCard
+ * File: components/ExternalResourceCard.js
+ * Purpose: Display a tappable card for official/external resources (web links).
+ *
+ * Responsibilities:
+ *  - Render logo, title, and short description in a compact row.
+ *  - Open the resource URL in the device browser on press (safe guard via canOpenURL).
+ *  - Respect app theme colors and accept optional style overrides.
+ *
  * Props:
  *  - item: { id, title, desc, url, logo }
  *  - theme: { colors: { card, text, subtext } }
- *  - style (optional): container style override
+ *  - style?: ViewStyle – container override
  */
+
+import React from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Linking } from "react-native";
+
 export default function ExternalResourceCard({ item, theme, style }) {
+  // Try to open the external link (no-throw UX)
   const open = async () => {
     try {
       const ok = await Linking.canOpenURL(item?.url);
       if (ok) await Linking.openURL(item.url);
     } catch {
-      // no-op
+      // swallow errors; UI stays responsive
     }
   };
 
@@ -30,10 +38,12 @@ export default function ExternalResourceCard({ item, theme, style }) {
         style,
       ]}
     >
+      {/* Left: logo/thumbnail */}
       <View style={styles.extLogoWrap}>
         {!!item?.logo && <Image source={item.logo} style={styles.extLogo} />}
       </View>
 
+      {/* Right: text block */}
       <View style={styles.extTextWrap}>
         <Text
           numberOfLines={2}
