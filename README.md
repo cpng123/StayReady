@@ -1,6 +1,6 @@
 # StayReady
 
-StayReady is a disaster-readiness app for Singapore. It shows nearby hazards (flash floods, haze/PM2.5, dengue clusters, strong wind, heat), a live map, local emergency contacts, preparedness guides, and smart notifications.
+StayReady is a disaster-readiness app for Singapore. It shows **nearby hazards** (flash floods, haze/PM2.5, dengue clusters, strong wind, heat), a **live map**, **local emergency contacts**, **preparedness guides**, and **smart notifications**. It also includes a **personal preparedness checklist** and **gamified learning—play quizzes**, take the **daily challenge**, **bookmark** tricky questions, earn XP and **badges**, and redeem points for real-world **rewards**.
 
 > **Disclaimer:** This project is for learning and community use. Data can lag behind official sources. Always follow instructions from Singapore authorities and emergency services.
 
@@ -11,6 +11,11 @@ StayReady is a disaster-readiness app for Singapore. It shows nearby hazards (fl
 - **Early warnings** for common hazards with severity badges and detail pages
 - **Interactive map** (Leaflet) with overlays (rain, PM2.5, wind, temperature, dengue)
 - **Preparedness guides** (before/during/after) + external resources
+- **Gamification**
+    * Quizzes by topic + Daily Challenge
+    * Earn XP and unlock badges/milestones
+    * Bookmark & review questions you want to revisit
+- **Rewards Catalog** — earn points from learning & actions and **redeem for real-world rewards**
 - **Notifications**: “All” (Warning + Danger) or “Danger-only”
 - **SOS & contacts**: 995 (SCDF Ambulance/Fire), 999 (Police), plus quick-dial
 - **Chatbot** (optional, OpenRouter) with SG-first tips and resource deep-links
