@@ -89,7 +89,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       await initI18n();
-      await initNotifications(); // prime _notifyEnabledCache before any screen mounts
+      await initNotifications();
       setReady(true);
     })();
   }, []);

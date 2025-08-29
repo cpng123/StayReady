@@ -364,7 +364,7 @@ export default function HomeScreen() {
           <LeafletMapWebView
             lat={center.lat}
             lon={center.lon}
-            height={200}
+            height={220}
             zoom={15}
             interactive={false}
             showMarker
