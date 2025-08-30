@@ -105,8 +105,11 @@ export async function getCurrentCoords() {
   }
 
   const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") throw new Error("Location permission denied");
-
+  if (status !== "granted") {
+    console.warn("Location permission denied — using demo fallback");
+    // Instead of throwing an error, fallback gracefully to Marina Bay
+    return { latitude: 1.283, longitude: 103.86, mocked: true };
+  }
   const pos = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.Balanced,
   });
