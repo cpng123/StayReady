@@ -645,7 +645,10 @@
       "title": "删除收藏？",
       "message": "该题目将从你的收藏中移除。",
       "delete": "删除",
-      "cancel": "取消"
+      "cancel": "取消",
+      "reset_title": "清除所有书签？",
+      "reset_message": "这将删除所有已保存的问题。此操作无法撤消。",
+      "delete_all": "全部清除"
     }
   },
   "hazardDetail": {

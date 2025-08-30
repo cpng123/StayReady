@@ -20,6 +20,7 @@ import {
   getAllBookmarks,
   removeBookmark,
   subscribeBookmarks,
+  clearAllBookmarks,
 } from "../utils/bookmarks";
 import { useTranslation } from "react-i18next";
 
@@ -63,6 +64,7 @@ export default function BookmarkScreen() {
   // Delete confirm modal state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingId, setPendingId] = useState(null);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
 
   // Load current bookmarks
   const load = async () => setItems(await getAllBookmarks());
@@ -107,6 +109,12 @@ export default function BookmarkScreen() {
     setPendingId(null);
   };
 
+  // Reset all bookmarks
+  const confirmResetAll = async () => {
+    await clearAllBookmarks();
+    setResetConfirmOpen(false);
+  };
+
   // -------- Empty state --------
   const EmptyState = () => (
     <View style={s.emptyWrap}>
@@ -140,6 +148,8 @@ export default function BookmarkScreen() {
       <TopBar
         title={t("bookmarks.title", "Bookmarked Questions")}
         onBack={() => navigation.goBack()}
+        rightIcon={hasAny ? "trash-outline" : null}
+        onRightPress={hasAny ? () => setResetConfirmOpen(true) : null}
       />
 
       {/* Search + category chips */}
@@ -154,18 +164,22 @@ export default function BookmarkScreen() {
           flexGrow: 1,
         }}
         data={filtered}
-        keyExtractor={(it) => it.id}
+        keyExtractor={(it) => String(it.id)}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         ListEmptyComponent={<EmptyState />}
         renderItem={({ item, index }) => (
           <ReviewQuestionCard
             index={index}
             total={filtered.length}
-            text={item.text}
-            options={item.options}
-            answerIndex={item.answerIndex}
-            selectedIndex={item.selectedIndex}
-            timesUp={item.timesUp}
+            text={typeof item.text === "string" ? item.text : ""}
+            options={Array.isArray(item.options) ? item.options : []}
+            answerIndex={
+              Number.isInteger(item.answerIndex) ? item.answerIndex : 0
+            }
+            selectedIndex={
+              Number.isInteger(item.selectedIndex) ? item.selectedIndex : null
+            }
+            timesUp={!!item.timesUp}
             actionIcon="trash-outline"
             actionIconColor={RED}
             onActionPress={() => requestDelete(item.id)}
@@ -186,6 +200,20 @@ export default function BookmarkScreen() {
         cancelLabel={t("bookmarks.confirm.cancel", "Cancel")}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
+      />
+
+      {/* Reset all confirmation */}
+      <ConfirmModal
+        visible={resetConfirmOpen}
+        title={t("bookmarks.confirm.reset_title", "Clear All Bookmarks?")}
+        message={t(
+          "bookmarks.confirm.reset_message",
+          "This will remove ALL saved questions. This action cannot be undone."
+        )}
+        confirmLabel={t("bookmarks.confirm.delete_all", "Clear All")}
+        cancelLabel={t("bookmarks.confirm.cancel", "Cancel")}
+        onConfirm={confirmResetAll}
+        onCancel={() => setResetConfirmOpen(false)}
       />
     </SafeAreaView>
   );

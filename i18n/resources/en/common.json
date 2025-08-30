@@ -133,41 +133,41 @@
       "flood": {
         "title": "Flash Flood",
         "desc": {
-          "safe":    "No significant rain detected. Drains and canals at normal levels.",
+          "safe": "No significant rain detected. Drains and canals at normal levels.",
           "warning": "Heavy showers near {{place}}. Ponding possible. Avoid low-lying roads and kerbside lanes.",
-          "danger":  "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements."
+          "danger": "Flash flooding around {{place}}. Do not drive through floodwater; avoid underpasses and basements."
         }
       },
       "haze": {
         "title": "Haze (PM2.5)",
         "desc": {
-          "safe":    "Air quality is within normal range across Singapore.",
+          "safe": "Air quality is within normal range across Singapore.",
           "warning": "Elevated PM2.5 in the {{region}}. Limit prolonged outdoor activity; consider a mask.",
-          "danger":  "Unhealthy PM2.5 in the {{region}}. Stay indoors with windows closed; use a purifier; wear an N95 if going out."
+          "danger": "Unhealthy PM2.5 in the {{region}}. Stay indoors with windows closed; use a purifier; wear an N95 if going out."
         }
       },
       "dengue": {
         "title": "Dengue Clusters",
         "desc": {
-          "safe":    "No active cluster within 5 km of your location.",
+          "safe": "No active cluster within 5 km of your location.",
           "warning": "Active cluster near {{place}} (~{{km}} km). Remove stagnant water; use repellent.",
-          "danger":  "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists."
+          "danger": "High-risk cluster near {{place}} ({{cases}}+ cases). Avoid dawn/dusk bites; check home daily; see a doctor if fever persists."
         }
       },
       "wind": {
         "title": "Strong Winds",
         "desc": {
-          "safe":    "Winds are light to moderate.",
+          "safe": "Winds are light to moderate.",
           "warning": "Strong winds in the {{region}}. Secure loose items; caution for riders and high vehicles.",
-          "danger":  "Damaging winds in the {{region}}. Stay indoors; avoid coastal and open areas."
+          "danger": "Damaging winds in the {{region}}. Stay indoors; avoid coastal and open areas."
         }
       },
       "heat": {
         "title": "Heat Advisory",
         "desc": {
-          "safe":    "Heat risk is low. Keep hydrated.",
+          "safe": "Heat risk is low. Keep hydrated.",
           "warning": "High heat in the {{region}} (HI ≈ {{hi}}°C). Reduce strenuous activity; drink water often.",
-          "danger":  "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Heat illness possible — stay in shade/AC; check on the vulnerable."
+          "danger": "Extreme heat in the {{region}} (HI ≈ {{hi}}°C). Heat illness possible — stay in shade/AC; check on the vulnerable."
         }
       }
     }
@@ -659,10 +659,13 @@
       "title": "Delete bookmark?",
       "message": "This question will be removed from your bookmarks.",
       "delete": "Delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "reset_title": "Clear All Bookmarks?",
+      "reset_message": "This will remove ALL saved questions. This action cannot be undone.",
+      "delete_all": "Clear All"
     }
   },
-    "hazardDetail": {
+  "hazardDetail": {
     "description": "Description",
     "affected_area": "Affected Area",
     "safety_tips": "Safety Tips",

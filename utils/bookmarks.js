@@ -33,9 +33,17 @@ export const subscribeBookmarks = (cb) => {
 
 // Read all bookmarks from storage (returns [] if none)
 export async function getAllBookmarks() {
-  const raw = await AsyncStorage.getItem(KEY);
-  return raw ? JSON.parse(raw) : [];
+  try {
+    const raw = await AsyncStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    await AsyncStorage.setItem(KEY, JSON.stringify([]));
+    return [];
+  }
 }
+
 
 // Overwrite storage with a new list and notify listeners
 async function saveAll(list) {
@@ -80,6 +88,11 @@ export async function toggleBookmark(item) {
     await saveAll(list);
     return true; // now bookmarked
   }
+}
+
+export async function clearAllBookmarks() {
+  await AsyncStorage.setItem(KEY, JSON.stringify([]));
+  emit([]); // notify subscribers to refresh UI
 }
 
 // Normalize various question fields into a consistent bookmark shape

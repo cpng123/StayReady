@@ -672,7 +672,10 @@
       "title": "Padam tanda buku?",
       "message": "Soalan ini akan dibuang daripada senarai tanda buku anda.",
       "delete": "Padam",
-      "cancel": "Batal"
+      "cancel": "Batal",
+      "reset_title": "Kosongkan Semua Penanda Halaman?",
+      "reset_message": "Ini akan mengalih keluar SEMUA soalan yang disimpan. Tindakan ini tidak boleh dibuat asal.",
+      "delete_all": "Kosongkan Semua"
     }
   },
   "hazardDetail": {
