@@ -7,10 +7,6 @@
  *  - Render left-aligned thumbnail with rounded mask.
  *  - Show reward title, 2-line description, and points with i18n suffix.
  *  - Use theme colors for text and surface; keep layout performant with memoized styles.
- *
- * Props:
- *  - item: { image, title, desc, points }
- *  - theme: Theme object from ThemeProvider (theme.colors.*)
  */
 
 import React, { useMemo } from "react";

@@ -9,11 +9,6 @@
  *  - Reset form fields when `initial` or `open` changes.
  *  - Respect app theme and provide accessible touch targets.
  *
- * Props:
- *  - open: boolean – show/hide modal
- *  - onClose: () => void – close handler
- *  - onSave: (contact) => void – receives {id?, name, value: +65XXXXXXXX, channel:'auto'}
- *  - initial?: { id?, name, value(+65XXXXXXXX) } – prefill for editing
  */
 
 import React, { useState, useEffect } from "react";
@@ -46,21 +41,26 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
   // Reset fields when editing a different contact or reopening
   useEffect(() => {
     setName(initial?.name || "");
-    setDigits(/^\+65\d{8}$/.test(initial?.value || "") ? initial.value.slice(-8) : "");
+    setDigits(
+      /^\+65\d{8}$/.test(initial?.value || "") ? initial.value.slice(-8) : ""
+    );
     setErr("");
   }, [initial, open]);
 
   // Keep only digits; clamp to 8; clear error as user types
   const handleChangeDigits = (txt) => {
     const onlyDigits = txt.replace(/\D/g, "");
-    if (onlyDigits.length <= 8) setDigits(onlyDigits);
+    const next = onlyDigits.slice(0, 8); // clamp to 8
+    setDigits(next);
     if (err) setErr("");
   };
 
   // Validate + normalize, then save and close
   const save = () => {
     if (!name.trim()) {
-      return setErr(t("contact_editor.error_name_required", "Please enter a name."));
+      return setErr(
+        t("contact_editor.error_name_required", "Please enter a name.")
+      );
     }
     if (!isValidSGMobileDigits(digits)) {
       return setErr(
@@ -72,8 +72,12 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
     }
 
     const e164 = normalizeSGToE164(digits);
-    if (!e164) return setErr(t("contact_editor.error_number_invalid", "Invalid number."));
+    if (!e164)
+      return setErr(
+        t("contact_editor.error_number_invalid", "Invalid number.")
+      );
 
+    setErr("");
     onSave?.({
       id: initial?.id,
       name: name.trim(),
@@ -85,7 +89,12 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
 
   // UI
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={open}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       {/* Backdrop (tap to dismiss) */}
       <Pressable style={styles.backdrop} onPress={onClose} />
 
@@ -103,7 +112,10 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
         </Text>
         <TextInput
           value={name}
-          onChangeText={setName}
+          onChangeText={(v) => {
+            setName(v);
+            if (err) setErr("");
+          }}
           placeholder={t("contact_editor.placeholder_name", "e.g., Mom")}
           placeholderTextColor={theme.colors.subtext}
           style={[
@@ -113,12 +125,16 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
         />
 
         {/* Phone (+65 fixed prefix, 8 digits input) */}
-        <Text style={[styles.label, { color: theme.colors.subtext, marginTop: 10 }]}>
+        <Text
+          style={[styles.label, { color: theme.colors.subtext, marginTop: 10 }]}
+        >
           {t("contact_editor.label_mobile", "Mobile (Singapore only)")}
         </Text>
         <View style={styles.phoneRow}>
           <View style={[styles.prefix, { borderColor: theme.colors.subtext }]}>
-            <Text style={[styles.prefixText, { color: theme.colors.text }]}>+65</Text>
+            <Text style={[styles.prefixText, { color: theme.colors.text }]}>
+              +65
+            </Text>
           </View>
           <TextInput
             value={digits}
@@ -145,9 +161,15 @@ export default function ContactEditorModal({ open, onClose, onSave, initial }) {
           activeOpacity={0.9}
           style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
         >
-          <Text style={styles.primaryBtnText}>{t("contact_editor.save", "Save")}</Text>
+          <Text style={styles.primaryBtnText}>
+            {t("contact_editor.save", "Save")}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={onClose} activeOpacity={0.9} style={styles.secondaryBtn}>
+        <TouchableOpacity
+          onPress={onClose}
+          activeOpacity={0.9}
+          style={styles.secondaryBtn}
+        >
           <Text style={[styles.secondaryBtnText, { color: theme.colors.text }]}>
             {t("contact_editor.cancel", "Cancel")}
           </Text>
@@ -171,7 +193,12 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 6,
   },
-  title: { fontSize: 18, fontWeight: "900", marginBottom: 30, textAlign: "center" },
+  title: {
+    fontSize: 18,
+    fontWeight: "900",
+    marginBottom: 30,
+    textAlign: "center",
+  },
   label: { fontSize: 13, fontWeight: "800", marginBottom: 6 },
   input: {
     borderWidth: 1.5,
@@ -192,8 +219,18 @@ const styles = StyleSheet.create({
   prefixText: { fontWeight: "800" },
   flex1: { flex: 1 },
   err: { marginTop: 8, fontWeight: "700" },
-  primaryBtn: { marginTop: 30, borderRadius: 12, paddingVertical: 12, alignItems: "center" },
+  primaryBtn: {
+    marginTop: 30,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
   primaryBtnText: { color: "#fff", fontWeight: "900" },
-  secondaryBtn: { marginTop: 8, borderRadius: 12, paddingVertical: 10, alignItems: "center" },
+  secondaryBtn: {
+    marginTop: 8,
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
   secondaryBtnText: { fontWeight: "800" },
 });

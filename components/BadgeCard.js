@@ -9,11 +9,6 @@
  *  - Respect the active theme (colors passed in via `theme`).
  *  - Expose an accessible button surface with a meaningful label.
  *
- * Props:
- *  - item   : { id, title, desc, icon, progress (0–100), achieved (bool) }
- *  - theme  : theme object from ThemeProvider (expects .colors + .key)
- *  - onPress: function(item) → void (optional)
- *
  * Accessibility & Performance:
  *  - Uses accessibilityRole="button" and a readable accessibilityLabel.
  *  - Wrapped in React.memo to avoid unnecessary re-renders when props don't change.

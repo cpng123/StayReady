@@ -7,11 +7,6 @@
  *  - Visually highlight the active chip (activeId).
  *  - Call onChange(id) when a chip is tapped.
  *  - Respect light/dark theme colors.
- *
- * Props:
- *  - options: Array<{ id: string, label: string }>
- *  - activeId: string
- *  - onChange: (id: string) => void
  */
 
 import React from "react";

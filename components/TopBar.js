@@ -6,12 +6,6 @@
  *  - Render an iOS-like back chevron and call `onBack` when pressed.
  *  - Center the title and gracefully truncate long text.
  *  - Optionally show a right-side icon button and forward presses via `onRightPress`.
- *
- * Props:
- *  - title: string
- *  - onBack: function
- *  - rightIcon: Ionicons name (e.g., "refresh", "trash-outline") or null
- *  - onRightPress: function
  */
 
 import React from "react";

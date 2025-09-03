@@ -7,9 +7,6 @@
  *  - Emit value changes via onChangeText and support the "search" return key.
  *  - Optionally show a sort toggle button (swap-vertical icon) that calls onSortToggle.
  *  - Adapt container, border, and text colors based on the current theme.
- *
- * Props:
- *  - value, onChangeText, placeholder?, onSortToggle?, showSort=true
  */
 
 import React from "react";

@@ -7,15 +7,6 @@
  *  - Animate in when opened and animate out before unmount to avoid flicker.
  *  - Respect app theme (overlay, surfaces, text, primary color).
  *
- * Props:
- *  - visible: boolean
- *  - title?: string
- *  - message?: string
- *  - confirmLabel?: string
- *  - cancelLabel?: string
- *  - onConfirm?: () => void
- *  - onCancel?: () => void
- *
  * Notes:
  *  - Controlled component: parent owns `visible`; this component manages an
  *    internal `showing` flag to allow the close animation to finish.

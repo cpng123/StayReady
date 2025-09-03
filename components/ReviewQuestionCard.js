@@ -10,11 +10,6 @@
  *    else theme primary.
  *  - Expose a configurable action icon with active/inactive state.
  *  - Respect app theming via ThemeProvider.
- *
- * Props:
- *  - index, total, text, options, answerIndex, selectedIndex, timesUp
- *  - actionIcon, actionActive, actionIconColor, actionActiveColor
- *  - onActionPress, style
  */
 
 import React, { useMemo } from "react";

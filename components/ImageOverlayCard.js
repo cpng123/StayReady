@@ -8,14 +8,6 @@
  *  - Add a bottom area gradient (≈30% height) for text contrast.
  *  - Overlay a single-line title centered above the gradient.
  *  - Optionally handle presses when `onPress` is provided.
- *
- * Props:
- *  - title: string shown over the gradient
- *  - source: Image source (require(...) or { uri })
- *  - width, height: dimensions of the card (defaults: 180×120)
- *  - borderRadius: corner radius (default: 16)
- *  - onPress: optional press handler (touchable only if provided)
- *  - style: optional container style override
  */
 
 import React from "react";

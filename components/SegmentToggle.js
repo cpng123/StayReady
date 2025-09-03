@@ -6,11 +6,6 @@
  *  - Render options evenly in a rounded container.
  *  - Highlight the active option using the theme's primary color.
  *  - Emit onChange(id) when an option is tapped.
- *
- * Props:
- *  - options: Array<{ id: string, label: string, icon?: ReactNode }>
- *  - value:   string (currently selected id)
- *  - onChange: (id: string) => void
  */
 
 import React from "react";

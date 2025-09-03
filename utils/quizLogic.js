@@ -50,7 +50,7 @@ export const pickEncouragement = (t) => {
 
 // Map A/B/C/D → 0/1/2/3 (tolerant of case/spacing)
 export const letterToIndex = (k) =>
-  ({ A: 0, B: 1, C: 2, D: 3 }[String(k || "").toUpperCase()]);
+  ({ A: 0, B: 1, C: 2, D: 3 }[String(k || "").trim().toUpperCase()]);
 
 // Fisher–Yates shuffle while tracking the correct index
 export function shuffleWithAnswer(options, answerIndex) {

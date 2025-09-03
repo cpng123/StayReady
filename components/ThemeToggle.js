@@ -6,9 +6,6 @@
  *  - Reflect the current theme from ThemeProvider.
  *  - Persist changes via ThemeProvider’s setThemeKey (which already saves to storage).
  *  - Provide accessible buttons with clear labels and selected state.
- *
- * Props:
- *  - containerStyle (optional): style override for the outer wrapper.
  */
 
 import React from "react";

@@ -8,12 +8,6 @@
  *  - Auto-advance every 3.5 seconds and keep the active index in sync.
  *  - Merge optional per-key style overrides from the parent with base styles.
  *  - Emit a press callback when a tip card is tapped.
- *
- * Props:
- *  - tips: Array of tip objects (expects at least { id, categoryTitle, text }).
- *  - theme: Current theme object (uses theme.colors and theme.key).
- *  - styles: Optional partial style overrides (e.g. { tipCard, tipBar, ... }).
- *  - onPressTip: Function invoked with the tip item when a card is pressed.
  */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";

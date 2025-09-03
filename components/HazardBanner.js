@@ -7,14 +7,6 @@
  *  - Localize titles via i18n keys by hazard kind + severity.
  *  - Fall back gracefully to supplied hazard.title and “no hazard” state.
  *  - Respect the app theme for shadows/shape; use semantic colors for severity.
- *
- * Props:
- *  - hazard: { kind: 'none'|'flood'|'haze'|'dengue'|'wind'|'heat', title?, severity?, locationName? }
- *  - dateStr: human date string (e.g., "Mon, 7 July 2025")
- *  - timeAgoStr: relative time string (e.g., "10 min ago")
- *  - locLabel: explicit location label override (else uses hazard.locationName)
- *  - compact: boolean to reduce paddings/icon/text size
- *  - style: optional ViewStyle overrides for the banner container
  */
 
 import React, { useMemo } from "react";

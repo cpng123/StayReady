@@ -9,14 +9,6 @@
  *  - Offer primary (Share) and secondary (Close) actions when unlocked.
  *  - Respect theme colors and i18n strings supplied by the parent.
  *
- * Props:
- *  - open    : boolean (whether the modal is visible)
- *  - badge   : { title, desc, icon, achieved: bool }
- *  - onClose : () => void
- *  - onShare : () => void
- *  - theme   : ThemeProvider theme object (expects colors.card, colors.text, etc.)
- *  - t       : i18n translate fn
- *
  * Accessibility & UX:
  *  - Background overlay closes on tap (Pressable outside card).
  *  - Card area is inert to prevent accidental dismissal.

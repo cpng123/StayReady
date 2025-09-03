@@ -6,29 +6,6 @@
  *  - Rainfall, Wind, Temperature, Humidity, PM2.5 (circle markers)
  *  - Dengue clusters (polygons with an outline + badge labels)
  *  - Clinics (point markers)
- *
- * Props
- *  - lat, lon:            center position
- *  - height, zoom:        map dimensions/zoom
- *  - showMarker:          show a "You are here" marker
- *  - pins:                extra lat/lon pins [{lat,lon,label?}]
- *  - interactive:         enable gestures/zoom/keyboard
- *  - rainfallPoints, windPoints, tempPoints, humPoints, pmPoints: arrays of {lat,lon,value,name?}
- *  - dengueGeoJSON:       Feature/FeatureCollection
- *  - clinicsGeoJSON:      FeatureCollection of { geometry: Point, properties: { name, address, phone } }
- *  - overlay:             "rain" | "wind" | "temp" | "hum" | "pm" | "dengue" | "clinics"
- *  - legendBottom:        px offset from bottom
- *  - showLegend:          show/hide legend box
- *  - dark:                dark map tiles + dark-styled legend
- *
- * Fixes in this version
- *  - BUG: dengue badges failed because `latlng` was undefined.
- *         We now compute a center using layer.getBounds().getCenter() or point coords.
- *  - BUG: 'dengue-outline' pane is created and used properly (previously missing).
- *  - BUG: showOverlay now removes *all* overlay layers (incl. clinics & dengue outline)
- *         and clears dengue badges when switching away from dengue.
- *  - Bootstrap includes `updateClinics(...)` on first load.
- *  - Removed duplicated pane creation and cleaned up code/comments.
  */
 
 import React, {

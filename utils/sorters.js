@@ -19,15 +19,17 @@ export const REWARD_SORTS = ["Default", "Price ↑", "Price ↓"];
 export function sortBadges(items = [], modeIndex = 0) {
   if (modeIndex === 1) {
     // Unlocked first
-    return [...items].sort((a, b) =>
-      a.achieved === b.achieved ? 0 : b.achieved ? -1 : 1
-    );
+    return [...items].sort((a, b) => {
+      if (a.achieved === b.achieved) return 0;
+      return a.achieved ? -1 : 1; // true (unlocked) comes first
+    });
   }
   if (modeIndex === 2) {
     // Locked first
-    return [...items].sort((a, b) =>
-      a.achieved === b.achieved ? 0 : a.achieved ? 1 : -1
-    );
+    return [...items].sort((a, b) => {
+      if (a.achieved === b.achieved) return 0;
+      return a.achieved ? 1 : -1; // false (locked) comes first
+    });
   }
   // Default (no re-ordering)
   return items;

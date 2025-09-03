@@ -6,11 +6,6 @@
  *  - Render logo, title, and short description in a compact row.
  *  - Open the resource URL in the device browser on press (safe guard via canOpenURL).
  *  - Respect app theme colors and accept optional style overrides.
- *
- * Props:
- *  - item: { id, title, desc, url, logo }
- *  - theme: { colors: { card, text, subtext } }
- *  - style?: ViewStyle – container override
  */
 
 import React from "react";

@@ -1,5 +1,5 @@
 /**
- * File: utils/checklistStore.js
+ * File: utils/checklistStorage.js
  * Purpose: Persist the user's preparedness checklist progress (done/undone per item)
  *          in AsyncStorage and provide a helper to apply that state to UI sections.
  *

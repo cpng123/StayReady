@@ -8,13 +8,6 @@
  *  - Show set title and number of questions.
  *  - Trigger onPress from both the card and the play button.
  *  - Use ThemeProvider colors for light/dark modes.
- *
- * Props:
- *  - title: string
- *  - questionsCount: number (default 10)
- *  - thumbnail: ImageSource
- *  - onPress: () => void
- *  - style: ViewStyle
  */
 
 import React from "react";
