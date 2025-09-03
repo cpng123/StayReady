@@ -160,10 +160,8 @@ export function mapRainfallToPoints(json) {
   const stations = data.stations || [];
   const readings = data.readings || [];
   const unit = data.readingUnit || "mm";
-
   const ts = readings[0]?.timestamp || null;
   const list = readings[0]?.data || [];
-
   const stationById = new Map(stations.map((s) => [s.id || s.deviceId, s]));
   const points = list
     .map((r) => {
@@ -192,7 +190,6 @@ export function mapRainfallToPoints(json) {
       };
     })
     .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lon));
-
   return { timestamp: ts, unit, points };
 }
 

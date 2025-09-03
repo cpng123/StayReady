@@ -148,7 +148,7 @@ export default function BookmarkScreen() {
       <TopBar
         title={t("bookmarks.title", "Bookmarked Questions")}
         onBack={() => navigation.goBack()}
-        rightIcon={hasAny ? "trash-outline" : null}
+        rightIcon={hasAny ? "trash" : null}
         onRightPress={hasAny ? () => setResetConfirmOpen(true) : null}
       />
 

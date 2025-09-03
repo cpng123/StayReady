@@ -57,7 +57,6 @@ Notifications.setNotificationHandler({
 // Initialize OS-level notification plumbing (channels + permission)
 export async function initNotifications() {
   await _ensureLegacyEnabledTrue();
-
   // Android channel
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
@@ -68,7 +67,6 @@ export async function initNotifications() {
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
   }
-
   // Ask for permission (iOS; Android 13+ may also present a dialog)
   const perm = await Notifications.getPermissionsAsync();
   if (!perm.granted) await Notifications.requestPermissionsAsync();

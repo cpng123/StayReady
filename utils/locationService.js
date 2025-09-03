@@ -44,7 +44,6 @@ export async function getOneMapToken() {
     const exp = expRaw ? Number(expRaw) : 0;
     if (token && exp && Date.now() < exp) return token;
   } catch {}
-
   // Fetch new token from OneMap auth endpoint
   const res = await fetch(TOKEN_URL, {
     method: "POST",
@@ -52,15 +51,13 @@ export async function getOneMapToken() {
     body: JSON.stringify({ email: ONEMAP_EMAIL, password: ONEMAP_PASSWORD }),
   });
   const j = await res.json();
-
   // OneMap may return different field names across versions
   const token =
     j?.access_token || j?.token || j?.accessToken || j?.AccessToken || "";
   if (!token) throw new Error("OneMap token fetch failed");
-
   // Use server expiry when available; else refresh a bit early ourselves
   let expAt = Date.now() + REFRESH_EARLY_MS;
-  const serverExp = j?.expiry_timestamp || j?.expires_at || j?.expires_in; // seconds if number
+  const serverExp = j?.expiry_timestamp || j?.expires_at || j?.expires_in;
   if (serverExp) {
     if (typeof serverExp === "number") expAt = Date.now() + serverExp * 1000;
     else {
@@ -68,14 +65,12 @@ export async function getOneMapToken() {
       if (!Number.isNaN(t)) expAt = t;
     }
   }
-
   try {
     await AsyncStorage.multiSet([
       [K_TOKEN, token],
       [K_TOKEN_EXP, String(expAt)],
     ]);
   } catch {}
-
   return token;
 }
 

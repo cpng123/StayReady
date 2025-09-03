@@ -32,6 +32,6 @@ export async function getDeviceId() {
     return id;
   } catch (e) {
     console.warn("Failed to fetch device ID, generating fallback:", e);
-    return uuid(); // not persisted; will change on next run if SecureStore keeps failing
+    return uuid(); 
   }
 }

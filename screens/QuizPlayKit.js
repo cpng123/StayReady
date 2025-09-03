@@ -766,19 +766,6 @@ export function SettingsModal({
             <Switch value={hapticEnabled} onValueChange={setHapticEnabled} />
           </View>
 
-          {/* Notifications */}
-          <View style={[s.rowBetween, { marginBottom: 20 }]}>
-            <Text
-              style={[
-                s.modalBody,
-                { color: theme.colors.text, marginBottom: 0 },
-              ]}
-            >
-              {t("games.settings.notifications", "Flood alerts")}
-            </Text>
-            <Switch value={notifEnabled} onValueChange={onToggleNotif} />
-          </View>
-
           {/* Theme (kept via component that already manages state) */}
           <ThemeToggle />
 

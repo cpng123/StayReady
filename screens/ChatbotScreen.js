@@ -187,7 +187,6 @@ function emergencyCTAs() {
   return [
     { label: "Call 995 (Ambulance/SCDF)", tel: "995" },
     { label: "Call 999 (Police)", tel: "999" },
-    { label: "Open SOS", to: { screen: "SOSTab" } },
   ];
 }
 

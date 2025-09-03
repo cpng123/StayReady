@@ -71,7 +71,7 @@ const stableSetId = (meta = {}) => {
 // Add a completed attempt (type: 'set' | 'daily'); returns the entry we stored
 export async function addQuizAttempt({
   type = "set",
-  meta = {},            // { setId?, setTitle?, categoryId?, dayKey? }
+  meta = {},          
   correct = 0,
   total = 0,
   timeTakenSec = 0,
@@ -80,12 +80,10 @@ export async function addQuizAttempt({
 }) {
   const ts = typeof timestamp === "number" ? timestamp : Date.now();
   const percent = total > 0 ? Math.round((Number(correct) / Number(total)) * 100) : 0;
-
   // Unique key for “quiz taken”
   const sid = stableSetId(meta);
   const dailyKey = meta.dayKey || sid || dateKeyFromTs(ts);
   const key = type === "daily" ? `daily:${dailyKey}` : `set:${sid}`;
-
   const entry = {
     key,
     type,
@@ -102,10 +100,8 @@ export async function addQuizAttempt({
     date: dateKeyFromTs(ts),
     ts,
   };
-
   const all = await loadAttempts();
   all.push(entry);
-
   // Keep only the most recent 500
   const trimmed = all.sort((a, b) => b.ts - a.ts).slice(0, 500);
   await saveAttempts(trimmed);
@@ -150,10 +146,8 @@ export function computeDayStreak(attempts) {
 // Aggregate quick stats: unique sets taken, rolling accuracy (last 5), day streak
 export async function getStatsSummary() {
   const attempts = await getAllAttempts();
-
   const uniqueKeys = new Set(attempts.map((a) => a.key));
   const taken = uniqueKeys.size;
-
   const recent = attempts.slice(0, 5);
   const accuracy =
     recent.length > 0
@@ -161,7 +155,6 @@ export async function getStatsSummary() {
           recent.reduce((sum, a) => sum + (a.percent || 0), 0) / recent.length
         )
       : 0;
-
   const streak = computeDayStreak(attempts);
   return { taken, accuracy, streak };
 }

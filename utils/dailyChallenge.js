@@ -75,11 +75,10 @@ function dayKeyFor(date = new Date()) {
 }
 
 // Create or return today's normalized set (one random question per category)
-// Create or return today's normalized set (exactly DAILY_COUNT questions)
+// (exactly DAILY_COUNT questions)
 export async function getOrCreateDailySet(quizData) {
   const todayKey = dayKeyFor();
-
-  // 1) Try to reuse today's cached set
+  // Try to reuse today's cached set
   const raw = await AsyncStorage.getItem(DAILY_SET_KEY);
   if (raw) {
     try {
@@ -96,10 +95,7 @@ export async function getOrCreateDailySet(quizData) {
         }
         if (!statusOk) {
           const reset = {
-            dayKey: todayKey,
-            completed: false,
-            review: [],
-            meta: null,
+            dayKey: todayKey, completed: false, review: [], meta: null,
           };
           await AsyncStorage.setItem(DAILY_STATUS_KEY, JSON.stringify(reset));
         }
@@ -107,12 +103,9 @@ export async function getOrCreateDailySet(quizData) {
       }
     } catch {}
   }
-
-  // 2) Build a fresh set (pick DAILY_COUNT usable categories deterministically)
+  // Build a fresh set (pick DAILY_COUNT usable categories deterministically)
   const allCategories = Array.isArray(quizData?.categories)
-    ? quizData.categories
-    : [];
-
+    ? quizData.categories : [];
   // Only categories that actually have at least one set with at least one question
   const usableCats = allCategories.filter((cat) => {
     const sets = Array.isArray(cat.sets) ? cat.sets : [];
@@ -120,38 +113,28 @@ export async function getOrCreateDailySet(quizData) {
       (s) => Array.isArray(s.questions) && s.questions.length > 0
     );
   });
-
   // Deterministic shuffle based on todayKey, then take the first DAILY_COUNT
   const pickedCats = seededShuffle(usableCats, todayKey).slice(0, DAILY_COUNT);
-
   const questions = [];
   for (const cat of pickedCats) {
     const sets = Array.isArray(cat.sets) ? cat.sets : [];
     // Deterministic pick of a set within the category
     const rndSet = prng(hashString(`${todayKey}:${cat.id}:set`));
     const set = sets[Math.floor(rndSet() * sets.length)];
-
     const qArr = Array.isArray(set.questions) ? set.questions : [];
     // Deterministic pick of a question within the set
     const rndQ = prng(hashString(`${todayKey}:${cat.id}:${set.id}:q`));
     const q = qArr[Math.floor(rndQ() * qArr.length)];
-
     // Normalize options (string array) and answerIndex
     const options =
       q.options?.map((o) => (typeof o === "string" ? o : o?.text ?? "")) ?? [];
-
     let answerIndex =
       typeof q.correctIndex === "number"
-        ? q.correctIndex
-        : typeof q.answerIndex === "number"
-        ? q.answerIndex
-        : typeof q.answer === "number"
-        ? q.answer
-        : typeof q.correct === "number"
-        ? q.correct
-        : 0;
+        ? q.correctIndex : typeof q.answerIndex === "number"
+        ? q.answerIndex : typeof q.answer === "number"
+        ? q.answer : typeof q.correct === "number"
+        ? q.correct : 0;
     if (!(answerIndex >= 0 && answerIndex < options.length)) answerIndex = 0;
-
     questions.push({
       id: q.id ?? `${cat.id}-${set.id}-${questions.length}`,
       categoryId: cat.id,
@@ -159,21 +142,16 @@ export async function getOrCreateDailySet(quizData) {
       setId: set.id,
       setTitle: set.title,
       text:
-        q.text ||
-        q.question ||
-        q.prompt ||
-        q.title ||
+        q.text || q.question || q.prompt || q.title ||
         `Question ${questions.length + 1}`,
       options,
       answerIndex,
     });
   }
-
-  // 3) Persist the new set for today
+  // Persist the new set for today
   const payload = { dayKey: todayKey, questions };
   await AsyncStorage.setItem(DAILY_SET_KEY, JSON.stringify(payload));
-
-  // 4) Ensure status exists for today (reset if it was from a previous day)
+  // Ensure status exists for today (reset if it was from a previous day)
   const statusRaw = await AsyncStorage.getItem(DAILY_STATUS_KEY);
   let needsReset = true;
   if (statusRaw) {
@@ -186,14 +164,10 @@ export async function getOrCreateDailySet(quizData) {
   }
   if (needsReset) {
     const reset = {
-      dayKey: todayKey,
-      completed: false,
-      review: [],
-      meta: null,
+      dayKey: todayKey, completed: false, review: [], meta: null,
     };
     await AsyncStorage.setItem(DAILY_STATUS_KEY, JSON.stringify(reset));
   }
-
   return payload;
 }
 
