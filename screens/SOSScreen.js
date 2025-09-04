@@ -288,6 +288,7 @@ export default function SOSScreen() {
           />
 
           <TouchableOpacity
+            testID="sos-button"
             activeOpacity={0.9}
             onPress={onTap}
             delayLongPress={450}

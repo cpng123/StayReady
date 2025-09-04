@@ -149,9 +149,13 @@ export default function SplashScreen({ navigation }) {
 
   // Render
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.appBg }]}>
+    <View
+      testID="splash-root"
+      style={[styles.container, { backgroundColor: theme.colors.appBg }]}
+    >
       {/* Animated logo (rise → bounce, fade in) */}
       <Animated.Image
+        testID="splash-logo"
         source={require("../assets/logo.png")}
         style={[
           styles.logo,
@@ -162,6 +166,7 @@ export default function SplashScreen({ navigation }) {
 
       {/* Animated app name (fade + scale) */}
       <Animated.Text
+        testID="splash-title"
         style={[
           styles.appName,
           { opacity: textOpacity, transform: [{ scale: textScale }] },

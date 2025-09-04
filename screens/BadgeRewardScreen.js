@@ -195,7 +195,7 @@ export default function BadgeRewardScreen() {
           </Text>
 
           {/* Sort (right) */}
-          <Pressable onPress={cycleSort} style={s.sortBtn} hitSlop={10}>
+          <Pressable testID="sort-btn" onPress={cycleSort} style={s.sortBtn} hitSlop={10}>
             <Ionicons name="swap-vertical" size={18} color="#fff" />
           </Pressable>
 

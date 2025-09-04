@@ -22,14 +22,14 @@ const realNow = Date.now;
 
 // freeze “now”
 const BASE_NOW = new Date("2025-09-03T12:00:00+08:00").getTime(); // SG time
-
+jest.useFakeTimers();
+jest.setSystemTime(new Date("2025-09-03T12:00:00+08:00"));
 beforeAll(() => {
-  Date.now = () => BASE_NOW;
   // Keep Date constructor functional; we don't need to fully freeze Date here
 });
 
 afterAll(() => {
-  Date.now = realNow;
+  jest.useRealTimers();
 });
 
 // Small helper to make a local timestamp N days ago (noon SG time)
