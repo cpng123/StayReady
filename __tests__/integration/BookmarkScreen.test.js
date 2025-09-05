@@ -1,8 +1,3 @@
-/**
- * __tests__/integration/BookmarkScreen.test.js
- * Integration tests for BookmarkScreen.
- */
-
 jest.useFakeTimers({ legacyFakeTimers: true });
 
 /* ---------------- Native shims (match SettingsScreen test) ---------------- */
@@ -289,7 +284,6 @@ jest.mock("../../components/SearchRow", () => {
 });
 
 jest.mock("../../components/FilterChips", () => {
-  const React = require("react");
   const { View, Pressable, Text } = require("react-native");
   return ({ options, activeId, onChange }) => (
     <View>
@@ -309,7 +303,6 @@ jest.mock("../../components/FilterChips", () => {
 });
 
 jest.mock("../../components/ReviewQuestionCard", () => {
-  const React = require("react");
   const { View, Text, Pressable } = require("react-native");
   return ({ text, onActionPress, index, total, style, actionIcon = "del" }) => (
     <View
@@ -326,7 +319,6 @@ jest.mock("../../components/ReviewQuestionCard", () => {
 });
 
 jest.mock("../../components/ConfirmModal", () => {
-  const React = require("react");
   const { View, Text, Pressable } = require("react-native");
   return ({
     visible,

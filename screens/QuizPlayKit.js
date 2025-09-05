@@ -85,7 +85,7 @@ export function useSound() {
           ),
           Audio.Sound.createAsync(require("../assets/Sound/correct.mp3")),
           Audio.Sound.createAsync(require("../assets/Sound/wrong.mp3")),
-          Audio.Sound.createAsync(require("../assets/Sound/times-up.mp3"))
+          Audio.Sound.createAsync(require("../assets/Sound/times-up.mp3")),
         ]);
 
         if (!mounted) {
@@ -288,7 +288,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
   };
 
   const [timesUp, setTimesUp] = useState(false);
-  const readyRef = useRef(false);
+  const [isReady, setIsReady] = useState(false);
   const revealTimeoutRef = useRef(null);
 
   const [toast, setToast] = useState(null);
@@ -302,13 +302,13 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       Animated.timing(toastY, {
         toValue: 0,
         duration: 220,
-        useNativeDriver: true,
+        useNativeDriver: false,
         easing: Easing.out(Easing.cubic),
       }),
       Animated.timing(toastOpacity, {
         toValue: 1,
         duration: 220,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start();
   };
@@ -317,13 +317,13 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       Animated.timing(toastY, {
         toValue: 60,
         duration: 180,
-        useNativeDriver: true,
+        useNativeDriver: false,
         easing: Easing.in(Easing.cubic),
       }),
       Animated.timing(toastOpacity, {
         toValue: 0,
         duration: 180,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start(() => setToast(null));
   };
@@ -347,7 +347,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
   }, []);
 
   useEffect(() => {
-    readyRef.current = false;
+    setIsReady(false);
     stopAllTimers();
     clearTimeout(revealTimeoutRef.current);
 
@@ -363,7 +363,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
 
     startBar();
     const readyTimeout = setTimeout(() => {
-      readyRef.current = true;
+      setIsReady(true);
     }, 100);
 
     return () => {
@@ -378,7 +378,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
   }, [trackW]);
 
   useEffect(() => {
-    if (!readyRef.current) return;
+    if (!isReady) return;
     if (time === 0 && !locked) {
       setLocked(true);
       setTimesUp(true);
@@ -392,7 +392,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       });
       revealTimeoutRef.current = setTimeout(goNext, REVEAL_DELAY_MS);
     }
-  }, [time, locked]);
+  }, [time, locked, isReady]);
 
   const choose = (i) => {
     if (locked || timesUp) return;
@@ -405,7 +405,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
     if (isCorrect) {
       const xp = computeXp(time, QUESTION_SECONDS);
 
-      // ✅ Update state AND refs in sync
+      // Update state AND refs in sync
       setScore((s0) => {
         const next = s0 + xp;
         scoreRef.current = next;
@@ -469,7 +469,7 @@ export function useQuizEngine({ questions = [], sfx, haptics, onFinish }) {
       current.answerIndex,
       selected,
       locked,
-      timesUp && readyRef.current
+      timesUp && isReady
     );
 
   return {
@@ -561,7 +561,7 @@ export function TimerBar({ barW, onLayout, time }) {
    - Expose selected/disabled state
    - This improves screen-reader navigation & clarity
 */
-export function OptionItem({ text, flags, disabled, onPress }) {
+export function OptionItem({ text, flags, disabled, onPress, ...rest }) {
   const { theme } = useThemeContext();
   const s = useMemo(() => makeStyles(theme), [theme]);
 
@@ -583,14 +583,23 @@ export function OptionItem({ text, flags, disabled, onPress }) {
 
   return (
     <TouchableOpacity
+      {...rest}
       activeOpacity={disabled ? 1 : 0.9}
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"                          // CHG
+      accessibilityRole="button" // CHG
       accessibilityState={{ disabled: !!disabled, selected: !!flags.showBlue }} // CHG
       style={[s.option, { borderColor }]}
     >
-      <Text style={[s.optText, { color: textColor }]}>{text}</Text>
+      <Text
+        style={[s.optText, { color: textColor }]}
+        accessibilityState={{
+          disabled: !!disabled,
+          selected: !!flags.showBlue,
+        }}
+      >
+        {text}
+      </Text>{" "}
       <View style={s.rightSlot}>
         {flags.showGreen && (
           <View style={[s.resultBadge, { backgroundColor: "#16A34A" }]}>

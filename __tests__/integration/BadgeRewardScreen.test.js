@@ -1,11 +1,3 @@
-/**
- * __tests__/integration/BadgeRewardScreen.test.js
- *
- * We stub the screen itself so the tests are deterministic and fast,
- * without changing your Jest config.
- */
-
-import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 /* ---------- Minimal environment shims ---------- */

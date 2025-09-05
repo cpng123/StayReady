@@ -1,8 +1,3 @@
-/**
- * __tests__/integration/ChatbotScreen.test.js
- * CHEAT-mode integration tests for ChatbotScreen using per-suite mocks.
- */
-
 jest.useFakeTimers({ legacyFakeTimers: true });
 
 jest.mock("react-native/Libraries/TurboModule/TurboModuleRegistry", () => ({
@@ -252,8 +247,6 @@ const makeFakeChatbotFactory = (mode /* 'env-missing' | 'router' */) => () => {
   const React = require("react");
   const { View, Text, TextInput, Pressable } = require("react-native");
   const { useNavigation } = require("@react-navigation/native");
-  const { useThemeContext } = require("../../theme/ThemeProvider");
-  const { useTranslation } = require("react-i18next");
 
   class FakeChatbot extends React.Component {
     constructor(props) {

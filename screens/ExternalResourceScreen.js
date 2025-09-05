@@ -105,14 +105,20 @@ export default function ExternalResourceScreen({ navigation }) {
 
     // Sort: updated (if provided) then title
     rows.sort((a, b) => {
-      const ua = a.updated || "";
-      const ub = b.updated || "";
-      if (ua && ub && ua !== ub) {
-        // String compare is OK when format is ISO-ish; otherwise this becomes
-        // a stable lexical ordering (better than nothing).
+      const ua = a.updated?.trim() || "";
+      const ub = b.updated?.trim() || "";
+      const ha = Boolean(ua);
+      const hb = Boolean(ub);
+
+      // Always put items WITH a date before items WITHOUT a date
+      if (ha !== hb) return ha ? -1 : 1;
+
+      // When both have dates, order by date (desc/asc)
+      if (ha && hb && ua !== ub) {
         return sortDesc ? ub.localeCompare(ua) : ua.localeCompare(ub);
       }
-      // Tiebreaker by title
+
+      // Dates equal or both missing: fall back to title; let toggle flip order
       return sortDesc
         ? (a.title || "").localeCompare(b.title || "")
         : (b.title || "").localeCompare(a.title || "");

@@ -1,9 +1,3 @@
-/**
- * __tests__/integration/SOSScreen.test.js
- * Integration tests for SOSScreen.
- */
-
-import React from "react";
 import { act, fireEvent, render } from "@testing-library/react-native";
 
 jest.mock('../../assets/Sound/alert.mp3', () => 1);

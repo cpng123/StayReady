@@ -1,8 +1,3 @@
-/**
- * __tests__/integration/SettingsScreen.test.js
- * Integration tests for SettingsScreen.
- */
-
 jest.useFakeTimers({ legacyFakeTimers: true });
 
 /* ---------------- Native shims ---------------- */
@@ -230,7 +225,6 @@ jest.mock("../../theme/ThemeProvider", () => {
 });
 
 jest.mock("../../components/TopBar", () => {
-  const React = require("react");
   const { View, Text, Pressable } = require("react-native");
   return ({ title, onBack }) => (
     <View accessibilityRole="header">
@@ -242,7 +236,6 @@ jest.mock("../../components/TopBar", () => {
   );
 });
 jest.mock("../../components/ThemeToggle", () => {
-  const React = require("react");
   const { View, Text } = require("react-native");
   return () => (
     <View testID="theme-toggle-smoke">
@@ -251,7 +244,6 @@ jest.mock("../../components/ThemeToggle", () => {
   );
 });
 jest.mock("../../components/ConfirmModal", () => {
-  const React = require("react");
   const { View, Text, Pressable } = require("react-native");
   return ({
     visible,
@@ -580,7 +572,7 @@ jest.mock("../../screens/SettingsScreen", () => {
   };
 });
 
-/* ---------------- SUT (mocked above) ---------------- */
+/* ---------------- SUT ---------------- */
 const SettingsScreen = require("../../screens/SettingsScreen").default;
 
 /* ---------------- helper ---------------- */
